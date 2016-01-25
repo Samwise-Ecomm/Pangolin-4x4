@@ -63,7 +63,15 @@
 			<div id="SideNav">
 				<div id="Search"></div>
 				<div id="Cart"></div>
-				SIDE NAVIGATION
+				<br>
+				@foreach ($catalogs as $catalog)
+					@if ($catalog['label'])
+						<b>{{ $catalog['name'] }}</b>
+					@else
+						<a href="/catalog/{{ makeSlug($catalog['name']) }}">{{ $catalog['name'] }}</a>
+					@endif
+					<br><br>
+				@endforeach
 			</div>
 		</div>
 	</div>
