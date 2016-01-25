@@ -40,7 +40,7 @@
 							<a href='{{ $link['path'] }}'>{{ $link['name'] }}</a>
 						@endif
 
-						@if ($link !== $menu['header']->last())
+						@if ($link !== end($menu['header']))
 							 | 
 						@endif
 					@endforeach
@@ -77,7 +77,7 @@
 					<a href='{{ $link['path'] }}'>{{ $link['name'] }}</a>
 				@endif
 
-				@if ($link !== $menu['footer']->last())
+				@if ($link !== end($menu['footer']))
 					 | 
 				@endif
 			@endforeach
