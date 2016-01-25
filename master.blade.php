@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-	<title>P4x4: {{ $page['name'] }}</title>
+	<title>P4x4: @yield('title')</title>
 
 	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,100' type='text/css'>
 	<link rel="stylesheet" href="/css/store/template.css">
@@ -25,8 +25,8 @@
 				</a>
 				<div id="Head-contact">
 					For questions and ordering<br>
-					Call us at <span class="u-active">{{ $phone }}</span><br>
-					Or email us at <span class="u-active">{{ $email }}</span>
+					Call us at <span class="u-active">{{ $settings['phone'] }}</span><br>
+					Or email us at <span class="u-active">{{ $settings['email'] }}</span>
 				</div>
 			</div>
 		</div>
@@ -34,7 +34,7 @@
 			<div class="u-contentWrapper">
 				<div id="Head-menu" class="u-inverted">
 					@foreach ($menu['header'] as $link)
-						@if ($link['id'] == $page['id'])
+						@if (isset($page) && $link['id'] == $page['id'])
 							<span class='u-highlight'>{{ $link['name'] }}</span>
 						@else
 							<a href='{{ $link['path'] }}'>{{ $link['name'] }}</a>
@@ -55,20 +55,17 @@
 	<div id="Body">
 		<div id="Body-column" class="u-contentWrapper">
 			<div id="Body-content">
-				@if (isset($page['content']))
-					{!! $page['content'] !!}
-				@else
-				@endif
+				@yield('content')
 			</div>
 			<div id="SideNav">
 				<div id="Search"></div>
 				<div id="Cart"></div>
 				<br>
-				@foreach ($catalogs as $catalog)
-					@if ($catalog['label'])
-						<b>{{ $catalog['name'] }}</b>
+				@foreach ($menu['sidebar'] as $link)
+					@if ($link['label'])
+						<b>{{ $link['name'] }}</b>
 					@else
-						<a href="/catalog/{{ makeSlug($catalog['name']) }}">{{ $catalog['name'] }}</a>
+						<a href="/catalog/{{ makeSlug($link['name']) }}">{{ $link['name'] }}</a>
 					@endif
 					<br><br>
 				@endforeach
@@ -79,7 +76,7 @@
 		<div id="Foot-blackBar"></div>
 		<div id="Foot-navBar">
 			@foreach ($menu['footer'] as $link)
-				@if ($link['id'] == 1)
+				@if (isset($page) && $link['id'] == $page['id'])
 					<span class='u-highlight'>{{ $link['name'] }}</span>
 				@else
 					<a href='{{ $link['path'] }}'>{{ $link['name'] }}</a>
@@ -90,7 +87,7 @@
 				@endif
 			@endforeach
 			<br>
-			{{ $copyright }}
+			{{ $settings['copyright'] }}
 		</div>
 	</div>
 
