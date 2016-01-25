@@ -92,13 +92,16 @@ b hr {
   border-bottom: 1px solid #252525; }
 
 h1 {
+  font-weight: 500;
   font-size: 25px; }
 
 h2 {
+  font-weight: 500;
   font-size: 20px;
   color: #dd8131; }
 
 h3 {
+  font-weight: 500;
   font-size: 20px; }
 
 h4 {
@@ -106,6 +109,7 @@ h4 {
   font-weight: 100; }
 
 h5 {
+  font-weight: 500;
   font-size: 17px; }
 
 h6 {
@@ -1026,3 +1030,36 @@ i.resize {
   display: inline-block; }
 
 /*# sourceMappingURL=template.css.map */
+
+
+/* NEW STUFF */
+.u-width400 select {
+  width: 380px !important;
+}
+
+label.Checkbox:hover {
+  cursor: pointer;
+  color: #dd8131;
+}
+
+label.Checkbox input {
+  position: fixed;
+  left: -10000px;
+}
+
+ul.u-cols-3 {
+  -webkit-columns: 3;
+  -moz-columns: 3;
+  columns: 3;
+}
+
+ul.u-cols-2 {
+  -webkit-columns: 2;
+  -moz-columns: 2;
+  columns: 2;
+}
+
+li.u-active:hover {
+  cursor: pointer;
+  color: #dd8131;
+}

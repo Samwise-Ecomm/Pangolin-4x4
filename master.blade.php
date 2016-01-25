@@ -4,15 +4,16 @@
     <meta charset="utf-8">
 	<title>P4x4: @yield('title')</title>
 
-	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,100' type='text/css'>
+	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:500,400,100' type='text/css'>
 	<link rel="stylesheet" href="/css/store/template.css">
 	<link rel="stylesheet" href="/css/store/font-awesome.min.css">
 	<link rel="stylesheet" href="/css/store/lightbox.css">
 
 	<script src="/js/store/jquery.min.js"></script>
 	<script src="/js/store/lightbox.min.js"></script>
-	<script src="/js/store/cart.js"></script>
-	<script src="/js/store/debounce.min.js"></script>
+	<script src="/js/store/vue.js"></script>
+	{{-- <script src="/js/store/cart.js"></script>
+	<script src="/js/store/debounce.min.js"></script> --}}
 
 </head>
 <body class="search"> {{-- or noSearch --}}
@@ -92,5 +93,6 @@
 	</div>
 
 	<script src="/js/store/init.js"></script>
+	@yield('scripts')
 </body>
 </html>

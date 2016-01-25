@@ -4,50 +4,49 @@ function resizeContent() {
 }
 
 $(document).ready( function() {
-	resizeContent();
-	cleanCart();
-	connectCatalog();
+	resizeContent()
+	// cleanCart();
+	// connectCatalog();
 
 	$(window).resize(function() {
-		resizeContent();
+		resizeContent()
 	})
 
 	// Check for catalog divs and fill them with catalog is present
-	$('.catalog').each(function() {
-		var catalog = $(this);
+	// $('.catalog').each(function() {
+	// 	var catalog = $(this);
 
-		if (typeof catalog.data('tags') != 'undefined') {
-			var tags = catalog.data('tags');
+	// 	if (typeof catalog.data('tags') != 'undefined') {
+	// 		var tags = catalog.data('tags');
 
-		} else {
-			var tags = 'null';
-			console.log(tags);
-		}
+	// 	} else {
+	// 		var tags = 'null';
+	// 	}
 		
-		if (typeof catalog.data('limit') != 'undefined') {
-			var limit = catalog.data('limit');
-		} else {
-			var limit = 'null';
-		}
+	// 	if (typeof catalog.data('limit') != 'undefined') {
+	// 		var limit = catalog.data('limit');
+	// 	} else {
+	// 		var limit = 'null';
+	// 	}
 
-		if (typeof catalog.data('recentdays') != 'undefined') {
-			var recentDays = catalog.data('recentdays');
-		} else {
-			var recentDays = 'null';
-		}
-		console.log(tags);
-		$.ajax({
-			type: "POST",
-			url: "/inc/echoCatalog.php",
-			data: { tags : tags, limit, limit, recentDays, recentDays },
-			success: function(data) {
-				catalog.html(data);
-				connectCatalog();
-			}
-		});
-	})
+	// 	if (typeof catalog.data('recentdays') != 'undefined') {
+	// 		var recentDays = catalog.data('recentdays');
+	// 	} else {
+	// 		var recentDays = 'null';
+	// 	}
+	// 	console.log(tags);
+	// 	$.ajax({
+	// 		type: "POST",
+	// 		url: "/inc/echoCatalog.php",
+	// 		data: { tags : tags, limit, limit, recentDays, recentDays },
+	// 		success: function(data) {
+	// 			catalog.html(data);
+	// 			connectCatalog();
+	// 		}
+	// 	});
+	// })
 
-	$('#Head-searchInput').keyup( $.debounce( 500, search ) )
+	// $('#Head-searchInput').keyup( $.debounce( 500, search ) )
 	// $('#Head-searchInput').keyup( $.debounce( 2500, store ) )
 
 	// function store() {
@@ -62,21 +61,21 @@ $(document).ready( function() {
 	// 	}
 	// }
 
-	function search() {
-		var q = $('#Head-searchInput').val() // Query
+	// function search() {
+	// 	var q = $('#Head-searchInput').val() // Query
 		
-		if (q == '') {
-			$('#Search').html('')
-		} else {
-			$.ajax({
-				type: "POST",
-				url: "/inc/search.php",
-				data: { q : q },
-				success: function(data) {
+	// 	if (q == '') {
+	// 		$('#Search').html('')
+	// 	} else {
+	// 		$.ajax({
+	// 			type: "POST",
+	// 			url: "/inc/search.php",
+	// 			data: { q : q },
+	// 			success: function(data) {
 
-					$('#Search').html(data)
-				}
-			});
-		}
-	}
+	// 				$('#Search').html(data)
+	// 			}
+	// 		});
+	// 	}
+	// }
 })
