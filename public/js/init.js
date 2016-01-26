@@ -1,16 +1,16 @@
-function resizeContent() {
-	minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
-	$('#Body-column').css('min-height', minHeight+'px');
-}
+// function resizeContent() {
+// 	minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
+// 	$('#Body-column').css('min-height', minHeight+'px');
+// }
 
-$(document).ready( function() {
-	resizeContent()
-	// cleanCart();
-	// connectCatalog();
+// $(document).ready( function() {
+// 	resizeContent()
+// 	// cleanCart();
+// 	// connectCatalog();
 
-	$(window).resize(function() {
-		resizeContent()
-	})
+// 	$(window).resize(function() {
+// 		resizeContent()
+// 	})
 
 	// Check for catalog divs and fill them with catalog is present
 	// $('.catalog').each(function() {

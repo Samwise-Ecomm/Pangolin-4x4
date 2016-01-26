@@ -86,9 +86,12 @@ select::-ms-expand {
 }
 
 body {
+	background-color: $light;
+}
+
+.wrapper {
 	width: 100%;
 	display: table;
-	background-color: $light;
 }
 
 a {
@@ -1217,4 +1220,36 @@ i.resize {
 
 .js-formWarn.isShown {
 	display: inline-block;
+}
+
+/* NEW STUFF */
+.u-width400 select {
+  width: 380px !important;
+}
+
+label.Checkbox:hover {
+  cursor: pointer;
+  color: #dd8131;
+}
+
+label.Checkbox input {
+  position: fixed;
+  left: -10000px;
+}
+
+ul.u-cols-3 {
+  -webkit-columns: 3;
+  -moz-columns: 3;
+  columns: 3;
+}
+
+ul.u-cols-2 {
+  -webkit-columns: 2;
+  -moz-columns: 2;
+  columns: 2;
+}
+
+li.u-active:hover {
+  cursor: pointer;
+  color: #dd8131;
 }
