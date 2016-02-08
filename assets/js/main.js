@@ -8,6 +8,8 @@ Vue.use(VueResource)
 var App 			=	require('./app.vue')
 var Page 			= require('./pages/page.vue')
 var Catalog 	= require('./pages/catalog.vue')
+var Checkout 	= require('./pages/checkout.vue')
+var Item 			= require('./pages/item.vue')
 
 // Set up routing and match routes to components
 var router = new VueRouter({
@@ -19,12 +21,23 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content')
 Vue.config.debug = true
 
 router.map({
+	'item/:id': {
+		component: Item
+	},
 	'catalog/:id': {
 		component: Catalog
+	},
+	'checkout/:step': {
+		component: Checkout
 	},
 	'*': {
 		component: Page
 	},
+})
+
+router.beforeEach(function (transition) {
+	transition.to.router.app.search = true
+	transition.next()
 })
 
 // Jquery watcher to modify div positioning on scroll
@@ -39,5 +52,4 @@ $(window).resize(function(){
 	resizeWindow()
 })
 
-console.log(Vue.http.options)
 router.start(App, '#app')

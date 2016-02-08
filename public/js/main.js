@@ -1,4 +1,200 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/assign"), __esModule: true };
+},{"core-js/library/fn/object/assign":3}],2:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
+},{"core-js/library/fn/object/keys":4}],3:[function(require,module,exports){
+require('../../modules/es6.object.assign');
+module.exports = require('../../modules/$.core').Object.assign;
+},{"../../modules/$.core":7,"../../modules/es6.object.assign":18}],4:[function(require,module,exports){
+require('../../modules/es6.object.keys');
+module.exports = require('../../modules/$.core').Object.keys;
+},{"../../modules/$.core":7,"../../modules/es6.object.keys":19}],5:[function(require,module,exports){
+module.exports = function(it){
+  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+  return it;
+};
+},{}],6:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = function(it){
+  return toString.call(it).slice(8, -1);
+};
+},{}],7:[function(require,module,exports){
+var core = module.exports = {version: '1.2.6'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+},{}],8:[function(require,module,exports){
+// optional / simple context binding
+var aFunction = require('./$.a-function');
+module.exports = function(fn, that, length){
+  aFunction(fn);
+  if(that === undefined)return fn;
+  switch(length){
+    case 1: return function(a){
+      return fn.call(that, a);
+    };
+    case 2: return function(a, b){
+      return fn.call(that, a, b);
+    };
+    case 3: return function(a, b, c){
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function(/* ...args */){
+    return fn.apply(that, arguments);
+  };
+};
+},{"./$.a-function":5}],9:[function(require,module,exports){
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+},{}],10:[function(require,module,exports){
+var global    = require('./$.global')
+  , core      = require('./$.core')
+  , ctx       = require('./$.ctx')
+  , PROTOTYPE = 'prototype';
+
+var $export = function(type, name, source){
+  var IS_FORCED = type & $export.F
+    , IS_GLOBAL = type & $export.G
+    , IS_STATIC = type & $export.S
+    , IS_PROTO  = type & $export.P
+    , IS_BIND   = type & $export.B
+    , IS_WRAP   = type & $export.W
+    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+    , key, own, out;
+  if(IS_GLOBAL)source = name;
+  for(key in source){
+    // contains in native
+    own = !IS_FORCED && target && key in target;
+    if(own && key in exports)continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function(C){
+      var F = function(param){
+        return this instanceof C ? new C(param) : C(param);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+  }
+};
+// type bitmap
+$export.F = 1;  // forced
+$export.G = 2;  // global
+$export.S = 4;  // static
+$export.P = 8;  // proto
+$export.B = 16; // bind
+$export.W = 32; // wrap
+module.exports = $export;
+},{"./$.core":7,"./$.ctx":8,"./$.global":12}],11:[function(require,module,exports){
+module.exports = function(exec){
+  try {
+    return !!exec();
+  } catch(e){
+    return true;
+  }
+};
+},{}],12:[function(require,module,exports){
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+},{}],13:[function(require,module,exports){
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = require('./$.cof');
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+  return cof(it) == 'String' ? it.split('') : Object(it);
+};
+},{"./$.cof":6}],14:[function(require,module,exports){
+var $Object = Object;
+module.exports = {
+  create:     $Object.create,
+  getProto:   $Object.getPrototypeOf,
+  isEnum:     {}.propertyIsEnumerable,
+  getDesc:    $Object.getOwnPropertyDescriptor,
+  setDesc:    $Object.defineProperty,
+  setDescs:   $Object.defineProperties,
+  getKeys:    $Object.keys,
+  getNames:   $Object.getOwnPropertyNames,
+  getSymbols: $Object.getOwnPropertySymbols,
+  each:       [].forEach
+};
+},{}],15:[function(require,module,exports){
+// 19.1.2.1 Object.assign(target, source, ...)
+var $        = require('./$')
+  , toObject = require('./$.to-object')
+  , IObject  = require('./$.iobject');
+
+// should work with symbols and should have deterministic property order (V8 bug)
+module.exports = require('./$.fails')(function(){
+  var a = Object.assign
+    , A = {}
+    , B = {}
+    , S = Symbol()
+    , K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function(k){ B[k] = k; });
+  return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
+}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
+  var T     = toObject(target)
+    , $$    = arguments
+    , $$len = $$.length
+    , index = 1
+    , getKeys    = $.getKeys
+    , getSymbols = $.getSymbols
+    , isEnum     = $.isEnum;
+  while($$len > index){
+    var S      = IObject($$[index++])
+      , keys   = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S)
+      , length = keys.length
+      , j      = 0
+      , key;
+    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
+  }
+  return T;
+} : Object.assign;
+},{"./$":14,"./$.fails":11,"./$.iobject":13,"./$.to-object":17}],16:[function(require,module,exports){
+// most Object methods by ES6 should accept primitives
+var $export = require('./$.export')
+  , core    = require('./$.core')
+  , fails   = require('./$.fails');
+module.exports = function(KEY, exec){
+  var fn  = (core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
+};
+},{"./$.core":7,"./$.export":10,"./$.fails":11}],17:[function(require,module,exports){
+// 7.1.13 ToObject(argument)
+var defined = require('./$.defined');
+module.exports = function(it){
+  return Object(defined(it));
+};
+},{"./$.defined":9}],18:[function(require,module,exports){
+// 19.1.3.1 Object.assign(target, source)
+var $export = require('./$.export');
+
+$export($export.S + $export.F, 'Object', {assign: require('./$.object-assign')});
+},{"./$.export":10,"./$.object-assign":15}],19:[function(require,module,exports){
+// 19.1.2.14 Object.keys(O)
+var toObject = require('./$.to-object');
+
+require('./$.object-sap')('keys', function($keys){
+  return function keys(it){
+    return $keys(toObject(it));
+  };
+});
+},{"./$.object-sap":16,"./$.to-object":17}],20:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -91,7 +287,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],2:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -332,7 +528,7 @@ function format (id) {
   return id.match(/[^\/]+\.vue$/)[0]
 }
 
-},{}],3:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /**
  * Before Interceptor.
  */
@@ -352,7 +548,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],4:[function(require,module,exports){
+},{"../util":45}],23:[function(require,module,exports){
 /**
  * Base client.
  */
@@ -419,7 +615,7 @@ function parseHeaders(str) {
     return headers;
 }
 
-},{"../../promise":19,"../../util":26,"./xhr":7}],5:[function(require,module,exports){
+},{"../../promise":38,"../../util":45,"./xhr":26}],24:[function(require,module,exports){
 /**
  * JSONP client.
  */
@@ -469,7 +665,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],6:[function(require,module,exports){
+},{"../../promise":38,"../../util":45}],25:[function(require,module,exports){
 /**
  * XDomain client (Internet Explorer).
  */
@@ -508,7 +704,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],7:[function(require,module,exports){
+},{"../../promise":38,"../../util":45}],26:[function(require,module,exports){
 /**
  * XMLHttp client.
  */
@@ -553,7 +749,7 @@ module.exports = function (request) {
     });
 };
 
-},{"../../promise":19,"../../util":26}],8:[function(require,module,exports){
+},{"../../promise":38,"../../util":45}],27:[function(require,module,exports){
 /**
  * CORS Interceptor.
  */
@@ -592,7 +788,7 @@ function crossOrigin(request) {
     return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
 }
 
-},{"../util":26,"./client/xdr":6}],9:[function(require,module,exports){
+},{"../util":45,"./client/xdr":25}],28:[function(require,module,exports){
 /**
  * Header Interceptor.
  */
@@ -620,7 +816,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],10:[function(require,module,exports){
+},{"../util":45}],29:[function(require,module,exports){
 /**
  * Service for sending network requests.
  */
@@ -719,7 +915,7 @@ Http.headers = {
 
 module.exports = _.http = Http;
 
-},{"../promise":19,"../util":26,"./before":3,"./client":4,"./cors":8,"./header":9,"./interceptor":11,"./jsonp":12,"./method":13,"./mime":14,"./timeout":15}],11:[function(require,module,exports){
+},{"../promise":38,"../util":45,"./before":22,"./client":23,"./cors":27,"./header":28,"./interceptor":30,"./jsonp":31,"./method":32,"./mime":33,"./timeout":34}],30:[function(require,module,exports){
 /**
  * Interceptor factory.
  */
@@ -766,7 +962,7 @@ function when(value, fulfilled, rejected) {
     return promise.then(fulfilled, rejected);
 }
 
-},{"../promise":19,"../util":26}],12:[function(require,module,exports){
+},{"../promise":38,"../util":45}],31:[function(require,module,exports){
 /**
  * JSONP Interceptor.
  */
@@ -786,7 +982,7 @@ module.exports = {
 
 };
 
-},{"./client/jsonp":5}],13:[function(require,module,exports){
+},{"./client/jsonp":24}],32:[function(require,module,exports){
 /**
  * HTTP method override Interceptor.
  */
@@ -805,7 +1001,7 @@ module.exports = {
 
 };
 
-},{}],14:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * Mime Interceptor.
  */
@@ -843,7 +1039,7 @@ module.exports = {
 
 };
 
-},{"../util":26}],15:[function(require,module,exports){
+},{"../util":45}],34:[function(require,module,exports){
 /**
  * Timeout Interceptor.
  */
@@ -875,7 +1071,7 @@ module.exports = function () {
     };
 };
 
-},{}],16:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * Install plugin.
  */
@@ -930,7 +1126,7 @@ if (window.Vue) {
 
 module.exports = install;
 
-},{"./http":10,"./promise":19,"./resource":20,"./url":21,"./util":26}],17:[function(require,module,exports){
+},{"./http":29,"./promise":38,"./resource":39,"./url":40,"./util":45}],36:[function(require,module,exports){
 /**
  * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
  */
@@ -1111,7 +1307,7 @@ p.catch = function (onRejected) {
 
 module.exports = Promise;
 
-},{"../util":26}],18:[function(require,module,exports){
+},{"../util":45}],37:[function(require,module,exports){
 /**
  * URL Template v2.0.6 (https://github.com/bramstein/url-template)
  */
@@ -1263,7 +1459,7 @@ exports.encodeReserved = function (str) {
     }).join('');
 };
 
-},{}],19:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /**
  * Promise adapter.
  */
@@ -1374,7 +1570,7 @@ p.always = function (callback) {
 
 module.exports = Promise;
 
-},{"./lib/promise":17,"./util":26}],20:[function(require,module,exports){
+},{"./lib/promise":36,"./util":45}],39:[function(require,module,exports){
 /**
  * Service for interacting with RESTful services.
  */
@@ -1486,7 +1682,7 @@ Resource.actions = {
 
 module.exports = _.resource = Resource;
 
-},{"./util":26}],21:[function(require,module,exports){
+},{"./util":45}],40:[function(require,module,exports){
 /**
  * Service for URL templating.
  */
@@ -1618,7 +1814,7 @@ function serialize(params, obj, scope) {
 
 module.exports = _.url = Url;
 
-},{"../util":26,"./legacy":22,"./query":23,"./root":24,"./template":25}],22:[function(require,module,exports){
+},{"../util":45,"./legacy":41,"./query":42,"./root":43,"./template":44}],41:[function(require,module,exports){
 /**
  * Legacy Transform.
  */
@@ -1666,7 +1862,7 @@ function encodeUriQuery(value, spaces) {
         replace(/%20/g, (spaces ? '%20' : '+'));
 }
 
-},{"../util":26}],23:[function(require,module,exports){
+},{"../util":45}],42:[function(require,module,exports){
 /**
  * Query Parameter Transform.
  */
@@ -1692,7 +1888,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":26}],24:[function(require,module,exports){
+},{"../util":45}],43:[function(require,module,exports){
 /**
  * Root Prefix Transform.
  */
@@ -1710,7 +1906,7 @@ module.exports = function (options, next) {
     return url;
 };
 
-},{"../util":26}],25:[function(require,module,exports){
+},{"../util":45}],44:[function(require,module,exports){
 /**
  * URL Template (RFC 6570) Transform.
  */
@@ -1728,7 +1924,7 @@ module.exports = function (options) {
     return url;
 };
 
-},{"../lib/url-template":18}],26:[function(require,module,exports){
+},{"../lib/url-template":37}],45:[function(require,module,exports){
 /**
  * Utility functions.
  */
@@ -1852,7 +2048,7 @@ function merge(target, source, deep) {
     }
 }
 
-},{}],27:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /*!
  * vue-router v0.7.9
  * (c) 2016 Evan You
@@ -4454,7 +4650,7 @@ function merge(target, source, deep) {
   return Router;
 
 }));
-},{}],28:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (process){
 /*!
  * Vue.js v1.0.15
@@ -13981,24 +14177,36 @@ if (process.env.NODE_ENV !== 'production' && inBrowser) {
 
 module.exports = Vue;
 }).call(this,require('_process'))
-},{"_process":1}],29:[function(require,module,exports){
+},{"_process":20}],48:[function(require,module,exports){
 'use strict';
 
 module.exports = {
 	data: function data() {
 		return {
+			search: true,
 			settings: {},
+			query: '',
 			loaded: false
 		};
+	},
+
+	route: {
+		data: function data() {
+			console.log('hi');
+		}
 	},
 
 	ready: function ready() {
 		this.getSettings();
 	},
 
+	components: {
+		search: require('./components/search.vue'),
+		cart: require('./components/cart.vue')
+	},
+
 	methods: {
 		getSettings: function getSettings() {
-			console.log('here');
 			this.$http.get('/api/settings').then(function (response) {
 				this.$set('settings', response.data);
 				this.loaded = true;
@@ -14006,10 +14214,25 @@ module.exports = {
 					$(window).scroll();
 				});
 			});
+		},
+
+		queryChanged: function queryChanged(event) {
+			if (event.keyCode == 27) {
+				// esc
+				$('#Head-searchInput').blur();
+				this.$set('query', '');
+			}
+			if (event.keyIdentifier == 'Enter' || event.keyIdentifier == 'Up' || event.keyIdentifier == 'Down') {
+				this.$broadcast('searchEvent', { key: event.keyIdentifier });
+			}
+			if (event.keyCode == 8 || 46 < event.keyCode && event.keyCode < 91 || event.keyCode > 145) {
+				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-search');
+				$('#Head-searchIcon i').addClass('fa-cog fa-spin');
+			}
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\">\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a href=\"/\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-active\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-active\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in settings.menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"settings.menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\" class=\"fa fa-search\"></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\">\n\t\t\t\t\t<div id=\"Search\"></div>\n\t\t\t\t\t<div id=\"Cart\"></div>\n\t\t\t\t\t<br>\n\t\t\t\t\t<span v-for=\"link in settings.menus.sidebar\">\n\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ path: '/catalog/'+link.id }\">{{ link.name }}</a>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in settings.menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"settings.menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in settings.menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"settings.menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<br>\n\t\t\t\t\t<span v-for=\"link in settings.menus.sidebar\">\n\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ path: '/catalog/'+link.slug }\">{{ link.name }}</a>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in settings.menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"settings.menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14021,8 +14244,617 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":28,"vue-hot-reload-api":2}],30:[function(require,module,exports){
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<p>{{ $route.params.id }}</p>\n"
+},{"./components/cart.vue":49,"./components/search.vue":51,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+'use strict';
+
+var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
+module.exports = {
+	data: function data() {
+		return {
+			cart: {},
+			show: false
+		};
+	},
+
+	props: ['checkout'],
+
+	created: function created() {
+		this.clearCart();
+		this.restoreCart();
+	},
+
+	watch: {
+		cart: function cart() {
+			this.setAddToCartButtons();
+		}
+	},
+
+	computed: {
+		lastObject: function lastObject() {
+			if (this.cart) {
+				return _Object$keys(this.cart)[_Object$keys(this.cart).length - 1];
+			} else {
+				return null;
+			}
+		},
+
+		subTotal: function subTotal() {
+			var subTotal = 0;
+			for (var itemId in this.cart) {
+				for (var variantId in this.cart[itemId].variants) {
+					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price;
+				}
+			}
+
+			return subTotal;
+		}
+	},
+
+	methods: {
+		addToCart: function addToCart(cartItem, itemId, variantId) {
+			var cart = {};
+			if (sessionStorage.cart) {
+				cart = JSON.parse(sessionStorage.cart);
+			}
+
+			if (cart[itemId]) {
+				if (cart[itemId].variants[variantId]) {
+					cart[itemId].variants[variantId].count += cartItem.variants[variantId].count;
+
+					var variant = cart[itemId].variants[variantId];
+					if (!variant.infinite && variant.count > variant.stock) {
+						cart[itemId].variants[variantId].count = variant.stock;
+					}
+				} else {
+					cart[itemId].variants[variantId] = cartItem.variants[variantId];
+				}
+			} else {
+				cart[itemId] = cartItem;
+			}
+
+			this.storeCart(cart);
+		},
+
+		storeCart: function storeCart(cart) {
+			sessionStorage.cart = JSON.stringify(cart);
+			this.restoreCart();
+		},
+
+		restoreCart: function restoreCart() {
+			if (sessionStorage.cart) {
+				this.show = true;
+				this.$set('cart', JSON.parse(sessionStorage.cart));
+			} else {
+				this.show = false;
+				return {};
+			}
+		},
+
+		clearCart: function clearCart() {
+			if (!sessionStorage.cart) {
+				return 0;
+			}
+
+			var cart = JSON.parse(sessionStorage.cart);
+			for (var itemId in cart) {
+				for (var variantId in cart[itemId].variants) {
+					if (cart[itemId].variants[variantId].count == 0) {
+						delete cart[itemId].variants[variantId];
+					}
+				}
+				if (_Object$keys(cart[itemId].variants).length == 0) {
+					delete cart[itemId];
+				}
+			}
+			if (_Object$keys(cart).length == 0) {
+				sessionStorage.removeItem('cart');
+			} else {
+				sessionStorage.cart = JSON.stringify(cart);
+			}
+		},
+
+		changeCount: function changeCount(variant, change) {
+			variant.count = parseInt(variant.count) + change;
+			if (variant.count < 0) {
+				variant.count = 0;
+			}
+			if (!variant.infinite && variant.count > variant.stock) {
+				variant.count = variant.stock;
+			}
+
+			this.storeCart(_Object$assign({}, this.cart));
+		},
+
+		setAddToCartButtons: function setAddToCartButtons() {
+			for (var itemId in this.cart) {
+				for (var variantId in this.cart[itemId].variants) {
+					var variant = this.cart[itemId].variants[variantId];
+					if (variant.count == 0) {
+						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('isDisabled');
+						$('.js-addToCart[variant-id=' + variantId + ']').addClass('Button--active');
+						$('.js-addToCart[variant-id=' + variantId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart');
+					} else if (!variant.infinite && variant.count >= variant.stock) {
+						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('Button--active');
+						$('.js-addToCart[variant-id=' + variantId + ']').addClass('isDisabled');
+						$('.js-addToCart[variant-id=' + variantId + ']').html('All in Cart (' + variant.count + ')');
+					} else {
+						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('isDisabled');
+						$('.js-addToCart[variant-id=' + variantId + ']').addClass('Button--active');
+						$('.js-addToCart[variant-id=' + variantId + ']').html('<i class="fa fa-cart-plus"></i> ' + variant.count + ' in Cart');
+					}
+				}
+			}
+		},
+
+		returnCount: function returnCount(itemId, variantId) {
+			if (cart[itemId] == undefined) {
+				return 0;
+			}
+
+			if (cart[itemId].variants[variantId] == undefined) {
+				return 0;
+			}
+
+			return cart[itemId].variants[variantId].count;
+		},
+
+		checkKey: function checkKey(event) {
+			if (event.keyCode == 8) {
+				return 0;
+			} else if (event.keyCode < 48 || 57 < event.keyCode) {
+				event.preventDefault();
+			}
+		},
+
+		checkCount: function checkCount(variant) {
+			if (variant.count < 0) {
+				variant.count = 0;
+			} else if (!variant.infinite && variant.count > variant.stock) {
+				variant.count = variant.stock;
+			}
+
+			this.storeCart(_Object$assign({}, this.cart));
+		},
+
+		submitCheckout: function submitCheckout() {
+			this.clearCart();
+			this.$parent.nextStep();
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section>\n\t\t<span v-if=\"checkout\">\n\t\t\t<section v-for=\"(itemId, item) in cart\">\n\t\t\t\t<div class=\"CheckoutCart-item\">\n\t\t\t\t\t<div class=\"CheckoutCart-pic\"><img :src=\"'/img/'+item.images.small[0]\"></div>\n\t\t\t\t\t<div class=\"CheckoutCart-desc\">\n\t\t\t\t\t\t<div class=\"CheckoutCart-title\"><h1>{{ item.name }}</h1></div>\n\t\t\t\t\t\t<div class=\"CheckoutCart-partNum\"><h4 v-if=\"item.part_number\">Part #{{ item.part_number.split(',').join(', #') }}</h4></div>\n\t\t\t\t\t\t<div class=\"CheckoutCart-variant\" v-for=\"variant in item.variants\">\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-varTitle\"><h4 v-if=\"variant.name\">{{{ variant.name }}} -&nbsp;</h4></div>\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-price\">\n\t\t\t\t\t\t\t\t<h4>{{ variant.price | currency }}<span v-if=\"variant.unit != 'Unit'\"> / {{ variant.unit }}</span></h4>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-counter\">\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-minus\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(variant, -1)\"></i>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-cnt\">\n\t\t\t\t\t\t\t\t\t<input type=\"text\" maxlength=\"4\" v-model=\"variant.count\" @keydown=\"checkKey\" @input=\"checkCount(variant)\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-plus\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.infinite || variant.count < variant.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(variant, 1)\"></i>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<hr class=\"inCheckoutCart\" v-if=\"item != lastItem\">\n\t\t\t\t<b v-else=\"\">\n\t\t\t\t\t<hr class=\"inCheckoutCart\">\n\t\t\t\t</b>\n\t\t\t</section>\n\n\t\t\t<div class=\"Subtotal-container\" data-subtotal=\"<?=$subtotal?>\">\n\t\t\t\t<div class=\"Subtotal-label\"><h4>Subtotal: </h4></div>\n\t\t\t\t<div id=\"Subtotal-total\"><h1>{{ subTotal | currency }}</h1></div>\n\t\t\t</div>\n\n\t\t\t<hr>\n\t\t\t<div>\n\t\t\t\t<a v-link=\"{ path: '/home' }\"><div class=\"Button Button--active u-width200 u-floatLeft\">&lt; Continue Shopping</div></a>\n\t\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\">Next &gt;</div>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-else=\"\">\n\t\t\t<div id=\"Cart\" v-if=\"show\">\n\t\t\t\t<div id=\"Cart-head\">Cart</div>\n\t\t\t\t<div class=\"Cart-item\" v-for=\"(itemId, item) in cart\">\n\t\t\t\t\t<small><b><a v-link=\"{ path: '/item/'+itemId }\">{{ item.name }}</a></b></small><br>\n\t\t\t\t\t<div v-for=\"(variantId, variant) in item.variants\">\n\t\t\t\t\t\t<small class=\"u-thin\">{{{ variant.name }}}</small><br v-if=\"variant.name\">\n\t\t\t\t\t\t<small>{{ variant.price | currency }} <span v-if=\"variant.unit != 'Unit'\">/ {{ variant.unit }}</span></small>\n\t\t\t\t\t\t<span class=\"u-floatRight\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(variant, -1)\"></i>\n\t\t\t\t\t\t\t{{ variant.count }}\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.infinite || variant.count < variant.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(variant, 1)\"></i>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<hr class=\"u-clear\" v-if=\"itemId != lastObject\">\n\t\t\t\t\t<span class=\"u-clear\" v-else=\"\"></span>\n\t\t\t\t</div>\n\t\t\t\t<a v-link=\"{ path: '/checkout/cart' }\">\n\t\t\t\t\t<div id=\"Cart-foot\" class=\"u-active\">\n\t\t\t\t\t\t<b>Subtotal:</b> {{ subTotal | currency }}<b class=\"u-floatRight\">Checkout</b>\n\t\t\t\t\t</div>\n\t\t\t\t</a>\n\t\t\t</div>\n\t\t</span>\n\t</section>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/cart.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"babel-runtime/core-js/object/assign":1,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
+'use strict';
+
+var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
+
+module.exports = {
+	data: function data() {
+		return {
+			warn: [],
+			selected: ''
+		};
+	},
+
+	props: ['shipping', 'info'],
+
+	methods: {
+		submit: function submit() {
+			if (this.checkFields()) {
+				this.$parent.nextStep();
+			}
+		},
+
+		checkFields: function checkFields() {
+			if (!this.shipping && !this.info.seperate_billing) {
+				return true;
+			}
+
+			var valid = true;
+
+			this.warn = [];
+			var requiredFields = ['first_name', 'last_name', 'zip', 'city', 'street_address_first'];
+			requiredFields.forEach((function (field) {
+				if (this.info[field] == "") {
+					this.warn.push(field);
+					valid = false;
+				}
+			}).bind(this));
+
+			if (this.shipping) {
+				if (!/\S+@\S+\.\S+/.test(this.info.email)) {
+					this.warn.push('email');
+					valid = false;
+				} else if (this.info.email != this.info.confirm_email) {
+					this.warn.push('confirm_email');
+					valid = false;
+				}
+			}
+
+			if (valid) {
+				if (this.shipping) {
+					sessionStorage.shippingInfo = JSON.stringify(this.info);
+				} else {
+					sessionStorage.billingInfo = JSON.stringify(this.info);
+				}
+			}
+			return valid;
+		},
+
+		checkField: function checkField(field) {
+			if (field == 'email') {
+				if (this.warn.indexOf('email') != -1 && /\S+@\S+\.\S+/.test(this.info.email)) {
+					this.warn.$remove('email');
+					return 1;
+				}
+			} else if (field == 'confirm_email') {
+				if (this.warn.indexOf('confirm_email') != -1 && this.info.email == this.info.confirm_email) {
+					this.warn.$remove('confirm_email');
+					return 1;
+				}
+			} else {
+				if (this.warn.indexOf(field) != -1 && this.info[field] != "") {
+					this.warn.$remove(field);
+					return 1;
+				}
+			}
+
+			return 0;
+		},
+
+		returnCountries: function returnCountries() {
+			var geoInfo = require('../store/geoInfo.js');
+			return _Object$keys(geoInfo);
+		},
+
+		returnStates: function returnStates(country) {
+			var geoInfo = require('../store/geoInfo.js');
+			if (geoInfo[country].length == 0) {
+				this.info.state = country;
+				return [country];
+			} else {
+				if (country == "United States") {
+					if (geoInfo[country].indexOf(this.info.state) == -1) {
+						this.info.state = "Oregon";
+					}
+					return geoInfo[country];
+				} else {
+					if (geoInfo[country].indexOf(this.info.state) == -1) {
+						this.info.state = geoInfo[country][0];
+					}
+					return geoInfo[country];
+				}
+			}
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2 v-if=\"shipping\">Shipping Information:</h2>\n\t\t<h2 v-else=\"\">Billing Information:</h2>\n\t\t<hr>\n\n\t\t<div v-if=\"!shipping\" @click=\"info.seperate_billing = !info.seperate_billing\">\n\t\t\t<i>Note: Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount.</i><br>\n\t\t\t<br>\n\t\t\t<span class=\"u-active\">\n\t\t\t\t<i class=\"fa fa-fw\" :class=\"info.seperate_billing?'fa-check-square':'fa-square'\"></i> Seperate Shipping &amp; Billing Address?\n\t\t\t</span>\n\t\t\t<hr>\n\t\t</div>\n\n\t\t<span v-if=\"shipping || !shipping &amp;&amp; info.seperate_billing\">\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">First Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'first_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"firstName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.first_name\" @input=\"checkField('first_name')\" @focus=\"selected = 'first_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('first_name') == -1)?'':'isShown'\">First name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Last Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'last_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"lastName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.last_name\" @input=\"checkField('last_name')\" @focus=\"selected = 'last_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('last_name') == -1)?'':'isShown'\">Last name is required</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Company:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'company')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"company\" maxlength=\"64\" v-model=\"info.company\" @focus=\"selected = 'company'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">Country:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'country')?'isSelected':''\">\n\t\t\t\t\t<select name=\"country\" v-model=\"info.country\" @focus=\"selected = 'country'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"country\" v-for=\"country in returnCountries()\">{{ country }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">State:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'state')?'isSelected':''\">\n\t\t\t\t\t<select name=\"state\" v-model=\"info.state\" @focus=\"selected = 'state'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"state\" v-for=\"state in returnStates(info.country)\">{{ state }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Zip:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'zip')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"zip\" maxlength=\"32\" placeholder=\"Required\" v-model=\"info.zip\" @input=\"checkField('zip')\" @focus=\"selected = 'zip'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('zip') == -1)?'':'isShown'\">Zip code is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">City:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'city')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"city\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.city\" @input=\"checkField('city')\" @focus=\"selected = 'city'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('city') == -1)?'':'isShown'\">City name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Street Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street_address_first')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetFirst\" maxlength=\"128\" placeholder=\"Required\" v-model=\"info.street_address_first\" @input=\"checkField('street_address_first')\" @focus=\"selected = 'street_address_first'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('street_address_first') == -1)?'':'isShown'\">Street address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\"></div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street_address_second')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetSecond\" maxlength=\"128\" v-model=\"info.street_address_second\" @focus=\"selected = 'street_address_second'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Apt / Suite / Bld #:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'apt')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"apt\" maxlength=\"32\" v-model=\"info.apt\" @focus=\"selected = 'apt'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shipping\">\n\t\t\t<hr>\n\t\t\t<h2>Contact Information:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Phone:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'phone')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"phone\" maxlength=\"64\" v-model=\"info.phone\" @focus=\"selected = 'phone'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">E-Mail Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"eMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.email\" @input=\"checkField('email')\" @focus=\"selected = 'email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('email') == -1)?'':'isShown'\">A valid E-Mail address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Confirm E-Mail:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'confirm_email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"cMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.confirm_email\" @input=\"checkField('confirm_email')\" @focus=\"selected = 'confirm_email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('confirm_email') == -1)?'':'isShown'\">Confirmation E-Mail must be identical to E-Mail.</div>\n\t\t\t</div>\n\n\t\t\t<hr>\n\t\t\t<h2>Notes:</h2>\n\t\t\t<hr>\n\n\t\t\t<textarea class=\"js-formTextArea\" name=\"notes\" maxlength=\"1024\" placeholder=\"Notes...\" v-model=\"info.notes\"></textarea>\n\t\t</span>\n\n\t\t<hr>\n\t\t<div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Prev</div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submit\">Next &gt;</div>\n\t\t</div>\n\n\t\t<pre>\t\t\t{{ yah | json }}\n\t\t</pre>\n\t</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/contactInfo.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"../store/geoInfo.js":57,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			focused: false,
+			selected: 0,
+			results: []
+		};
+	},
+
+	props: ['query'],
+
+	watch: {
+		query: function query() {
+			if (this.query.length > 2) {
+				this.$http.post('/api/search/items', { query: this.query }).then(function (response) {
+					$('#Head-searchIcon i').removeClass('fa-cog fa-spin');
+					if (response.data.length > 0) {
+						// TODO: log succesful query
+						$('#Head-searchIcon i').addClass('fa-check');
+					} else {
+						$('#Head-searchIcon i').addClass('fa-times');
+					}
+
+					this.$set('results', response.data);
+					this.selected = 0;
+
+					setTimeout(function () {
+						$('#Head-searchIcon i').removeClass('fa-check fa-times');
+						$('#Head-searchIcon i').addClass('fa-search');
+					}, 1000);
+				});
+			} else {
+				// length is less than 3
+				this.results = [];
+				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-cog fa-spin');
+				$('#Head-searchIcon i').addClass('fa-search');
+			}
+		}
+	},
+
+	events: {
+		searchEvent: function searchEvent(data) {
+			if (data.key == 'Down') {
+				this.selected++;
+				if (this.selected >= this.results.length) {
+					this.selected = 0;
+				}
+			} else if (data.key == 'Up') {
+				this.selected--;
+				if (this.selected < 0) {
+					this.selected = this.results.length - 1;
+				}
+			} else if (data.key == 'Enter') {
+				this.$router.go({ path: '/item/' + this.results[this.selected].id });
+			}
+		},
+
+		searchFocus: function searchFocus() {
+			this.focused = true;
+		},
+
+		searchBlurred: function searchBlurred() {
+			setTimeout((function () {
+				this.focused = false;
+			}).bind(this), 1000);
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<ul v-if=\"focused\">\n\t\t<li v-for=\"result in results\" :class=\"(selected == $index)?'u-light':''\">\n\t\t\t<a v-link=\"{ path: '/item/'+result.id }\"><small>{{{ result.name }}}</small><br>\n\t\t\t<small class=\"u-thin\" v-if=\"result.type_info.part_number\">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>\n\t\t</li>\n\t</ul>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/search.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+'use strict';
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
+module.exports = {
+	data: function data() {
+		if (sessionStorage.cart) {
+			var cart = JSON.parse(sessionStorage.cart);
+		} else {
+			var cart = {};
+		}
+
+		return {
+			cart: cart
+		};
+	},
+
+	computed: {
+		subTotal: function subTotal() {
+			var subTotal = 0;
+			for (var itemId in this.cart) {
+				for (var variantId in this.cart[itemId].variants) {
+					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price;
+				}
+			}
+
+			return subTotal;
+		}
+	},
+
+	props: ['shippingInfo', 'billingInfo'],
+
+	methods: {
+		submitCheckout: function submitCheckout() {
+			var request = _Object$assign({}, this.shippingInfo);
+			var billing = _Object$assign({}, this.billingInfo);
+			for (var field in billing) {
+				if (field != 'seperate_billing') {
+					request['billing_' + field] = billing[field];
+				} else {
+					request[field] = billing[field];
+				}
+			}
+			request['cart'] = this.$parent.returnCartCount();
+
+			this.$http.post('/api/submit/invoice', request)['catch'](function (response) {
+				if (response.status == 422) {
+					for (var errorField in response.data) {
+						this.$parent.errors.push(response.data[errorField]);
+					}
+				}
+			}).then(function (response) {
+				if (response.data == 'success') {
+					// WOO, We did it!
+					sessionStorage.removeItem('cart');
+					var info = require('../store/invoiceInfo.js');
+					info.clear();
+
+					this.$router.go({ path: '/checkout/success' });
+				}
+			});
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2>Order Confirmation:</h2>\n\t\t<hr>\n\n\t\t<div class=\"CheckoutConfirm-item\" v-for=\"item in cart\">\n\t\t\t<div class=\"CheckoutConfirm-title\">{{{ item.name }}}</div>\n\t\t\t<div class=\"CheckoutConfirm-itemNum\" v-if=\"item.part_number\">Part #{{ item.part_number.split(',').join(', #') }}</div>\n\n\t\t\t<span v-for=\"variant in item.variants\">\n\t\t\t\t<div class=\"CheckoutConfirm-price\">{{ variant.price | currency }} * {{ variant.count }}</div>\n\t\t\t\t<div class=\"CheckoutConfirm-variant u-thin\" v-if=\"variant.name\">{{{ variant.name }}} -&nbsp;</div>\n\t\t\t</span>\n\n\t\t\t<hr>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-subContainer\">\n\t\t\t<div class=\"Button Button--active Button--thin u-width200 u-floatLeft\" v-link=\"{ path: '/checkout/cart' }\">&lt; Edit Cart</div>\n\t\t\t<div class=\"CheckoutConfirm-subTotal\">{{ subTotal | currency }}</div>\n\t\t\t<div class=\"CheckoutConfirm-subTitle\">Subtotal:&nbsp;</div>\n\t\t</div>\n\n\t\t<hr class=\"u-clear\">\n\n\t\t<h2 v-if=\"billingInfo.seperate_billing\">Shipping Confirmation:</h2>\n\t\t<h2 v-else=\"\">Shipping &amp; Billing Confirmation:</h2>\n\n\t\t<hr>\n\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t<b>{{ shippingInfo.first_name + \" \" + shippingInfo.last_name }}\n\t\t\t<span v-if=\"shippingInfo.company\"> of {{ shippingInfo.company }}</span></b><br>\n\t\t\t{{ shippingInfo.street_address_first }}<br>\n\t\t\t<span v-if=\"shippingInfo.street_address_second\">{{ shippingInfo.street_address_second }}<br></span>\n\t\t\t{{ shippingInfo.city + \" \" + shippingInfo.state + \", \" + shippingInfo.zip }}<br>\n\t\t\t{{ shippingInfo.country }}<br>\n\t\t\t<span v-if=\"shippingInfo.apt\">Apt/Suite/Bld # {{ shippingInfo.apt }}</span>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-contact\">\n\t\t\t<b>{{ shippingInfo.email }}</b>\n\t\t\t<div v-if=\"shippingInfo.phone\">{{ shippingInfo.phone }}</div>\n\t\t</div>\n\n\t\t<br class=\"u-clear\">\n\t\t<div class=\"Button Button--active Button--thin u-width200\" v-link=\"{ path: '/checkout/shipping' }\">&lt; Edit Shipping</div>\n\n\t\t<span v-if=\"billingInfo.seperate_billing\">\n\t\t\t<hr>\n\t\t\t<h2>Billing Confirmation:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t\t<b>{{ billingInfo.first_name + \" \" + billingInfo.last_name }}\n\t\t\t\t<span v-if=\"billingInfo.company\"> of {{ billingInfo.company }}</span></b><br>\n\t\t\t\t{{ billingInfo.street_address_first }}<br>\n\t\t\t\t<span v-if=\"billingInfo.street_address_second\">{{ billingInfo.street_address_second }}<br></span>\n\t\t\t\t{{ billingInfo.city + \" \" + billingInfo.state + \", \" + billingInfo.zip }}<br>\n\t\t\t\t{{ billingInfo.country }}<br>\n\t\t\t\t<span v-if=\"billingInfo.apt\">Apt/Suite/Bld # {{ billingInfo.apt }}</span>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shippingInfo.notes\">\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t<h3>Notes:</h3>\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t{{ shippingInfo.notes }}<br><br>\n\t\t</span>\n\t\t<span v-else=\"\">\n\t\t\t<hr class=\"u-clear\"><br>\t\n\t\t</span>\n\n\t\t<div>\n\t\t\t<div id=\"prev\" class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Edit Billing</div>\n\t\t\t<div id=\"submit\" class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\">Submit</div>\n\t\t</div>\n\t</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/submitCheckout.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"../store/invoiceInfo.js":58,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			catalog: {},
+			selected: {
+				tags: [],
+				items: [],
+				count: 0,
+				pages: 0,
+				page: 1,
+				limit: 10
+			},
+			loaded: false
+		};
+	},
+
+	route: {
+		data: function data() {
+			this.getCatalog();
+		}
+	},
+
+	watch: {
+		'selected.tags': function selectedTags() {
+			this.selected.page = 1;
+			this.getItems();
+		}
+	},
+
+	methods: {
+		getCatalog: function getCatalog() {
+			this.$http.get('/api/catalog/' + this.$route.params.id).then(function (response) {
+				this.$set('catalog', response.data);
+				this.fillTags();
+				this.loaded = true;
+			});
+		},
+
+		getItems: function getItems() {
+			var request = {
+				tags: this.selected.tags,
+				page: this.selected.page,
+				limit: this.selected.limit
+			};
+			this.$http.post('/api/search/item-tags', request).then(function (response) {
+				for (var i in response.data.items) {
+					response.data.items[i].selected = 0;
+				}
+
+				this.selected.items = response.data.items;
+				this.selected.count = response.data.count;
+				this.selected.pages = response.data.pages;
+				this.selected.page = response.data.page;
+				this.selected.limit = response.data.limit;
+
+				this.$nextTick(function () {
+					this.$parent.$refs.cart.setAddToCartButtons();
+				});
+			});
+		},
+
+		changePage: function changePage(page) {
+			if (page < 1) {
+				page = this.selected.pages;
+			}
+			if (page > this.selected.pages) {
+				page = 1;
+			}
+
+			this.selected.page = page;
+			this.getItems();
+		},
+
+		changedVariant: function changedVariant(item) {
+			var itemId = item.id;
+			var variantId = item.selected;
+
+			$('.js-addToCart[item-id=' + itemId + ']').removeClass('isDisabled');
+			$('.js-addToCart[item-id=' + itemId + ']').addClass('Button--active');
+			$('.js-addToCart[item-id=' + itemId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart');
+
+			this.$nextTick(function () {
+				this.$parent.$refs.cart.setAddToCartButtons();
+			});
+		},
+
+		fillTags: function fillTags() {
+			this.selected.tags = [];
+			for (var i = 0; i < this.catalog.tags.length; i++) {
+				this.selected.tags.push(this.catalog.tags[i]);
+			};
+		},
+
+		clearTags: function clearTags() {
+			this.selected.tags = [];
+		},
+
+		toggleTag: function toggleTag(tag) {
+			var index = this.selected.tags.indexOf(tag);
+			if (index != -1) {
+				this.selected.tags.splice(index, 1);
+			} else {
+				this.selected.tags.push(tag);
+			}
+		},
+
+		addToCart: function addToCart(item) {
+			var variantId = item.variants[item.selected].id;
+			var variant = item.variants[item.selected];
+
+			if (!variant.infinite && variant.stock == 0) {
+				return 0;
+			}
+
+			var cartItem = {
+				name: item.name,
+				images: item.images,
+				part_number: item.type_info.part_number,
+				state: item.type_info.state,
+				variants: {}
+			};
+
+			cartItem.variants[variant.id] = {
+				name: variant.name,
+				price: variant.price,
+				unit: variant.unit,
+				stock: variant.stock,
+				infinite: variant.infinite,
+				count: 1
+			};
+
+			this.$parent.$refs.cart.addToCart(cartItem, item.id, variant.id);
+
+			return 1;
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<section>\n\t\t\t<div class=\"u-floatLeft\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span v-for=\"p in selected.pages\">\n\t\t\t\t\t<span class=\"u-highlight\" v-if=\"p + 1 == selected.page\">{{ p + 1 }}</span>\n\t\t\t\t\t<span class=\"u-active\" v-else=\"\" @click=\"changePage(p + 1)\">{{ p + 1 }}</span>&nbsp;\n\t\t\t\t</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t\t<div class=\"u-floatRight\">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>\n\t\t\t<br><br>\n\n\t\t\t<div class=\"CatalogItem\" v-for=\"item in selected.items\">\n\t\t\t\t<a v-link=\"{ path: '/item/'+item.id }\">\n\t\t\t\t\t<img :src=\"'/img/'+item.images.medium[0]\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t\t\t</a>\n\t\t\t\t<div class=\"CatalogItem-description\">\n\t\t\t\t\t<h2><a v-link=\"{ path: '/item/'+item.id }\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t\t<br>\n\t\t\t\t\t<p>\n\t\t\t\t\t\t{{{ item.description }}}\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t</p>\n\t\t\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t\t        \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t        \t</div>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t\t</div>\n\t        \t<a v-link=\"{ path: '/item/'+item.id }\">\n\t        \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t        \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t        \t\t</div>\n\t        \t</a>\n\t        \t<span class=\"CatalogItem-price\">\n\t        \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t        \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t        \t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr class=\"u-clear\">\n\t\t\t</div>\n\n\t\t\t<br>\n\t\t\t<div class=\"u-floatRight\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span v-for=\"p in selected.pages\">\n\t\t\t\t\t<span class=\"u-highlight\" v-if=\"p + 1 == selected.page\">{{ p + 1 }}</span>\n\t\t\t\t\t<span class=\"u-active\" v-else=\"\" @click=\"changePage(p + 1)\">{{ p + 1 }}</span>&nbsp;\n\t\t\t\t</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t</section>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14034,8 +14866,242 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":28,"vue-hot-reload-api":2}],31:[function(require,module,exports){
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<p>{{ $route.path }}</p>\n"
+},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		var store = require('../store/invoiceInfo.js');
+		store.load();
+
+		return {
+			step: 0,
+			loaded: false,
+			shippingInfo: store.shippingInfo,
+			billingInfo: store.billingInfo,
+			errors: []
+		};
+	},
+
+	components: {
+		cart: require('../components/cart.vue'),
+		contactInfo: require('../components/contactInfo.vue'),
+		submitCheckout: require('../components/submitCheckout.vue')
+	},
+
+	route: {
+		data: function data() {
+			switch (this.$route.params.step) {
+				case 'cart':
+					this.step = 0;
+					break;
+				case 'shipping':
+					this.step = 1;
+					break;
+				case 'billing':
+					this.step = 2;
+					break;
+				case 'submit':
+					this.step = 3;
+					break;
+				case 'success':
+					this.step = 4;
+					break;
+				default:
+					this.step = 0;
+			}
+
+			this.$parent.search = false;
+			this.loaded = false;
+			this.errors = [];
+
+			// check the cart against the server to make sure everything is still in stock
+			this.$http.post('/api/test/cart', { cart: this.returnCartCount() }).then(function (response) {
+				for (var i = 0; i < response.data.length; i++) {
+					var cart = JSON.parse(sessionStorage.cart);
+					var error = response.data[i];
+					if (error.error == 'count_changed') {
+						// throw an error for the user
+						var item = cart[error.item_id];
+						if (item.variants[error.variant_id].name) {
+							var variantName = ' (' + item.variants[error.variant_id].name + ')';
+						} else {
+							var variantName = '';
+						}
+
+						if (error.count == 0) {
+							this.errors.push('"' + item.name + variantName + '" has been sold out and because of this it has been removed from your cart, we apologize for the inconveniance. ');
+						} else {
+							this.errors.push('The stock on "' + item.name + variantName + '" has been reduced, most likely due to a purchase since you added it to your cart. The amount in your cart has been reduced to ' + error.count + ' to reflect this change. We are sorry for the inconveniance.');
+						}
+
+						cart[error.item_id].variants[error.variant_id].count = error.count;
+						cart[error.item_id].variants[error.variant_id].stock = error.count;
+					} else if (error.error == "stock_changed") {
+						cart[error.item_id].variants[error.variant_id].stock = error['stock'];
+					}
+				}
+
+				if (response.data.length > 0) {
+					sessionStorage.cart = JSON.stringify(cart);
+				}
+
+				this.loaded = true;
+			});
+		}
+	},
+
+	methods: {
+		nextStep: function nextStep() {
+			if (this.step == 0) {
+				this.$router.go({ path: '/checkout/shipping' });
+			} else if (this.step == 1) {
+				this.$router.go({ path: '/checkout/billing' });
+			} else if (this.step == 2) {
+				this.$router.go({ path: '/checkout/submit' });
+			}
+		},
+
+		prevStep: function prevStep() {
+			if (this.step == 1) {
+				this.$router.go({ path: '/checkout/cart' });
+			} else if (this.step == 2) {
+				this.$router.go({ path: '/checkout/shipping' });
+			} else if (this.step == 3) {
+				this.$router.go({ path: '/checkout/billing' });
+			}
+		},
+
+		returnCartCount: function returnCartCount() {
+			var request = [];
+			if (sessionStorage.cart) {
+				var cart = JSON.parse(sessionStorage.cart);
+			} else {
+				var cart = {};
+			}
+
+			for (var itemId in cart) {
+				for (var variantId in cart[itemId].variants) {
+					var variant = cart[itemId].variants[variantId];
+					request.push({ variant_id: variantId, count: variant.count, stock: variant.stock });
+				}
+			}
+
+			return request;
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<form id=\"form\" method=\"post\">\n\t\t\t<input type=\"hidden\" name=\"stage\" id=\"js-stage\" value=\"<?=$stage?>\">\n\n\t\t\t<ol id=\"Checkout-progressBar\" data-steps=\"4\">\n\t\t\t\t<li :class=\"(step == 0)?'ProgressBar-current':(step > 0)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-shopping-cart\"></i> Cart Confirmation\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 1)?'ProgressBar-current':(step > 1)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-truck\"></i> Shipping Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 2)?'ProgressBar-current':(step > 2)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-credit-card\"></i> Billing Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 3)?'ProgressBar-current':(step > 3)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-pencil-square-o\"></i> Submit Order\n\t\t\t\t</li>\n\t\t\t</ol>\n\n\t\t\t<div v-if=\"errors.length > 0\" class=\"Checkout-errorList\">\n\t\t\t\t<span v-for=\"error in errors\"> - {{ error }}<br></span>\n\t\t\t</div>\n\t\t\t<hr>\n\n\t\t\t<cart v-if=\"step == 0\" :checkout=\"true\">\n\t\t\t</cart>\n\t\t\t<contact-info v-if=\"step == 1\" :shipping=\"true\" :info.sync=\"shippingInfo\">\n\t\t\t</contact-info>\n\t\t\t<contact-info v-if=\"step == 2\" :shipping=\"false\" :info.sync=\"billingInfo\">\n\t\t\t</contact-info>\n\t\t\t<submit-checkout v-if=\"step == 3\" :shipping-info=\"shippingInfo\" :billing-info=\"billingInfo\">\n\t\t\t</submit-checkout>\n\t\t\t<div v-if=\"step == 4\">\n\t\t\t\t<h1>Thank you for your order!</h1>\n\t\t\t\t<h4>We will calculate shipping and send the full bill to you as soon as possible.</h4>\n\t\t\t\t<hr>\n\t\t\t\t<p>If you have any questions call us at <span class=\"u-highlight\">(541) 606-0095</span>&nbsp;\n\t\t\t\tor Email us at <span class=\"u-highlight\">Info@Pangolin4x4.com</span>.</p>\n\t\t\t\t<br>\n\t\t\t\t<div class=\"Button Button--active Button--thin u-width400\" v-link=\"{ path: '/home' }\">Return Home</div>\n\t\t\t</div>\n\t\t</form>\n\t</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/pages/checkout.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"../components/cart.vue":49,"../components/contactInfo.vue":50,"../components/submitCheckout.vue":52,"../store/invoiceInfo.js":58,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			item: {},
+			loaded: false
+		};
+	},
+
+	route: {
+		data: function data() {
+			this.getItem();
+		}
+	},
+
+	methods: {
+		getItem: function getItem() {
+			this.$http.get('/api/item/' + this.$route.params.id).then(function (response) {
+				this.$set('item', response.data);
+				this.selectPic(0);
+
+				this.loaded = true;
+				this.$nextTick(function () {
+					this.$parent.$refs.cart.setAddToCartButtons();
+				});
+			});
+		},
+
+		selectPic: function selectPic(index) {
+			for (var i = 0; i < this.item.images.large.length; i++) {
+				this.item.images.large[i].selected = false;
+			}
+			this.item.images.large[index].selected = true;
+		},
+
+		addToCart: function addToCart(variant) {
+			var cartItem = {
+				name: this.item.name,
+				images: this.item.images,
+				part_number: this.item.type_info.part_number,
+				state: this.item.type_info.state,
+				variants: {}
+			};
+
+			cartItem.variants[variant.id] = {
+				name: variant.name,
+				price: variant.price,
+				unit: variant.unit,
+				stock: variant.stock,
+				infinite: variant.infinite,
+				count: 1
+			};
+
+			this.$parent.$refs.cart.addToCart(cartItem, this.item.id, variant.id);
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{{ item.name + ', ' + item.type_info.state }}}</h1>\n\t\t<h4 v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<a :href=\"'/img/'+pic.path\" id=\"js-currentPicLink\" data-lightbox=\"pic\" v-for=\"pic in item.images.large\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[$index]\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"pic.selected\">\n\t\t</a>\n\t  <img :src=\"'/img/'+pic\" class=\"u-activeImg Pictures-thumb\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" v-for=\"pic in item.images.small\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ item.description }}}\n\t\t\t<br><br>\n\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"item.variants.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ item.variants[0].price | currency }}\n\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"item.variants[0].stock > 0 || item.variants[0].infinite\" :variant-id=\"item.variants[0].id\" @click=\"addToCart(item.variants[0])\">\n\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t</div>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\tOut of Stock\n\t\t\t</div>\n\t\t</section>\n\t\t\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"variant in item.variants\">\n\t\t\t\t<td>{{ variant.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ variant.price | currency }}\n\t\t\t\t\t<span v-if=\"variant.unit != 'Unit'\" class=\"u-thin\"> / {{ variant.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"variant.stock > 0 || variant.infinite\" :variant-id=\"variant.id\" @click=\"addToCart(variant)\">\n\t\t\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Specs\">\n\t\t<div v-if=\"item.x\"> Dimensions: {{ item.x }}\"\n\t\t\t<span v-if=\"item.y\"> x {{ item.y }}\"\n\t\t\t\t<span v-if=\"item.z\"> x {{ item.z }}\"</span>\n\t\t\t</span>\n\t\t</div>\n\t\t<div v-if=\"item.weight\">{{ item.weight }} lbs.</div>\n\t\t<hr v-if=\"item.weight || item.x\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"item.type_info.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in item.type_info.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/pages/item.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			page: {},
+			loaded: false
+		};
+	},
+
+	route: {
+		data: function data() {
+			this.getPage();
+		}
+	},
+
+	methods: {
+		getPage: function getPage() {
+			this.$http.get('/api/page' + this.$route.path).then(function (response) {
+				this.$set('page', response.data);
+				this.$parent.search = response.data.search;
+				this.loaded = true;
+			});
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t{{{ page.content }}}\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14047,7 +15113,340 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":28,"vue-hot-reload-api":2}],32:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  "Afghanistan": ["Badakhshan", "Badghis", "Baghlan", "Balkh", "Bamian", "Farah", "Faryab", "Ghazni", "Ghowr", "Helmand", "Herat", "Jowzjan", "Kabul", "Kandahar", "Kapisa", "Khowst", "Konar", "Kondoz", "Laghman", "Lowgar", "Nangrahar", "Nimruz", "Nurestan", "Oruzgan", "Paktia", "Paktika", "Parwan", "Samangan", "Sar-e Pol", "Takhar", "Wardak", "Zabol"],
+  "Albania": ["Berat", "Bulqizë", "Delvinë", "Devoll", "Dibër", "Durrsës", "Elbasan", "Fier", "Gramsh", "Gjirokastër", "Has", "Kavajë", "Kolonjë", "Korcë", "Krujë", "Kuçovë", "Kukës", "Kurbin", "Lezhë", "Librazhd", "Lushnjë", "Malësi e Madhe", "Mallakastër", "Mat", "Mirditë", "Peqin", "Përmet", "Pogradec", "Pukë", "Sarandë", "Skrapar", "Shkodër", "Tepelenë", "Tiranë", "Tropojë", "Vlorë"],
+  "Algeria": ["Adrar", "Ain Defla", "Ain Tmouchent", "Alger", "Annaba", "Batna", "Bechar", "Bejaia", "Biskra", "Blida", "Bordj Bou Arreridj", "Bouira", "Boumerdes", "Chlef", "Constantine", "Djelfa", "El Bayadh", "El Oued", "El Tarf", "Ghardaia", "Guelma", "Illizi", "Jijel", "Khenchela", "Laghouat", "Mascara", "Medea", "Mila", "Mostaganem", "Msila", "Naama", "Oran", "Ouargla", "Oum el Bouaghi", "Relizane", "Saida", "Setif", "Sidi Bel Abbes", "Skikda", "Souk Ahras", "Tamanghasset", "Tebessa", "Tiaret", "Tindouf", "Tipaza", "Tissemsilt", "Tizi Ouzou", "Tlemcen"],
+  "American Samoa": [],
+  "Andorra": [],
+  "Angola": ["Bengo", "Benguela", "Bie", "Cabinda", "Cuando-Cubango", "Cuanza Norte", "Cuanza Sul", "Cunene", "Huambo", "Huila", "Luanda", "Lunda Norte", "Lunda Sul", "Malange", "Moxico", "Namibe", "Uige", "Zaire"],
+  "Anguilla": [],
+  "Antarctica": ["Australian Antarctic Territory"],
+  "Antigua and Barbuda": [],
+  "Argentina": ["Capital federal", "Buenos Aires", "Catamarca", "Cordoba", "Corrientes", "Chaco", "Chubut", "Entre Rios", "Formosa", "Jujuy", "La Pampa", "Mendoza", "Misiones", "Neuquen", "Rio Negro", "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe", "Santiago del Estero", "Tierra del Fuego", "Tucuman"],
+  "Armenia": ["Erevan", "Aragacotn", "Ararat", "Armavir", "Gegarkunik'", "Kotayk'", "Lory", "Sirak", "Syunik'", "Tavus", "Vayoc Jor"],
+  "Aruba": [],
+  "Australia": ["Australian Capital Territory", "Northern Territory", "New South Wales", "Queensland", "South Australia", "Tasmania", "Victoria", "Western Australia"],
+  "Austria": ["Burgenland", "Kärnten", "Niederosterreich", "Oberosterreich", "Salzburg", "Steiermark", "Tirol", "Vorarlberg", "Wien"],
+  "Azerbaijan": ["Naxcivan", "Ali Bayramli", "Baki", "Ganca", "Lankaran", "Mingacevir", "Naftalan", "Saki", "Sumqayit", "Susa", "Xankandi", "Yevlax", "Abseron", "Agcabadi", "Agdam", "Agdas", "Agstafa", "Agsu", "Astara", "Babak", "Balakan", "Barda", "Beylagan", "Bilasuvar", "Cabrayll", "Calilabad", "Culfa", "Daskasan", "Davaci", "Fuzuli", "Gadabay", "Goranboy", "Goycay", "Haciqabul", "Imisli", "Ismayilli", "Kalbacar", "Kurdamir", "Lacin", "Lerik", "Masalli", "Neftcala", "Oguz", "Ordubad", "Qabala", "Qax", "Qazax", "Qobustan", "Quba", "Qubadli", "Qusar", "Saatli", "Sabirabad", "Sadarak", "Sahbuz", "Salyan", "Samaxi", "Samkir", "Samux", "Sarur", "Siyazan", "Tartar", "Tovuz", "Ucar", "Xacmaz", "Xanlar", "Xizi", "Xocali", "Xocavand", "Yardimli", "Zangilan", "Zaqatala", "Zardab"],
+  "Bahrain": ["Al Hadd", "Al Manamah", "Al Mintaqah al Gharbiyah", "Al Mintagah al Wusta", "Al Mintaqah ash Shamaliyah", "Al Muharraq", "Ar Rifa", "Jidd Hafs", "Madluat Jamad", "Madluat Isa", "Mintaqat Juzur tawar", "Sitrah", "Al Manāmah (Al ‘Āşimah)", "Al Janūbīyah", "Al Wusţá", "Ash Shamālīyah"],
+  "Bangladesh": ["Bagerhat zila", "Bandarban zila", "Barguna zila", "Barisal zila", "Bhola zila", "Bogra zila", "Brahmanbaria zila", "Chandpur zila", "Chittagong zila", "Chuadanga zila", "Comilla zila", "Cox's Bazar zila", "Dhaka zila", "Dinajpur zila", "Faridpur zila", "Feni zila", "Gaibandha zila", "Gazipur zila", "Gopalganj zila", "Habiganj zila", "Jaipurhat zila", "Jamalpur zila", "Jessore zila", "Jhalakati zila", "Jhenaidah zila", "Khagrachari zila", "Khulna zila", "Kishorganj zila", "Kurigram zila", "Kushtia zila", "Lakshmipur zila", "Lalmonirhat zila", "Madaripur zila", "Magura zila", "Manikganj zila", "Meherpur zila", "Moulvibazar zila", "Munshiganj zila", "Mymensingh zila", "Naogaon zila", "Narail zila", "Narayanganj zila", "Narsingdi zila", "Natore zila", "Nawabganj zila", "Netrakona zila", "Nilphamari zila", "Noakhali zila", "Pabna zila", "Panchagarh zila", "Patuakhali zila", "Pirojpur zila", "Rajbari zila", "Rajshahi zila", "Rangamati zila", "Rangpur zila", "Satkhira zila", "Shariatpur zila", "Sherpur zila", "Sirajganj zila", "Sunamganj zila", "Sylhet zila", "Tangail zila", "Thakurgaon zila"],
+  "Barbados": [],
+  "Belarus": ["Brèsckaja voblasc'", "Homel'skaja voblasc'", "Hrodzenskaja voblasc'", "Mahilëuskaja voblasc'", "Minskaja voblasc'", "Vicebskaja voblasc'"],
+  "Belgium": ["Antwerpen", "Brabant Wallon", "Hainaut", "Liege", "Limburg", "Luxembourg", "Namur", "Oost-Vlaanderen", "Vlaams-Brabant", "West-Vlaanderen", "Brussels"],
+  "Belize": ["Belize", "Cayo", "Corozal", "Orange Walk", "Stann Creek", "Toledo"],
+  "Benin": ["Alibori", "Atakora", "Atlantique", "Borgou", "Collines", "Donga", "Kouffo", "Littoral", "Mono", "Oueme", "Plateau", "Zou"],
+  "Bermuda": [],
+  "Bhutan": ["Bumthang", "Chhukha", "Dagana", "Gasa", "Ha", "Lhuentse", "Monggar", "Paro", "Pemagatshel", "Punakha", "Samdrup Jongkha", "Samtee", "Sarpang", "Thimphu", "Trashigang", "Trashi Yangtse", "Trongsa", "Tsirang", "Wangdue Phodrang", "Zhemgang"],
+  "Bolivia": ["Cochabamba", "Chuquisaca", "El Beni", "La Paz", "Oruro", "Pando", "Potosi", "Tarija"],
+  "Bosnia and Herzegovina": ["Federacija Bosna i Hercegovina", "Republika Srpska"],
+  "Botswana": ["Central", "Ghanzi", "Kgalagadi", "Kgatleng", "Kweneng", "Ngamiland", "North-East", "North-West", "South-East", "Southern"],
+  "Bouvet Island": [],
+  "Brazil": ["Acre", "Alagoas", "Amazonas", "Amapa", "Baia", "Ceara", "Distrito Federal", "Espirito Santo", "Fernando de Noronha", "Goias", "Maranhao", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Para", "Paraiba", "Pernambuco", "Piaui", "Parana", "Rio de Janeiro", "Rio Grande do Norte", "Rondonia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "Sao Paulo", "Tocatins"],
+  "British Indian Ocean Territory": [],
+  "Virgin Islands, British": [],
+  "Brunei Darussalam": ["Belait", "Brunei-Muara", "Temburong", "Tutong"],
+  "Bulgaria": ["Blagoevgrad", "Burgas", "Dobric", "Gabrovo", "Haskovo", "Jambol", "Kardzali", "Kjstendil", "Lovec", "Montana", "Pazardzik", "Pernik", "Pleven", "Plovdiv", "Razgrad", "Ruse", "Silistra", "Sliven", "Smoljan", "Sofia", "Stara Zagora", "Sumen", "Targoviste", "Varna", "Veliko Tarnovo", "Vidin", "Vraca"],
+  "Burkina Faso": ["Bale", "Bam", "Banwa", "Bazega", "Bougouriba", "Boulgou", "Boulkiemde", "Comoe", "Ganzourgou", "Gnagna", "Gourma", "Houet", "Ioba", "Kadiogo", "Kenedougou", "Komondjari", "Kompienga", "Kossi", "Koulpulogo", "Kouritenga", "Kourweogo", "Leraba", "Loroum", "Mouhoun", "Nahouri", "Namentenga", "Nayala", "Noumbiel", "Oubritenga", "Oudalan", "Passore", "Poni", "Sanguie", "Sanmatenga", "Seno", "Siasili", "Soum", "Sourou", "Tapoa", "Tui", "Yagha", "Yatenga", "Ziro", "Zondoma", "Zoundweogo"],
+  "Myanmar": ["Ayeyarwady", "Bago", "Magway", "Mandalay", "Sagaing", "Tanintharyi", "Yangon", "Chin", "Kachin", "Kayah", "Kayin", "Mon", "Rakhine", "Shan"],
+  "Burundi": ["Bubanza", "Bujumbura", "Bururi", "Cankuzo", "Cibitoke", "Gitega", "Karuzi", "Kayanza", "Makamba", "Muramvya", "Mwaro", "Ngozi", "Rutana", "Ruyigi"],
+  "Cambodia": ["Krong Kaeb", "Krong Pailin", "Xrong Preah Sihanouk", "Phnom Penh", "Baat Dambang", "Banteay Mean Chey", "Rampong Chaam", "Kampong Chhnang", "Kampong Spueu", "Kampong Thum", "Kampot", "Kandaal", "Kach Kong", "Krachoh", "Mondol Kiri", "Otdar Mean Chey", "Pousaat", "Preah Vihear", "Prey Veaeng", "Rotanak Kiri", "Siem Reab", "Stueng Traeng", "Svaay Rieng", "Taakaev"],
+  "Cameroon": ["Adamaoua", "Centre", "East", "Far North", "North", "South", "South-West", "West"],
+  "Canada": ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia", "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon Territory"],
+  "Cape Verde": ["Boa Vista", "Brava", "Calheta de Sao Miguel", "Fogo", "Maio", "Mosteiros", "Paul", "Porto Novo", "Praia", "Ribeira Grande", "Sal", "Sao Domingos", "Sao Filipe", "Sao Nicolau", "Sao Vicente", "Tarrafal"],
+  "Cayman Islands": [],
+  "Central African Republic": ["Bangui", "Bamingui-Bangoran", "Basse-Kotto", "Haute-Kotto", "Haut-Mbomou", "Kemo", "Lobaye", "Mambere-Kadei", "Mbomou", "Nana-Grebizi", "Nana-Mambere", "Ombella-Mpoko", "Ouaka", "Ouham", "Ouham-Pende", "Sangha-Mbaere", "Vakaga"],
+  "Chad": ["Batha", "Biltine", "Borkou-Ennedi-Tibesti", "Chari-Baguirmi", "Guera", "Kanem", "Lac", "Logone-Occidental", "Logone-Oriental", "Mayo-Kebbi", "Moyen-Chari", "Ouaddai", "Salamat", "Tandjile"],
+  "Chile": ["Aisen del General Carlos Ibanez del Campo", "Antofagasta", "Araucania", "Atacama", "Bio-Bio", "Coquimbo", "Libertador General Bernardo O'Higgins", "Los Lagos", "Magallanes", "Maule", "Region Metropolitana de Santiago", "Tarapaca", "Valparaiso"],
+  "China": ["Beijing", "Chongqing", "Shanghai", "Tianjin", "Anhui", "Fujian", "Gansu", "Guangdong", "Guizhou", "Hainan", "Hebei", "Heilongjiang", "Henan", "Hubei", "Hunan", "Jiangsu", "Jiangxi", "Jilin", "Liaoning", "Qinghai", "Shaanxi", "Shandong", "Shanxi", "Sichuan", "Taiwan", "Yunnan", "Zhejiang", "Guangxi", "Neia Mongol (mn)", "Xinjiang", "Xizang", "Hong Kong", "Macau"],
+  "Christmas Island": [],
+  "Cocos (Keeling) Islands": [],
+  "Colombia": ["Distrito Capital de Bogotá", "Amazonea", "Antioquia", "Arauca", "Atlántico", "Bolívar", "Boyacá", "Caldea", "Caquetá", "Casanare", "Cauca", "Cesar", "Córdoba", "Cundinamarca", "Chocó", "Guainía", "Guaviare", "La Guajira", "Magdalena", "Meta", "Nariño", "Norte de Santander", "Putumayo", "Quindio", "Risaralda", "San Andrés, Providencia y Santa Catalina", "Santander", "Sucre", "Tolima", "Valle del Cauca", "Vaupés", "Vichada"],
+  "Comoros": ["Anjouan Ndzouani", "Grande Comore Ngazidja", "Moheli Moili"],
+  "Congo, The Democratic Republic of the": ["Kinshasa", "Bandundu", "Bas-Congo", "Equateur", "Haut-Congo", "Kasai-Occidental", "Kasai-Oriental", "Katanga", "Maniema", "Nord-Kivu", "Orientale", "Sud-Kivu"],
+  "Congo": ["Brazzaville", "Bouenza", "Cuvette", "Cuvette-Ouest", "Kouilou", "Lekoumou", "Likouala", "Niari", "Plateaux", "Pool", "Sangha"],
+  "Cook Islands": [],
+  "Costa Rica": ["Alajuela", "Cartago", "Guanacaste", "Heredia", "Limon", "Puntarenas", "San Jose"],
+  "Côte d'Ivoire": ["18 Montagnes", "Agnebi", "Bas-Sassandra", "Denguele", "Haut-Sassandra", "Lacs", "Lagunes", "Marahoue", "Moyen-Comoe", "Nzi-Comoe", "Savanes", "Sud-Bandama", "Sud-Comoe", "Vallee du Bandama", "Worodouqou", "Zanzan"],
+  "Croatia": ["Bjelovarsko-bilogorska zupanija", "Brodsko-posavska zupanija", "Dubrovacko-neretvanska zupanija", "Istarska zupanija", "Karlovacka zupanija", "Koprivnickco-krizevacka zupanija", "Krapinako-zagorska zupanija", "Licko-senjska zupanija", "Medimurska zupanija", "Osjecko-baranjska zupanija", "Pozesko-slavonska zupanija", "Primorsko-goranska zupanija", "Sisacko-moelavacka Iupanija", "Splitako-dalmatinska zupanija", "Sibenako-kninska zupanija", "Varaidinska zupanija", "VirovitiEko-podravska zupanija", "VuRovarako-srijemska zupanija", "Zadaraka", "Zagrebacka zupanija"],
+  "Cuba": ["Camagey", "Ciego de `vila", "Cienfuegos", "Ciudad de La Habana", "Granma", "Guantanamo", "Holquin", "La Habana", "Las Tunas", "Matanzas", "Pinar del Rio", "Sancti Spiritus", "Santiago de Cuba", "Villa Clara", "Isla de la Juventud", "Pinar del Roo", "Ciego de Avila", "Camagoey", "Holgun", "Sancti Spritus", "Municipio Especial Isla de la Juventud"],
+  "Cyprus": ["Ammochostos Magusa", "Keryneia", "Larnaka", "Lefkosia", "Lemesos", "Pafos"],
+  "Czech Republic": ["Jihočeský kraj", "Jihomoravský kraj", "Karlovarský kraj", "Královéhradecký kraj", "Liberecký kraj", "Moravskoslezský kraj", "Olomoucký kraj", "Pardubický kraj", "Plzeňský kraj", "Praha, hlavní město", "Středočeský kraj", "Ústecký kraj", "Vysočina", "Zlínský kraj"],
+  "Denmark": ["Frederiksberg", "Copenhagen City", "Copenhagen", "Frederiksborg", "Roskilde", "Vestsjælland", "Storstrøm", "Bornholm", "Fyn", "South Jutland", "Ribe", "Vejle", "Ringkjøbing", "Århus", "Viborg", "North Jutland"],
+  "Djibouti": ["Ali Sabiah", "Dikhil", "Djibouti", "Obock", "Tadjoura"],
+  "Dominica": [],
+  "Dominican Republic": ["Distrito Nacional (Santo Domingo)", "Azua", "Bahoruco", "Barahona", "Dajabón", "Duarte", "El Seybo [El Seibo]", "Espaillat", "Hato Mayor", "Independencia", "La Altagracia", "La Estrelleta [Elias Pina]", "La Romana", "La Vega", "Maroia Trinidad Sánchez", "Monseñor Nouel", "Monte Cristi", "Monte Plata", "Pedernales", "Peravia", "Puerto Plata", "Salcedo", "Samaná", "San Cristóbal", "San Pedro de Macorís", "Sánchez Ramírez", "Santiago", "Santiago Rodríguez", "Valverde"],
+  "Timor-Leste": ["Aileu", "Ainaro", "Bacucau", "Bobonaro", "Cova Lima", "Dili", "Ermera", "Laulem", "Liquica", "Manatuto", "Manafahi", "Oecussi", "Viqueque"],
+  "Ecuador": ["Azuay", "Bolivar", "Canar", "Carchi", "Cotopaxi", "Chimborazo", "El Oro", "Esmeraldas", "Galapagos", "Guayas", "Imbabura", "Loja", "Los Rios", "Manabi", "Morona-Santiago", "Napo", "Orellana", "Pastaza", "Pichincha", "Sucumbios", "Tungurahua", "Zamora-Chinchipe"],
+  "Egypt": ["Ad Daqahllyah", "Al Bahr al Ahmar", "Al Buhayrah", "Al Fayym", "Al Gharbiyah", "Al Iskandarlyah", "Al Isma illyah", "Al Jizah", "Al Minuflyah", "Al Minya", "Al Qahirah", "Al Qalyublyah", "Al Wadi al Jadid", "Ash Sharqiyah", "As Suways", "Aswan", "Asyut", "Bani Suwayf", "Bur Sa'id", "Dumyat", "Janub Sina'", "Kafr ash Shaykh", "Matruh", "Qina", "Shamal Sina'", "Suhaj"],
+  "El Salvador": ["Ahuachapan", "Cabanas", "Cuscatlan", "Chalatenango", "Morazan", "San Miguel", "San Salvador", "Santa Ana", "San Vicente", "Sonsonate", "Usulutan"],
+  "Equatorial Guinea": ["Region Continental", "Region Insular", "Annobon", "Bioko Norte", "Bioko Sur", "Centro Sur", "Kie-Ntem", "Litoral", "Wele-Nzas"],
+  "Eritrea": ["Anseba", "Debub", "Debubawi Keyih Bahri [Debub-Keih-Bahri]", "Gash-Barka", "Maakel [Maekel]", "Semenawi Keyih Bahri [Semien-Keih-Bahri]"],
+  "Estonia": ["Harjumsa", "Hitumea", "Ida-Virumsa", "Jogevamsa", "Jarvamsa", "Lasnemsa", "Laane-Virumaa", "Polvamea", "Parnumsa", "Raplamsa", "Saaremsa", "Tartumsa", "Valgamaa", "Viljandimsa", "Vorumaa"],
+  "Ethiopia": ["Addis Ababa", "Dire Dawa", "Afar", "Amara", "Benshangul-Gumaz", "Gambela Peoples", "Harari People", "Oromia", "Somali", "Southern Nations, Nationalities and Peoples", "Tigrai"],
+  "Falkland Islands (Malvinas)": [],
+  "Faroe Islands": [],
+  "Fiji": ["Eastern", "Northern", "Western", "Rotuma"],
+  "Finland": ["South Karelia", "South Ostrobothnia", "Etelä-Savo", "Häme", "Itä-Uusimaa", "Kainuu", "Central Ostrobothnia", "Central Finland", "Kymenlaakso", "Lapland", "Tampere Region", "Ostrobothnia", "North Karelia", "Nothern Ostrobothnia", "Northern Savo", "Päijät-Häme", "Satakunta", "Uusimaa", "South-West Finland", "Åland"],
+  "France": ["Ain", "Aisne", "Allier", "Alpes-de-Haute-Provence", "Alpes-Maritimes", "Ardèche", "Ardennes", "Ariège", "Aube", "Aude", "Aveyron", "Bas-Rhin", "Bouches-du-Rhône", "Calvados", "Cantal", "Charente", "Charente-Maritime", "Cher", "Corrèze", "Corse-du-Sud", "Côte-d'Or", "Côtes-d'Armor", "Creuse", "Deux-Sèvres", "Dordogne", "Doubs", "Drôme", "Essonne", "Eure", "Eure-et-Loir", "Finistère", "Gard", "Gers", "Gironde", "Haut-Rhin", "Haute-Corse", "Haute-Garonne", "Haute-Loire", "Haute-Saône", "Haute-Savoie", "Haute-Vienne", "Hautes-Alpes", "Hautes-Pyrénées", "Hauts-de-Seine", "Hérault", "Indre", "Ille-et-Vilaine", "Indre-et-Loire", "Isère", "Landes", "Loir-et-Cher", "Loire", "Loire-Atlantique", "Loiret", "Lot", "Lot-et-Garonne", "Lozère", "Maine-et-Loire", "Manche", "Marne", "Mayenne", "Meurthe-et-Moselle", "Meuse", "Morbihan", "Moselle", "Nièvre", "Nord", "Oise", "Orne", "Paris", "Pas-de-Calais", "Puy-de-Dôme", "Pyrénées-Atlantiques", "Pyrénées-Orientales", "Rhône", "Saône-et-Loire", "Sarthe", "Savoie", "Seine-et-Marne", "Seine-Maritime", "Seine-Saint-Denis", "Somme", "Tarn", "Tarn-et-Garonne", "Val d'Oise", "Territoire de Belfort", "Val-de-Marne", "Var", "Vaucluse", "Vendée", "Vienne", "Vosges", "Yonne", "Yvelines", "Jura"],
+  "French Guiana": [],
+  "French Polynesia": [],
+  "French Southern Territories": [],
+  "Gabon": [],
+  "Georgia": [],
+  "Germany": ["Baden-Wuerttemberg", "Bayern", "Bremen", "Hamburg", "Hessen", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Schleswig-Holstein", "Berlin", "Brandenburg", "Mecklenburg-Vorpommern", "Sachsen", "Sachsen-Anhalt", "Thueringen"],
+  "Ghana": ["Ashanti", "Brong-Ahafo", "Greater Accra", "Upper East", "Upper West", "Volta"],
+  "Gibraltar": [],
+  "Greece": ["Achaïa", "Aitolia-Akarnania", "Argolis", "Arkadia", "Arta", "Attiki", "Chalkidiki", "Chania", "Chios", "Dodekanisos", "Drama", "Evros", "Evrytania", "Evvoia", "Florina", "Fokis", "Fthiotis", "Grevena", "Ileia", "Imathia", "Ioannina", "Irakleion", "Karditsa", "Kastoria", "Kavalla", "Kefallinia", "Kerkyra", "Kilkis", "Korinthia", "Kozani", "Kyklades", "Lakonia", "Larisa", "Lasithion", "Lefkas", "Lesvos", "Magnisia", "Messinia", "Pella", "Preveza", "Rethymnon", "Rodopi", "Samos", "Serrai", "Thesprotia", "Thessaloniki", "Trikala", "Voiotia", "Xanthi", "Zakynthos", "Agio Oros"],
+  "Greenland": [],
+  "Grenada": [],
+  "Guadeloupe": [],
+  "Guam": [],
+  "Guatemala": ["Alta Verapez", "Baja Verapez", "Chimaltenango", "Chiquimula", "El Progreso", "Escuintla", "Guatemala", "Huehuetenango", "Izabal", "Jalapa", "Jutiapa", "Peten", "Quetzaltenango", "Quiche", "Reta.thuleu", "Sacatepequez", "San Marcos", "Santa Rosa", "Solol6", "Suchitepequez", "Totonicapan", "Zacapa"],
+  "Guinea": ["Beyla", "Boffa", "Boke", "Coyah", "Dabola", "Dalaba", "Dinguiraye", "Dubreka", "Faranah", "Forecariah", "Fria", "Gaoual", "Guekedou", "Kankan", "Kerouane", "Kindia", "Kissidougou", "Koubia", "Koundara", "Kouroussa", "Labe", "Lelouma", "Lola", "Macenta", "Mali", "Mamou", "Mandiana", "Nzerekore", "Pita", "Siguiri", "Telimele", "Tougue", "Yomou"],
+  "Guinea-Bissau": ["Bissau", "Bafata", "Biombo", "Bolama", "Cacheu", "Gabu", "Oio", "Quloara", "Tombali S"],
+  "Guyana": ["Barima-Waini", "Cuyuni-Mazaruni", "Demerara-Mahaica", "East Berbice-Corentyne", "Essequibo Islands-West Demerara", "Mahaica-Berbice", "Pomeroon-Supenaam", "Potaro-Siparuni", "Upper Demerara-Berbice", "Upper Takutu-Upper Essequibo"],
+  "Haiti": ["Grande-Anse", "Nord-Est", "Nord-Ouest", "Ouest", "Sud", "Sud-Est", "Artibonite", "Centre", "Nippes", "Nord"],
+  "Heard Island and McDonald Islands": [],
+  "Holy See (Vatican City State)": [],
+  "Honduras": ["Atlantida", "Colon", "Comayagua", "Copan", "Cortes", "Choluteca", "El Paraiso", "Francisco Morazan", "Gracias a Dios", "Intibuca", "Islas de la Bahia", "Lempira", "Ocotepeque", "Olancho", "Santa Barbara", "Valle", "Yoro"],
+  "Hong Kong": ["Central and Western", "Eastern", "Southern", "Wan Chai", "Kowloon City", "Kwun Tong", "Sham Shui Po", "Wong Tai Sin", "Yau Tsim Mong", "Islands", "Kwai Tsing", "North", "Sai Kung", "Sha Tin", "Tai Po", "Tsuen Wan", "Tuen Mun", "Yuen Long"],
+  "Hungary": ["Budapest", "Bács-Kiskun", "Baranya", "Békés", "Borsod-Abaúj-Zemplén", "Csongrád", "Fejér", "Győr-Moson-Sopron", "Hajdu-Bihar", "Heves", "Jász-Nagykun-Szolnok", "Komárom-Esztergom", "Nográd", "Pest", "Somogy", "Szabolcs-Szatmár-Bereg", "Tolna", "Vas", "Veszprém", "Zala", "Békéscsaba", "Debrecen", "Dunaújváros", "Eger", "Győr", "Hódmezővásárhely", "Kaposvár", "Kecskemét", "Miskolc", "Nagykanizsa", "Nyiregyháza", "Pécs", "Salgótarján", "Sopron", "Szeged", "Székesfehérvár", "Szekszárd", "Szolnok", "Szombathely", "Tatabánya", "Zalaegerszeg"],
+  "Iceland": ["Austurland", "Hofuoborgarsvaeoi utan Reykjavikur", "Norourland eystra", "Norourland vestra", "Reykjavik", "Suourland", "Suournes", "Vestfirolr", "Vesturland"],
+  "India": ["Maharashtra", "Karnataka", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Kerala", "Madhya Pradesh", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Tripura", "Uttaranchal", "Uttar Pradesh", "West Bengal", "Andaman and Nicobar Islands", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi", "Lakshadweep", "Pondicherry"],
+  "Indonesia": ["Bali", "Bangka Belitung", "Banten", "Bengkulu", "Gorontalo", "Irian Jaya", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Timur", "Kalimantan Selatan", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Riau", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatra Barat", "Sumatra Selatan", "Sumatera Utara", "Jakarta Raya", "Aceh", "Yogyakarta"],
+  "Iran, Islamic Republic of": ["Ardabil", "Azarbayjan-e Gharbi", "Azarbayjan-e Sharqi", "Bushehr", "Chahar Mahall va Bakhtiari", "Esfahan", "Fars", "Gilan", "Golestan", "Hamadan", "Hormozgan", "Iiam", "Kerman", "Kermanshah", "Khorasan", "Khuzestan", "Kohjiluyeh va Buyer Ahmad", "Kordestan", "Lorestan", "Markazi", "Mazandaran", "Qazvin", "Qom", "Semnan", "Sistan va Baluchestan", "Tehran", "Yazd", "Zanjan"],
+  "Iraq": ["Al Anbar", "Al Ba,rah", "Al Muthanna", "Al Qadisiyah", "An Najef", "Arbil", "As Sulaymaniyah", "At Ta'mim", "Babil", "Baghdad", "Dahuk", "Dhi Qar", "Diyala", "Karbala'", "Maysan", "Ninawa", "Salah ad Din", "Wasit"],
+  "Ireland": ["Cork", "Clare", "Cavan", "Carlow", "Dublin", "Donegal", "Galway", "Kildare", "Kilkenny", "Kerry", "Longford", "Louth", "Limerick", "Leitrim", "Laois", "Meath", "Monaghan", "Mayo", "Offaly", "Roscommon", "Sligo", "Tipperary", "Waterford", "Westmeath", "Wicklow", "Wexford"],
+  "Israel": ["HaDarom", "HaMerkaz", "HaZafon", "Haifa", "Tel-Aviv", "Jerusalem"],
+  "Italy": ["Agrigento", "Alessandria", "Ancona", "Aosta", "Arezzo", "Ascoli Piceno", "Asti", "Avellino", "Bari", "Belluno", "Benevento", "Bergamo", "Biella", "Bologna", "Bolzano", "Brescia", "Brindisi", "Cagliari", "Caltanissetta", "Campobasso", "Caserta", "Catania", "Catanzaro", "Chieti", "Como", "Cosenza", "Cremona", "Crotone", "Cuneo", "Enna", "Ferrara", "Firenze", "Foggia", "Forlì-Cesena", "Frosinone", "Genova", "Gorizia", "Grosseto", "Imperia", "Isernia", "L'Aquila", "La Spezia", "Latina", "Lecce", "Lecco", "Livorno", "Lodi", "Lucca", "Macerata", "Mantova", "Massa-Carrara", "Matera", "Messina", "Milano", "Modena", "Napoli", "Novara", "Nuoro", "Oristano", "Padova", "Palermo", "Parma", "Pavia", "Perugia", "Pesaro e Urbino", "Pescara", "Piacenza", "Pisa", "Pistoia", "Pordenone", "Potenza", "Prato", "Ragusa", "Ravenna", "Reggio Calabria", "Reggio Emilia", "Rieti", "Rimini", "Roma", "Rovigo", "Salerno", "Sassari", "Savona", "Siena", "Siracusa", "Sondrio", "Taranto", "Teramo", "Terni", "Torino", "Trapani", "Trento", "Treviso", "Trieste", "Udine", "Varese", "Venezia", "Verbano-Cusio-Ossola", "Vercelli", "Verona", "Vibo Valentia", "Vicenza", "Viterbo", "Carbonia-Iglesias", "Olbia-Tempio", "Medio Campidano", "Ogliastra", "Barletta-Andria-Trani", "Fermo", "Monza e Brianza"],
+  "Jamaica": ["Clarendon", "Hanover", "Kingston", "Portland", "Saint Andrew", "Saint Ann", "Saint Catherine", "Saint Elizabeth", "Saint James", "Saint Mary", "Saint Thomas", "Trelawny", "Westmoreland", "Manchester"],
+  "Japan": ["Aichi", "Akita", "Aomori", "Chiba", "Ehime", "Fukui", "Fukuoka", "Fukusima", "Gifu", "Gunma", "Hiroshima", "Hokkaido", "Hyogo", "Ibaraki", "Ishikawa", "Iwate", "Kagawa", "Kagoshima", "Kanagawa", "Kochi", "Kumamoto", "Kyoto", "Mie", "Miyagi", "Miyazaki", "Nagano", "Nagasaki", "Nara", "Niigata", "Oita", "Okayama", "Okinawa", "Osaka", "Saga", "Saitama", "Shiga", "Shimane", "Shizuoka", "Tochigi", "Tokushima", "Tokyo", "Tottori", "Toyama", "Wakayama", "Yamagata", "Yamaguchi", "Yamanashi"],
+  "Jordan": ["Ajln", "Al 'Aqaba", "Al Balqa'", "Al Karak", "Al Mafraq", "Amman", "At Tafilah", "Az Zarga", "Irbid", "Jarash", "Ma'an", "Madaba"],
+  "Kazakhstan": ["Almaty", "Astana", "Almaty oblysy", "Aqmola oblysy", "Aqtobe oblysy", "Atyrau oblyfiy", "Batys Quzaqstan oblysy", "Mangghystau oblysy", "Ongtustik Quzaqstan oblysy", "Pavlodar oblysy", "Qaraghandy oblysy", "Qostanay oblysy", "Qyzylorda oblysy", "Shyghys Quzaqstan oblysy", "Soltustik Quzaqstan oblysy", "Zhambyl oblysy Zhambylskaya oblast'"],
+  "Kenya": ["Nairobi Municipality", "Coast", "North-Eastern Kaskazini Mashariki", "Rift Valley", "Western Magharibi"],
+  "Kiribati": ["Gilbert Islands", "Line Islands", "Phoenix Islands"],
+  "Korea, Democratic People's Republic of": ["Kaesong-si", "Nampo-si", "Pyongyang-ai", "Chagang-do", "Hamgyongbuk-do", "Hamgyongnam-do", "Hwanghaebuk-do", "Hwanghaenam-do", "Kangwon-do", "Pyonganbuk-do", "Pyongannam-do", "Yanggang-do", "Najin Sonbong-si"],
+  "Korea, Republic of": ["Seoul Teugbyeolsi", "Busan Gwang'yeogsi", "Daegu Gwang'yeogsi", "Daejeon Gwang'yeogsi", "Gwangju Gwang'yeogsi", "Incheon Gwang'yeogsi", "Ulsan Gwang'yeogsi", "Chungcheongbugdo", "Chungcheongnamdo", "Gang'weondo", "Gyeonggido", "Gyeongsangbugdo", "Gyeongsangnamdo", "Jejudo", "Jeonrabugdo", "Jeonranamdo"],
+  "Kuwait": ["Al Ahmadi", "Al Farwanlyah", "Al Jahrah", "Al Kuwayt", "Hawalli"],
+  "Kyrgyzstan": ["Bishkek", "Batken", "Chu", "Jalal-Abad", "Naryn", "Osh", "Talas", "Ysyk-Kol"],
+  "Lao People's Democratic Republic": ["Vientiane", "Attapu", "Bokeo", "Bolikhamxai", "Champasak", "Houaphan", "Khammouan", "Louang Namtha", "Louangphabang", "Oudomxai", "Phongsali", "Salavan", "Savannakhet", "Xaignabouli", "Xiasomboun", "Xekong", "Xiangkhoang"],
+  "Latvia": ["Aizkraukles Apripkis", "Alkanes Apripkis", "Balvu Apripkis", "Bauskas Apripkis", "Cesu Aprikis", "Daugavpile Apripkis", "Dobeles Apripkis", "Gulbenes Aprlpkis", "Jelgavas Apripkis", "Jekabpils Apripkis", "Kraslavas Apripkis", "Kuldlgas Apripkis", "Limbazu Apripkis", "Liepajas Apripkis", "Ludzas Apripkis", "Madonas Apripkis", "Ogres Apripkis", "Preilu Apripkis", "Rezaknes Apripkis", "Rigas Apripkis", "Saldus Apripkis", "Talsu Apripkis", "Tukuma Apriplcis", "Valkas Apripkis", "Valmieras Apripkis", "Ventspils Apripkis", "Daugavpils", "Jelgava", "Jurmala", "Liepaja", "Rezekne", "Riga", "Ventspils"],
+  "Lebanon": ["Beirout", "El Begsa", "Jabal Loubnane", "Loubnane ech Chemali", "Loubnane ej Jnoubi", "Nabatiye"],
+  "Lesotho": ["Berea", "Butha-Buthe", "Leribe", "Mafeteng", "Maseru", "Mohale's Hoek", "Mokhotlong", "Qacha's Nek", "Quthing", "Thaba-Tseka"],
+  "Liberia": ["Bomi", "Bong", "Grand Basaa", "Grand Cape Mount", "Grand Gedeh", "Grand Kru", "Lofa", "Margibi", "Maryland", "Montserrado", "Nimba", "Rivercess", "Sinoe"],
+  "Libyan Arab Jamahiriya": ["Ajdābiyā", "Al Buţnān", "Al Hizām al Akhdar", "Al Jabal al Akhdar", "Al Jifārah", "Al Jufrah", "Al Kufrah", "Al Marj", "Al Marqab", "Al Qaţrūn", "Al Qubbah", "Al Wāhah", "An Nuqaţ al Khams", "Ash Shāţi'", "Az Zāwiyah", "Banghāzī", "Banī Walīd", "Darnah", "Ghadāmis", "Gharyān", "Ghāt", "Jaghbūb", "Mişrātah", "Mizdah", "Murzuq", "Nālūt", "Sabhā", "Şabrātah Şurmān", "Surt", "Tājūrā' wa an Nawāhī al Arbāh", "Ţarābulus", "Tarhūnah-Masallātah", "Wādī al hayāt", "Yafran-Jādū"],
+  "Liechtenstein": [],
+  "Lithuania": ["Alytaus Apskritis", "Kauno Apskritis", "Klaipedos Apskritis", "Marijampoles Apskritis", "Panevezio Apskritis", "Sisuliu Apskritis", "Taurages Apskritis", "Telsiu Apskritis", "Utenos Apskritis", "Vilniaus Apskritis"],
+  "Luxembourg": ["Diekirch", "GreveNmacher"],
+  "Macao": [],
+  "Macedonia, Republic of": [],
+  "Madagascar": ["Antananarivo", "Antsiranana", "Fianarantsoa", "Mahajanga", "Toamasina", "Toliara"],
+  "Malawi": ["Balaka", "Blantyre", "Chikwawa", "Chiradzulu", "Chitipa", "Dedza", "Dowa", "Karonga", "Kasungu", "Likoma Island", "Lilongwe", "Machinga", "Mangochi", "Mchinji", "Mulanje", "Mwanza", "Mzimba", "Nkhata Bay", "Nkhotakota", "Nsanje", "Ntcheu", "Ntchisi", "Phalomba", "Rumphi", "Salima", "Thyolo", "Zomba"],
+  "Malaysia": ["Wilayah Persekutuan Kuala Lumpur", "Wilayah Persekutuan Labuan", "Wilayah Persekutuan Putrajaya", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan", "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor", "Terengganu"],
+  "Maldives": ["Male", "Alif", "Baa", "Dhaalu", "Faafu", "Gaaf Alif", "Gaefu Dhaalu", "Gnaviyani", "Haa Alif", "Haa Dhaalu", "Kaafu", "Laamu", "Lhaviyani", "Meemu", "Noonu", "Raa", "Seenu", "Shaviyani", "Thaa", "Vaavu"],
+  "Mali": ["Bamako", "Gao", "Kayes", "Kidal", "Xoulikoro", "Mopti", "S69ou", "Sikasso", "Tombouctou"],
+  "Malta": [],
+  "Marshall Islands": ["Ailinglapalap", "Ailuk", "Arno", "Aur", "Ebon", "Eniwetok", "Jaluit", "Kili", "Kwajalein", "Lae", "Lib", "Likiep", "Majuro", "Maloelap", "Mejit", "Mili", "Namorik", "Namu", "Rongelap", "Ujae", "Ujelang", "Utirik", "Wotho", "Wotje"],
+  "Martinique": [],
+  "Mauritania": ["Nouakchott", "Assaba", "Brakna", "Dakhlet Nouadhibou", "Gorgol", "Guidimaka", "Hodh ech Chargui", "Hodh el Charbi", "Inchiri", "Tagant", "Tiris Zemmour", "Trarza"],
+  "Mauritius": ["Beau Bassin-Rose Hill", "Curepipe", "Port Louis", "Quatre Bornes", "Vacosa-Phoenix", "Black River", "Flacq", "Grand Port", "Moka", "Pamplemousses", "Plaines Wilhems", "Riviere du Rempart", "Savanne", "Agalega Islands", "Cargados Carajos Shoals", "Rodrigues Island"],
+  "Mayotte": [],
+  "Mexico": ["Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Coahuila", "Colima", "Chiapas", "Chihuahua", "Durango", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Mexico", "Michoacin", "Morelos", "Nayarit", "Nuevo Leon", "Oaxaca", "Puebla", "Queretaro", "Quintana Roo", "San Luis Potosi", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatan", "Zacatecas", "Distrito Federal"],
+  "Micronesia, Federated States of": ["Chuuk", "Kosrae", "Pohnpei", "Yap"],
+  "Moldova": ["Gagauzia, Unitate Teritoriala Autonoma", "Chisinau", "Stinga Nistrului, unitatea teritoriala din", "Balti", "Cahul", "Edinet", "Lapusna", "Orhei", "Soroca", "Taraclia", "Tighina [Bender]", "Ungheni"],
+  "Monaco": [],
+  "Mongolia": ["Ulaanbaatar", "Arhangay", "Bayanhongor", "Bayan-Olgiy", "Bulgan", "Darhan uul", "Dornod", "Dornogov,", "DundgovL", "Dzavhan", "Govi-Altay", "Govi-Smber", "Hentiy", "Hovd", "Hovsgol", "Omnogovi", "Orhon", "Ovorhangay", "Selenge", "Shbaatar", "Tov", "Uvs"],
+  "Montserrat": [],
+  "Morocco": ["Agadir", "Aït Baha", "Aït Melloul", "Al Haouz", "Al Hoceïma", "Assa-Zag", "Azilal", "Beni Mellal", "Ben Sllmane", "Berkane", "Boujdour", "Boulemane", "Casablanca  [Dar el Beïda]", "Chefchaouene", "Chichaoua", "El Hajeb", "El Jadida", "Errachidia", "Essaouira", "Es Smara", "Fès", "Figuig", "Guelmim", "Ifrane", "Jerada", "Kelaat Sraghna", "Kénitra", "Khemisaet", "Khenifra", "Khouribga", "Laâyoune (EH)", "Larache", "Marrakech", "Meknsès", "Nador", "Ouarzazate", "Oued ed Dahab (EH)", "Oujda", "Rabat-Salé", "Safi", "Sefrou", "Settat", "Sidl Kacem", "Tanger", "Tan-Tan", "Taounate", "Taroudannt", "Tata", "Taza", "Tétouan", "Tiznit"],
+  "Mozambique": ["Maputo", "Cabo Delgado", "Gaza", "Inhambane", "Manica", "Numpula", "Niaaea", "Sofala", "Tete", "Zambezia"],
+  "Namibia": ["Caprivi", "Erongo", "Hardap", "Karas", "Khomae", "Kunene", "Ohangwena", "Okavango", "Omaheke", "Omusati", "Oshana", "Oshikoto", "Otjozondjupa"],
+  "Nauru": [],
+  "Nepal": [],
+  "Netherlands Antilles": ["Bonaire", "Curaçao", "Saba", "St. Eustatius", "St. Maarten"],
+  "Netherlands": ["Drente", "Flevoland", "Friesland", "Gelderland", "Groningen", "Noord-Brabant", "Noord-Holland", "Overijssel", "Utrecht", "Zuid-Holland", "Zeeland", "Limburg"],
+  "New Caledonia": [],
+  "New Zealand": ["Auckland", "Bay of Plenty", "Canterbury", "Gisborne", "Hawkes Bay", "Manawatu-Wanganui", "Marlborough", "Nelson", "Northland", "Otago", "Southland", "Taranaki", "Tasman", "waikato", "Wellington", "West Coast"],
+  "Nicaragua": ["Boaco", "Carazo", "Chinandega", "Chontales", "Esteli", "Jinotega", "Leon", "Madriz", "Managua", "Masaya", "Matagalpa", "Nueva Segovia", "Rio San Juan", "Rivas", "Atlantico Norte", "Atlantico Sur"],
+  "Niger": ["Niamey", "Agadez", "Diffa", "Dosso", "Maradi", "Tahoua", "Tillaberi", "Zinder"],
+  "Nigeria": ["Abuja Capital Territory", "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nassarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"],
+  "Niue": [],
+  "Norfolk Island": [],
+  "Northern Mariana Islands": [],
+  "Norway": ["Akershus", "Aust-Agder", "Buskerud", "Finumark", "Hedmark", "Hordaland", "Mire og Romsdal", "Nordland", "Nord-Trindelag", "Oppland", "Oslo", "Rogaland", "Sogn og Fjordane", "Sir-Trindelag", "Telemark", "Troms", "Vest-Agder", "Vestfold", "Ostfold", "Jan Mayen", "Svalbard"],
+  "Oman": ["Ad Dakhillyah", "Al Batinah", "Al Janblyah", "Al Wusta", "Ash Sharqlyah", "Az Zahirah", "Masqat", "Musandam"],
+  "Pakistan": ["Islamabad", "Baluchistan (en)", "North-West Frontier", "Sind (en)", "Federally Administered Tribal Aresa", "Azad Rashmir", "Northern Areas"],
+  "Palau": [],
+  "Palestinian Territory, Occupied": ["Jenin", "Tubas", "Tulkarm", "Nablus", "Qalqilya", "Salfit", "Ramallah and Al-Bireh", "Jericho", "Jerusalem", "Bethlehem", "Hebron", "North Gaza", "Gaza", "Deir el-Balah", "Khan Yunis", "Rafah"],
+  "Panama": ["Bocas del Toro", "Cocle", "Chiriqui", "Darien", "Herrera", "Loa Santoa", "Panama", "Veraguas", "Comarca de San Blas"],
+  "Papua New Guinea": ["National Capital District (Port Moresby)", "Chimbu", "Eastern Highlands", "East New Britain", "East Sepik", "Enga", "Gulf", "Madang", "Manus", "Milne Bay", "Morobe", "New Ireland", "North Solomons", "Santaun", "Southern Highlands", "Western Highlands", "West New Britain"],
+  "Paraguay": ["Asuncion", "Alto Paraguay", "Alto Parana", "Amambay", "Boqueron", "Caeguazu", "Caazapl", "Canindeyu", "Concepcion", "Cordillera", "Guaira", "Itapua", "Miaiones", "Neembucu", "Paraguari", "Presidente Hayes", "San Pedro"],
+  "Peru": ["El Callao", "Ancash", "Apurimac", "Arequipa", "Ayacucho", "Cajamarca", "Cuzco", "Huancavelica", "Huanuco", "Ica", "Junin", "La Libertad", "Lambayeque", "Lima", "Loreto", "Madre de Dios", "Moquegua", "Pasco", "Piura", "Puno", "San Martin", "Tacna", "Tumbes", "Ucayali"],
+  "Philippines": ["Abra", "Agusan del Norte", "Agusan del Sur", "Aklan", "Albay", "Antique", "Apayao", "Aurora", "Basilan", "Batasn", "Batanes", "Batangas", "Benguet", "Biliran", "Bohol", "Bukidnon", "Bulacan", "Cagayan", "Camarines Norte", "Camarines Sur", "Camiguin", "Capiz", "Catanduanes", "Cavite", "Cebu", "Compostela Valley", "Davao", "Davao del Sur", "Davao Oriental", "Eastern Samar", "Guimaras", "Ifugao", "Ilocos Norte", "Ilocos Sur", "Iloilo", "Isabela", "Kalinga-Apayso", "Laguna", "Lanao del Norte", "Lanao del Sur", "La Union", "Leyte", "Maguindanao", "Marinduque", "Masbate", "Mindoro Occidental", "Mindoro Oriental", "Misamis Occidental", "Misamis Oriental", "Mountain Province", "Negroe Occidental", "Negros Oriental", "North Cotabato", "Northern Samar", "Nueva Ecija", "Nueva Vizcaya", "Palawan", "Pampanga", "Pangasinan", "Quezon", "Quirino", "Rizal", "Romblon", "Sarangani", "Siquijor", "Sorsogon", "South Cotabato", "Southern Leyte", "Sultan Kudarat", "Sulu", "Surigao del Norte", "Surigao del Sur", "Tarlac", "Tawi-Tawi", "Western Samar", "Zambales", "Zamboanga del Norte", "Zamboanga del Sur", "Zamboanga Sibiguey"],
+  "Pitcairn": [],
+  "Poland": ["mazowieckie", "pomorskie", "dolnośląskie", "kujawsko-pomorskie", "lubelskie", "lubuskie", "łódzkie", "małopolskie", "opolskie", "podkarpackie", "podlaskie", "śląskie", "świętokrzyskie", "warmińsko-mazurskie", "wielkopolskie", "zachodniopomorskie"],
+  "Portugal": ["Aveiro", "Beja", "Braga", "Braganca", "Castelo Branco", "Colmbra", "Ovora", "Faro", "Guarda", "Leiria", "Lisboa", "Portalegre", "Porto", "Santarem", "Setubal", "Viana do Castelo", "Vila Real", "Viseu", "Regiao Autonoma dos Acores", "Regiao Autonoma da Madeira"],
+  "Puerto Rico": [],
+  "Qatar": ["Ad Dawhah", "Al Ghuwayriyah", "Al Jumayliyah", "Al Khawr", "Al Wakrah", "Ar Rayyan", "Jariyan al Batnah", "Madinat ash Shamal", "Umm Salal"],
+  "Romania": ["Bucuresti", "Alba", "Arad", "Arges", "Bacau", "Bihor", "Bistrita-Nasaud", "Boto'ani", "Bra'ov", "Braila", "Buzau", "Caras-Severin", "Ca la ras'i", "Cluj", "Constant'a", "Covasna", "Dambovit'a", "Dolj", "Galat'i", "Giurgiu", "Gorj", "Harghita", "Hunedoara", "Ialomit'a", "Ias'i", "Ilfov", "Maramures", "Mehedint'i", "Mures", "Neamt", "Olt", "Prahova", "Satu Mare", "Sa laj", "Sibiu", "Suceava", "Teleorman", "Timis", "Tulcea", "Vaslui", "Valcea", "Vrancea"],
+  "Russian Federation": ["Adygeya, Respublika", "Altay, Respublika", "Bashkortostan, Respublika", "Buryatiya, Respublika", "Chechenskaya Respublika", "Chuvashskaya Respublika", "Dagestan, Respublika", "Ingushskaya Respublika", "Kabardino-Balkarskaya", "Kalmykiya, Respublika", "Karachayevo-Cherkesskaya Respublika", "Kareliya, Respublika", "Khakasiya, Respublika", "Komi, Respublika", "Mariy El, Respublika", "Mordoviya, Respublika", "Sakha, Respublika [Yakutiya]", "Severnaya Osetiya, Respublika", "Tatarstan, Respublika", "Tyva, Respublika [Tuva]", "Udmurtskaya Respublika", "Altayskiy kray", "Khabarovskiy kray", "Krasnodarskiy kray", "Krasnoyarskiy kray", "Primorskiy kray", "Stavropol'skiy kray", "Amurskaya oblast'", "Arkhangel'skaya oblast'", "Astrakhanskaya oblast'", "Belgorodskaya oblast'", "Bryanskaya oblast'", "Chelyabinskaya oblast'", "Chitinskaya oblast'", "Irkutskaya oblast'", "Ivanovskaya oblast'", "Kaliningradskaya oblast'", "Kaluzhskaya oblast'", "Kamchatskaya oblast'", "Kemerovskaya oblast'", "Kirovskaya oblast'", "Kostromskaya oblast'", "Kurganskaya oblast'", "Kurskaya oblast'", "Leningradskaya oblast'", "Lipetskaya oblast'", "Magadanskaya oblast'", "Moskovskaya oblast'", "Murmanskaya oblast'", "Nizhegorodskaya oblast'", "Novgorodskaya oblast'", "Novosibirskaya oblast'", "Omskaya oblast'", "Orenburgskaya oblast'", "Orlovskaya oblast'", "Penzenskaya oblast'", "Permskaya oblast'", "Pskovskaya oblast'", "Rostovskaya oblast'", "Ryazanskaya oblast'", "Sakhalinskaya oblast'", "Samarskaya oblast'", "Saratovskaya oblast'", "Smolenskaya oblast'", "Sverdlovskaya oblast'", "Tambovskaya oblast'", "Tomskaya oblast'", "Tul'skaya oblast'", "Tverskaya oblast'", "Tyumenskaya oblast'", "Ul'yanovskaya oblast'", "Vladimirskaya oblast'", "Volgogradskaya oblast'", "Vologodskaya oblast'", "Voronezhskaya oblast'", "Yaroslavskaya oblast'", "Moskva", "Sankt-Peterburg", "Yevreyskaya avtonomnaya oblast'", "Aginskiy Buryatskiy avtonomnyy", "Chukotskiy avtonomnyy okrug", "Evenkiyskiy avtonomnyy okrug", "Khanty-Mansiyskiy avtonomnyy okrug", "Komi-Permyatskiy avtonomnyy okrug", "Koryakskiy avtonomnyy okrug", "Nenetskiy avtonomnyy okrug", "Taymyrskiy (Dolgano-Nenetskiy)", "Ust'-Ordynskiy Buryatskiy", "Yamalo-Nenetskiy avtonomnyy okrug"],
+  "Rwanda": ["Butare", "Byumba", "Cyangugu", "Gikongoro", "Gisenyi", "Gitarama", "Kibungo", "Kibuye", "Kigali-Rural Kigali y' Icyaro", "Kigali-Ville Kigali Ngari", "Mutara", "Ruhengeri"],
+  "Reunion": [],
+  "Saint Helena": ["Saint Helena", "Ascension", "Tristan da Cunha"],
+  "Saint Kitts and Nevis": [],
+  "Saint Lucia": [],
+  "Saint Pierre and Miquelon": [],
+  "Saint Vincent and the Grenadines": [],
+  "Samoa": ["A'ana", "Aiga-i-le-Tai", "Atua", "Fa'aaaleleaga", "Gaga'emauga", "Gagaifomauga", "Palauli", "Satupa'itea", "Tuamasaga", "Va'a-o-Fonoti", "Vaisigano"],
+  "San Marino": [],
+  "Saudi Arabia": ["Al Batah", "Al H,udd ash Shamallyah", "Al Jawf", "Al Madinah", "Al Qasim", "Ar Riyad", "Asir", "Ha'il", "Jlzan", "Makkah", "Najran", "Tabuk"],
+  "Senegal": ["Dakar", "Diourbel", "Fatick", "Kaolack", "Kolda", "Louga", "Matam", "Saint-Louis", "Tambacounda", "Thies", "Ziguinchor"],
+  "Seychelles": [],
+  "Sierra Leone": ["Western Area (Freetown)"],
+  "Singapore": [],
+  "Slovakia": ["Banskobystrický kraj", "Bratislavský kraj", "Košický kraj", "Nitriansky kraj", "Prešovský kraj", "Trenčiansky kraj", "Trnavský kraj", "Žilinský kraj"],
+  "Slovenia": ["Ajdovscina", "Beltinci", "Benedikt", "Bistrica ob Sotli", "Bled", "Bloke", "Bohinj", "Borovnica", "Bovec", "Braslovce", "Brda", "Brezovica", "Brezica", "Cankova", "Celje", "Cerklje na Gorenjskem", "Cerknica", "Cerkno", "Cerkvenjak", "Crensovci", "Crna na Koroskem", "Crnomelj", "Destrnik", "Divaca", "Dobje", "Dobrepolje", "Dobrna", "Dobrova-Polhov Gradec", "Dobrovnik", "Dol pri Ljubljani", "Dolenjske Toplice", "Domzale", "Dornava", "Dravograd", "Duplek", "Gorenja vas-Poljane", "Gorsnica", "Gornja Radgona", "Gornji Grad", "Gornji Petrovci", "Grad", "Grosuplje", "Hajdina", "Hoce-Slivnica", "Hodos", "Jorjul", "Hrastnik", "Hrpelje-Kozina", "Idrija", "Ig", "IIrska Bistrica", "Ivancna Gorica", "Izola", "Jesenice", "Jezersko", "Jursinci", "Kamnik", "Kanal", "Kidricevo", "Kobarid", "Kobilje", "Jovevje", "Komen", "Komenda", "Koper", "Kostel", "Kozje", "Kranj", "Kranjska Gora", "Krizevci", "Krsko", "Kungota", "Kuzma", "Lasko", "Lenart", "Lendava", "Litija", "Ljubljana", "Ljubno", "Ljutomer", "Logatec", "Loska dolina", "Loski Potok", "Lovrenc na Pohorju", "Luce", "Lukovica", "Majsperk", "Maribor", "Markovci", "Medvode", "Menges", "Metlika", "Mezica", "Miklavz na Dravskern polju", "Miren-Kostanjevica", "Mirna Pec", "Mislinja", "Moravce", "Moravske Toplice", "Mozirje", "Murska Sobota", "Muta", "Naklo", "Nazarje", "Nova Gorica", "Nova mesto", "Sveta Ana", "Sveti Andraz v Slovenskih goricah", "Sveti Jurij", "Salovci", "Sempeter-Vrtojba", "Sencur", "Sentilj", "Sentjernej", "Sentjur pri Celju", "Skocjan", "Skofja Loka", "Skoftjica", "Smarje pri Jelsah", "Smartno ob Paki", "Smartno pri Litiji", "Sostanj", "Store", "Tabor", "Tisina", "Tolmin", "Trbovje", "Trebnje", "Trnovska vas", "Trzic", "Trzin", "Turnisce", "Velenje", "Velika Polana", "Velika Lasce", "Verzej", "Videm", "Vipava", "Vitanje", "Vojnik", "Vransko", "Vrhnika", "Vuzenica", "Zagorje ob Savi", "Zavrc", "Zrece", "Zalec", "Zelezniki", "Zetale", "Ziri", "Zirovnica", "Zuzemberk"],
+  "Solomon Islands": ["Capital Territory (Honiara)", "Guadalcanal", "Isabel", "Makira", "Malaita", "Temotu"],
+  "Somalia": ["Awdal", "Bakool", "Banaadir", "Bay", "Galguduud", "Gedo", "Hiirsan", "Jubbada Dhexe", "Jubbada Hoose", "Mudug", "Nugaal", "Saneag", "Shabeellaha Dhexe", "Shabeellaha Hoose", "Sool", "Togdheer", "Woqooyi Galbeed"],
+  "South Africa": ["Eastern Cape", "Free State", "Gauteng", "Kwazulu-Natal", "Mpumalanga", "Northern Cape", "Limpopo", "Western Cape", "North West"],
+  "South Georgia and the South Sandwich Islands": [],
+  "Spain": ["Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz", "Baleares", "Barcelona", "Burgos", "Cáceres", "Cádiz", "Cantabria", "Castellón", "Ciudad Real", "Cuenca", "Girona [Gerona]", "Granada", "Guadalajara", "Guipúzcoa", "Huelva", "Huesca", "Jaén", "La Coruña", "La Rioja", "Las Palmas", "León", "Lleida [Lérida]", "Lugo", "Madrid", "Málaga", "Murcia", "Navarra", "Ourense", "Palencia", "Pontevedra", "Salamanca", "Santa Cruz de Tenerife", "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel", "Valencia", "Valladolid", "Vizcaya", "Zamora", "Zaragoza", "Ceuta", "Melilla"],
+  "Sri Lanka": ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalla", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaittivu", "Nuwara Eliya", "Polonnaruwa", "Puttalum", "Ratnapura", "Trincomalee", "VavunLya"],
+  "Sudan": ["A'ali an Nil", "Al Bah al Ahmar", "Al Buhayrat", "Al Jazirah", "Al Khartum", "Al Qadarif", "Al Wahdah", "An Nil", "An Nil al Abyaq", "An Nil al Azraq", "Ash Shamallyah", "Bahr al Jabal", "Gharb al Istiwa'iyah", "Gharb Ba~r al Ghazal", "Gharb Darfur", "Gharb Kurdufan", "Janub Darfur", "Janub Rurdufan", "Jnqall", "Kassala", "Shamal Batr al Ghazal", "Shamal Darfur", "Shamal Kurdufan", "Sharq al Istiwa'iyah", "Sinnar", "Warab"],
+  "Suriname": ["Brokopondo", "Commewijne", "Coronie", "Marowijne", "Nickerie", "Paramaribo", "Saramacca", "Sipaliwini", "Wanica"],
+  "Svalbard and Jan Mayen": [],
+  "Swaziland": ["Hhohho", "Lubombo", "Manzini", "Shiselweni"],
+  "Sweden": ["Blekinge lan", "Dalarnas lan", "Gotlands lan", "Gavleborge lan", "Hallands lan", "Jamtlande lan", "Jonkopings lan", "Kalmar lan", "Kronoberge lan", "Norrbottena lan", "Skane lan", "Stockholms lan", "Sodermanlands lan", "Uppsala lan", "Varmlanda lan", "Vasterbottens lan", "Vasternorrlands lan", "Vastmanlanda lan", "Vastra Gotalands lan", "Orebro lan", "Ostergotlands lan"],
+  "Switzerland": ["Aargau", "Appenzell Innerrhoden", "Appenzell Ausserrhoden", "Bern", "Basel-Landschaft", "Basel-Stadt", "Fribourg", "Geneva", "Glarus", "Graubunden", "Jura", "Luzern", "Neuchatel", "Nidwalden", "Obwalden", "Sankt Gallen", "Schaffhausen", "Solothurn", "Schwyz", "Thurgau", "Ticino", "Uri", "Vaud", "Valais", "Zug", "Zurich"],
+  "Syrian Arab Republic": ["Al Hasakah", "Al Ladhiqiyah", "Al Qunaytirah", "Ar Raqqah", "As Suwayda'", "Dar'a", "Dayr az Zawr", "Dimashq", "Halab", "Hamah", "Jim'", "Idlib", "Rif Dimashq", "Tarts"],
+  "Sao Tome and Principe": ["Principe", "Sao Tome"],
+  "Taiwan": ["Changhua", "Chiayi", "Hsinchu", "Hualien", "Ilan", "Kaohsiung", "Miaoli", "Nantou", "Penghu", "Pingtung", "Taichung", "Tainan", "Taipei", "Taitung", "Taoyuan", "Yunlin", "Keelung"],
+  "Tajikistan": ["Sughd", "Khatlon", "Gorno-Badakhshan"],
+  "Tanzania, United Republic of": ["Arusha", "Dar-es-Salaam", "Dodoma", "Iringa", "Kagera", "Kaskazini Pemba", "Kaskazini Unguja", "Xigoma", "Kilimanjaro", "Rusini Pemba", "Kusini Unguja", "Lindi", "Manyara", "Mara", "Mbeya", "Mjini Magharibi", "Morogoro", "Mtwara", "Pwani", "Rukwa", "Ruvuma", "Shinyanga", "Singida", "Tabora", "Tanga"],
+  "Thailand": ["Krung Thep Maha Nakhon Bangkok", "Phatthaya", "Amnat Charoen", "Ang Thong", "Buri Ram", "Chachoengsao", "Chai Nat", "Chaiyaphum", "Chanthaburi", "Chiang Mai", "Chiang Rai", "Chon Buri", "Chumphon", "Kalasin", "Kamphasng Phet", "Kanchanaburi", "Khon Kaen", "Krabi", "Lampang", "Lamphun", "Loei", "Lop Buri", "Mae Hong Son", "Maha Sarakham", "Mukdahan", "Nakhon Nayok", "Nakhon Pathom", "Nakhon Phanom", "Nakhon Ratchasima", "Nakhon Sawan", "Nakhon Si Thammarat", "Nan", "Narathiwat", "Nong Bua Lam Phu", "Nong Khai", "Nonthaburi", "Pathum Thani", "Pattani", "Phangnga", "Phatthalung", "Phayao", "Phetchabun", "Phetchaburi", "Phichit", "Phitsanulok", "Phrae", "Phra Nakhon Si Ayutthaya", "Phaket", "Prachin Buri", "Prachuap Khiri Khan", "Ranong", "Ratchaburi", "Rayong", "Roi Et", "Sa Kaeo", "Sakon Nakhon", "Samut Prakan", "Samut Sakhon", "Samut Songkhram", "Saraburi", "Satun", "Sing Buri", "Si Sa Ket", "Songkhla", "Sukhothai", "Suphan Buri", "Surat Thani", "Surin", "Tak", "Trang", "Trat", "Ubon Ratchathani", "Udon Thani", "Uthai Thani", "Uttaradit", "Yala", "Yasothon"],
+  "Bahamas": ["Acklins and Crooked Islands", "Bimini", "Cat Island", "Exuma", "Freeport", "Fresh Creek", "Governor's Harbour", "Green Turtle Cay", "Harbour Island", "High Rock", "Inagua", "Kemps Bay", "Long Island", "Marsh Harbour", "Mayaguana", "New Providence", "Nicholls Town and Berry Islands", "Ragged Island", "Rock Sound", "Sandy Point", "San Salvador and Rum Cay"],
+  "Gambia": ["Banjul", "Lower River", "MacCarthy Island", "North Bank", "Upper River"],
+  "Togo": ["Kara", "Maritime (Region)", "Savannes"],
+  "Tokelau": [],
+  "Tonga": [],
+  "Trinidad and Tobago": ["Couva-Tabaquite-Talparo", "Diego Martin", "Eastern Tobago", "Penal-Debe", "Princes Town", "Rio Claro-Mayaro", "Sangre Grande", "San Juan-Laventille", "Siparia", "Tunapuna-Piarco", "Western Tobago", "Arima", "Chaguanas", "Point Fortin", "Port of Spain", "San Fernando"],
+  "Tunisia": ["Béja", "Ben Arous", "Bizerte", "Gabès", "Gafsa", "Jendouba", "Kairouan", "Rasserine", "Kebili", "L'Ariana", "Le Ref", "Mahdia", "La Manouba", "Medenine", "Moneatir", "Naboul", "Sfax", "Sidi Bouxid", "Siliana", "Sousse", "Tataouine", "Tozeur", "Tunis", "Zaghouan"],
+  "Turkey": ["Adana", "Ad yaman", "Afyon", "Ag r", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin", "Aydin", "Bal kesir", "Bartin", "Batman", "Bayburt", "Bilecik", "Bingol", "Bitlis", "Bolu", "Burdur", "Bursa", "Canakkale", "Cankir", "Corum", "Denizli", "Diyarbakir", "Duzce", "Edirne", "Elazig", "Erzincan", "Erzurum", "Eskis'ehir", "Gaziantep", "Giresun", "Gms'hane", "Hakkari", "Hatay", "Igidir", "Isparta", "Icel", "Istanbul", "Izmir", "Kahramanmaras", "Karabk", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kirikkale", "Kirklareli", "Kirs'ehir", "Kilis", "Kocaeli", "Konya", "Ktahya", "Malatya", "Manisa", "Mardin", "Mugila", "Mus", "Nevs'ehir", "Nigide", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "S'anliurfa", "S'rnak", "Tekirdag", "Tokat", "Trabzon", "Tunceli", "Us'ak", "Van", "Yalova", "Yozgat", "Zonguldak"],
+  "Turkmenistan": ["Ahal", "Balkan", "Dasoguz", "Lebap", "Mary"],
+  "Turks and Caicos Islands": [],
+  "Tuvalu": [],
+  "Uganda": ["Adjumani", "Apac", "Arua", "Bugiri", "Bundibugyo", "Bushenyi", "Busia", "Gulu", "Hoima", "Iganga", "Jinja", "Kabale", "Kabarole", "Kaberamaido", "Kalangala", "Kampala", "Kamuli", "Kamwenge", "Kanungu", "Kapchorwa", "Kasese", "Katakwi", "Kayunga", "Kibaale", "Kiboga", "Kisoro", "Kitgum", "Kotido", "Kumi", "Kyenjojo", "Lira", "Luwero", "Masaka", "Masindi", "Mayuge", "Mbale", "Mbarara", "Moroto", "Moyo", "Mpigi", "Mubende", "Mukono", "Nakapiripirit", "Nakasongola", "Nebbi", "Ntungamo", "Pader", "Pallisa", "Rakai", "Rukungiri", "Sembabule", "Sironko", "Soroti", "Tororo", "Wakiso", "Yumbe"],
+  "Ukraine": ["Cherkas'ka Oblast'", "Chernihivs'ka Oblast'", "Chernivets'ka Oblast'", "Dnipropetrovs'ka Oblast'", "Donets'ka Oblast'", "Ivano-Frankivs'ka Oblast'", "Kharkivs'ka Oblast'", "Khersons'ka Oblast'", "Khmel'nyts'ka Oblast'", "Kirovohrads'ka Oblast'", "Kyivs'ka Oblast'", "Luhans'ka Oblast'", "L'vivs'ka Oblast'", "Mykolaivs'ka Oblast'", "Odes 'ka Oblast'", "Poltavs'ka Oblast'", "Rivnens'ka Oblast'", "Sums 'ka Oblast'", "Ternopil's'ka Oblast'", "Vinnyts'ka Oblast'", "Volyos'ka Oblast'", "Zakarpats'ka Oblast'", "Zaporiz'ka Oblast'", "Zhytomyrs'ka Oblast'", "Respublika Krym", "Kyiv", "Sevastopol"],
+  "United Arab Emirates": ["Abu Zaby", "'Ajman", "Al Fujayrah", "Ash Shariqah", "Dubayy", "Ra's al Khaymah", "Umm al Qaywayn"],
+  "United Kingdom": ["Aberdeen City", "Aberdeenshire", "Angus", "Co Antrim", "Argyll and Bute", "Co Armagh", "Bedfordshire", "Gwent", "Bristol, City of", "Buckinghamshire", "Cambridgeshire", "Cheshire", "Clackmannanshire", "Cornwall", "Cumbria", "Derbyshire", "Co Londonderry", "Devon", "Dorset", "Co Down", "Dumfries and Galloway", "Dundee City", "County Durham", "East Ayrshire", "East Dunbartonshire", "East Lothian", "East Renfrewshire", "East Riding of Yorkshire", "East Sussex", "Edinburgh, City of", "Na h-Eileanan Siar", "Essex", "Falkirk", "Co Fermanagh", "Fife", "Glasgow City", "Gloucestershire", "Gwynedd", "Hampshire", "Herefordshire", "Hertfordshire", "Highland", "Inverclyde", "Isle of Wight", "Kent", "Lancashire", "Leicestershire", "Midlothian", "Moray", "Norfolk", "North Ayrshire", "North Lanarkshire", "North Yorkshire", "Northamptonshire", "Northumberland", "Nottinghamshire", "Oldham", "Omagh", "Orkney Islands", "Oxfordshire", "Perth and Kinross", "Powys", "Renfrewshire", "Rutland", "Scottish Borders", "Shetland Islands", "Shropshire", "Somerset", "South Ayrshire", "South Gloucestershire", "South Lanarkshire", "Staffordshire", "Stirling", "Suffolk", "Surrey", "Mid Glamorgan", "Warwickshire", "West Dunbartonshire", "West Lothian", "West Sussex", "Wiltshire", "Worcestershire", "Tyne and Wear", "Greater Manchester", "Co Tyrone", "West Yorkshire", "South Yorkshire", "Merseyside", "Berkshire", "West Midlands", "West Glamorgan", "Greater London", "Clwyd", "Dyfed", "South Glamorgan"],
+  "United States Minor Outlying Islands": ["Baker Island", "Howland Island", "Jarvis Island", "Johnston Atoll", "Kingman Reef", "Midway Islands", "Navassa Island", "Palmyra Atoll", "Wake Ialand"],
+  "United States": ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "District of Columbia", "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "Virgin Islands", "United States Minor Outlying Islands", "Armed Forces Europe", "Armed Forces Americas", "Armed Forces Pacific"],
+  "Uruguay": ["Artigsa", "Canelones", "Cerro Largo", "Colonia", "Durazno", "Flores", "Lavalleja", "Maldonado", "Montevideo", "Paysandu", "Rivera", "Rocha", "Salto", "Soriano", "Tacuarembo", "Treinta y Tres"],
+  "Uzbekistan": ["Toshkent (city)", "Qoraqalpogiston Respublikasi", "Andijon", "Buxoro", "Farg'ona", "Jizzax", "Khorazm", "Namangan", "Navoiy", "Qashqadaryo", "Samarqand", "Sirdaryo", "Surxondaryo", "Toshkent", "Xorazm"],
+  "Vanuatu": ["Malampa", "Penama", "Sanma", "Shefa", "Tafea", "Torba"],
+  "Venezuela": ["Diatrito Federal", "Anzoategui", "Apure", "Aragua", "Barinas", "Carabobo", "Cojedes", "Falcon", "Guarico", "Lara", "Merida", "Miranda", "Monagas", "Nueva Esparta", "Portuguesa", "Tachira", "Trujillo", "Vargas", "Yaracuy", "Zulia", "Delta Amacuro", "Dependencias Federales"],
+  "Viet Nam": ["Dac Lac", "An Giang", "Ba Ria - Vung Tau", "Bac Can", "Bac Giang", "Bac Lieu", "Bac Ninh", "Ben Tre", "Binh Dinh", "Binh Duong", "Binh Phuoc", "Binh Thuan", "Ca Mau", "Can Tho", "Cao Bang", "Da Nang, thanh pho", "Dong Nai", "Dong Thap", "Gia Lai", "Ha Giang", "Ha Nam", "Ha Noi, thu do", "Ha Tay", "Ha Tinh", "Hai Duong", "Hai Phong, thanh pho", "Hoa Binh", "Ho Chi Minh, thanh pho [Sai Gon]", "Hung Yen", "Khanh Hoa", "Kien Giang", "Kon Tum", "Lai Chau", "Lam Dong", "Lang Son", "Lao Cai", "Long An", "Nam Dinh", "Nghe An", "Ninh Binh", "Ninh Thuan", "Phu Tho", "Phu Yen", "Quang Binh", "Quang Nam", "Quang Ngai", "Quang Ninh", "Quang Tri", "Soc Trang", "Son La", "Tay Ninh", "Thai Binh", "Thai Nguyen", "Thanh Hoa", "Thua Thien-Hue", "Tien Giang", "Tra Vinh", "Tuyen Quang", "Vinh Long", "Vinh Phuc", "Yen Bai"],
+  "Virgin Islands, U.S.": [],
+  "Wallis and Futuna": [],
+  "Western Sahara": [],
+  "Yemen": ["Abyan", "Adan", "Ad Dali", "Al Bayda'", "Al Hudaydah", "Al Mahrah", "Al Mahwit", "Amran", "Dhamar", "Hadramawt", "Hajjah", "Ibb", "Lahij", "Ma'rib", "Sa'dah", "San'a'", "Shabwah", "Ta'izz"],
+  "Serbia and Montenegro": ["Crna Gora", "Srbija", "Kosovo-Metohija", "Vojvodina"],
+  "Zambia": ["Copperbelt", "Luapula", "Lusaka", "North-Western"],
+  "Zimbabwe": ["Bulawayo", "Harare", "Manicaland", "Mashonaland Central", "Mashonaland East", "Mashonaland West", "Masvingo", "Matabeleland North", "Matabeleland South", "Midlands"],
+  "Åland Islands": [],
+  "Serbia": [],
+  "Montenegro": [],
+  "Jersey": [],
+  "Guernsey": [],
+  "Isle of Man": []
+};
+
+},{}],58:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+	shippingInfo: {
+		first_name: "",
+		last_name: "",
+		company: "",
+		country: "United States",
+		state: "Oregon",
+		zip: "",
+		city: "",
+		street_address_first: "",
+		street_address_second: "",
+		apt: "",
+		email: "",
+		confirm_email: "",
+		phone: "",
+		phone_preferred: false,
+		notes: ""
+	},
+	billingInfo: {
+		seperate_billing: false,
+		first_name: "",
+		last_name: "",
+		company: "",
+		country: "United States",
+		state: "Oregon",
+		zip: "",
+		city: "",
+		street_address_first: "",
+		street_address_second: "",
+		apt: ""
+	},
+
+	load: function load() {
+		if (sessionStorage.shippingInfo) {
+			this.shippingInfo = JSON.parse(sessionStorage.shippingInfo);
+		}
+		if (sessionStorage.billingInfo) {
+			this.billingInfo = JSON.parse(sessionStorage.billingInfo);
+		}
+	},
+
+	clear: function clear() {
+		this.shippingInfo = {
+			first_name: "",
+			last_name: "",
+			company: "",
+			country: "United States",
+			state: "Oregon",
+			zip: "",
+			city: "",
+			street_address_first: "",
+			street_address_second: "",
+			apt: "",
+			email: "",
+			confirm_email: "",
+			phone: "",
+			phone_preferred: false,
+			notes: ""
+		};
+
+		this.billingInfo = {
+			seperate_billing: false,
+			first_name: "",
+			last_name: "",
+			company: "",
+			country: "United States",
+			state: "Oregon",
+			zip: "",
+			city: "",
+			street_address_first: "",
+			street_address_second: "",
+			apt: ""
+		};
+
+		sessionStorage.removeItem('shippingInfo');
+		sessionStorage.removeItem('billingInfo');
+	}
+};
+
+},{}],59:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -14060,6 +15459,8 @@ Vue.use(VueResource);
 var App = require('./app.vue');
 var Page = require('./pages/page.vue');
 var Catalog = require('./pages/catalog.vue');
+var Checkout = require('./pages/checkout.vue');
+var Item = require('./pages/item.vue');
 
 // Set up routing and match routes to components
 var router = new VueRouter({
@@ -14071,12 +15472,23 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content');
 Vue.config.debug = true;
 
 router.map({
+	'item/:id': {
+		component: Item
+	},
 	'catalog/:id': {
 		component: Catalog
+	},
+	'checkout/:step': {
+		component: Checkout
 	},
 	'*': {
 		component: Page
 	}
+});
+
+router.beforeEach(function (transition) {
+	transition.to.router.app.search = true;
+	transition.next();
 });
 
 // Jquery watcher to modify div positioning on scroll
@@ -14091,9 +15503,8 @@ $(window).resize(function () {
 	resizeWindow();
 });
 
-console.log(Vue.http.options);
 router.start(App, '#app');
 
-},{"./app.vue":29,"./pages/catalog.vue":30,"./pages/page.vue":31,"vue":28,"vue-resource":16,"vue-router":27}]},{},[32]);
+},{"./app.vue":48,"./pages/catalog.vue":53,"./pages/checkout.vue":54,"./pages/item.vue":55,"./pages/page.vue":56,"vue":47,"vue-resource":35,"vue-router":46}]},{},[59]);
 
 //# sourceMappingURL=main.js.map

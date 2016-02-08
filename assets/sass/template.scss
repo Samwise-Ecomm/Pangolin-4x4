@@ -58,13 +58,13 @@ a:focus {
 	outline: 2px solid rgba(51, 51, 51, 0.3);
 }
 
+a {
+	border: 0;
+}
+
 a:hover,
 a:active {
 	outline: 0;
-}
-
-a img {
-	border: 0;
 }
 
 input::-ms-clear {
@@ -100,6 +100,7 @@ a {
 }
 
 a:hover {
+	cursor: pointer;
 	color: $highlight;
 }
 
@@ -118,12 +119,14 @@ b hr {
 }
 
 h1 {
+	font-weight: 400;
 	font-size: 25px;
 }
 
 h2 {
+	font-weight: 400;
 	font-size: 20px;
-	color: $active
+	color: $active;
 }
 
 h3 {
@@ -146,6 +149,14 @@ h6 {
 
 .u-highlight {
 	color: $highlight;
+}
+
+.u-light {
+	color: $active;
+}
+
+.u-thin {
+	font-weight: 200;
 }
 
 .u-contentWrapper {
@@ -229,8 +240,9 @@ i.u-active:hover {
 	cursor: pointer;
 }
 
-span.u-active {
-	color: $active;
+span.u-active:hover {
+	color: $highlight;
+	cursor: pointer;
 }
 
 img.u-active {
@@ -440,13 +452,18 @@ div.u-active {
 }
 
 #Head-searchIcon {
-	padding: 4px 0 0 6px;
+	padding: 0 0 0 6px;
 	float: left;
 	background: $light;
 	color: $lightest;
 	border-radius: 4px 0 0 4px;
 	height: 23px;
 	width: 24px;
+}
+
+#Head-searchIcon i {
+	position: relative;
+	top: -6px;
 }
 
 /* 3.2 Body */
@@ -501,6 +518,19 @@ div.u-active {
 
 #SideNav a:hover {
 	color: $active;
+}
+
+#SideNav .u-light a {
+	color: $active;
+}
+
+#SideNav .u-light a:hover {
+	color: $highlight;
+}
+
+#SideNav ul li {
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
 /* 3.4 Search */
@@ -654,6 +684,10 @@ div.u-active {
 	margin-bottom: 10px;
 }
 
+.CatalogItem-description p {
+	margin-left: 210px;
+}
+
 .Button.inCatalog {
 	height: 30px;
 	line-height: 30px;
@@ -725,6 +759,7 @@ div.u-active {
 #Variations {
 	clear: both;
 	padding-left: 10px;
+	padding-top: 10px;
 }
 
 .Variations-price {
@@ -817,6 +852,14 @@ div.u-active {
 .ProgressBar-todo {
     color: $light; 
     border-top: 4px solid $light;
+}
+
+.Checkout-errorList {
+  border: $highlight solid 2px;
+  border-radius: 10px;
+  padding: 10px;
+  background: #FF655C;
+  color: #fff;
 }
 
 /* 6.1 - Checkout Cart */
@@ -1139,6 +1182,10 @@ i.resize {
 	border: 1px solid $light;
 }
 
+.js-formInput.isSelected {
+	border: 1px solid #000;
+}
+
 .js-formInput:hover {
 	border-color: $active;
 	color: $active;
@@ -1212,10 +1259,10 @@ i.resize {
 	width: 0;
 	height: 0;
 	border: 10px solid;
-    border-color: transparent transparent $active transparent;
-    top: -30px;
-    left: 5px;
-    pointer-events: none;
+  border-color: transparent transparent $active transparent;
+  top: -30px;
+  left: 5px;
+  pointer-events: none;
 }
 
 .js-formWarn.isShown {
@@ -1223,6 +1270,11 @@ i.resize {
 }
 
 /* NEW STUFF */
+// Vue specific
+a.v-link-active, #SideNav a.v-link-active {
+	color: $highlight;
+}
+
 .u-width400 select {
   width: 380px !important;
 }

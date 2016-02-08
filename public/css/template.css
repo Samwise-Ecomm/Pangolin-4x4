@@ -47,12 +47,12 @@ a:focus {
   outline: 2px solid #c1c1c1;
   outline: 2px solid rgba(51, 51, 51, 0.3); }
 
+a {
+  border: 0; }
+
 a:hover,
 a:active {
   outline: 0; }
-
-a img {
-  border: 0; }
 
 input::-ms-clear {
   display: none; }
@@ -80,6 +80,7 @@ a {
   color: #dd8131; }
 
 a:hover {
+  cursor: pointer;
   color: #ce3229; }
 
 ul {
@@ -94,9 +95,11 @@ b hr {
   border-bottom: 1px solid #252525; }
 
 h1 {
+  font-weight: 400;
   font-size: 25px; }
 
 h2 {
+  font-weight: 400;
   font-size: 20px;
   color: #dd8131; }
 
@@ -116,6 +119,12 @@ h6 {
 
 .u-highlight {
   color: #ce3229; }
+
+.u-light {
+  color: #dd8131; }
+
+.u-thin {
+  font-weight: 200; }
 
 .u-contentWrapper {
   width: 900px;
@@ -180,8 +189,9 @@ i.u-active:hover {
   color: #ce3229;
   cursor: pointer; }
 
-span.u-active {
-  color: #dd8131; }
+span.u-active:hover {
+  color: #ce3229;
+  cursor: pointer; }
 
 img.u-active {
   padding: 5px;
@@ -353,13 +363,17 @@ div.u-active {
   outline: 0; }
 
 #Head-searchIcon {
-  padding: 4px 0 0 6px;
+  padding: 0 0 0 6px;
   float: left;
   background: #bebebe;
   color: #f7f7f7;
   border-radius: 4px 0 0 4px;
   height: 23px;
   width: 24px; }
+
+#Head-searchIcon i {
+  position: relative;
+  top: -6px; }
 
 /* 3.2 Body */
 #Body {
@@ -402,6 +416,16 @@ div.u-active {
 
 #SideNav a:hover {
   color: #dd8131; }
+
+#SideNav .u-light a {
+  color: #dd8131; }
+
+#SideNav .u-light a:hover {
+  color: #ce3229; }
+
+#SideNav ul li {
+  margin-top: 15px;
+  margin-bottom: 15px; }
 
 /* 3.4 Search */
 #Search {
@@ -524,6 +548,9 @@ div.u-active {
   margin-right: 10px;
   margin-bottom: 10px; }
 
+.CatalogItem-description p {
+  margin-left: 210px; }
+
 .Button.inCatalog {
   height: 30px;
   line-height: 30px;
@@ -582,7 +609,8 @@ div.u-active {
 
 #Variations {
   clear: both;
-  padding-left: 10px; }
+  padding-left: 10px;
+  padding-top: 10px; }
 
 .Variations-price {
   color: green;
@@ -677,6 +705,13 @@ div.u-active {
 .ProgressBar-todo {
   color: #bebebe;
   border-top: 4px solid #bebebe; }
+
+.Checkout-errorList {
+  border: #ce3229 solid 2px;
+  border-radius: 10px;
+  padding: 10px;
+  background: #FF655C;
+  color: #fff; }
 
 /* 6.1 - Checkout Cart */
 hr.inCheckoutCart {
@@ -955,6 +990,9 @@ i.resize {
   border-radius: 3px;
   border: 1px solid #bebebe; }
 
+.js-formInput.isSelected {
+  border: 1px solid #000; }
+
 .js-formInput:hover {
   border-color: #dd8131;
   color: #dd8131; }
@@ -1028,6 +1066,9 @@ i.resize {
   display: inline-block; }
 
 /* NEW STUFF */
+a.v-link-active, #SideNav a.v-link-active {
+  color: #ce3229; }
+
 .u-width400 select {
   width: 380px !important; }
 

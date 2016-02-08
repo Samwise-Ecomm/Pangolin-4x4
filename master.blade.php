@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta id="csrf-token" content="{{ csrf_token() }}" />
 	<title>Pangolin 4x4</title>
 
 	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:500,400,100' type='text/css'>
@@ -10,7 +11,7 @@
 	<link rel="stylesheet" href="/css/store/lightbox.css">
 
 </head>
-<body class="search">
+<body>
 	<div id="app"></div>
 
 	{{-- <script src="/js/store/cart.js"></script>
