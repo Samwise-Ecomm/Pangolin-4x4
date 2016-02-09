@@ -14190,12 +14190,6 @@ module.exports = {
 		};
 	},
 
-	route: {
-		data: function data() {
-			console.log('hi');
-		}
-	},
-
 	ready: function ready() {
 		this.getSettings();
 	},

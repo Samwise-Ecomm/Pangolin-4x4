@@ -76,12 +76,6 @@ module.exports = {
 		}
 	},
 
-	route: {
-		data () {
-			console.log('hi')
-		}
-	},
-
 	ready() {
 		this.getSettings()
 	},
