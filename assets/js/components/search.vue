@@ -1,10 +1,12 @@
 <template>
-	<ul v-if="focused">
-		<li v-for="result in results" :class="(selected == $index)?'u-light':''">
-			<a v-link="{ path: '/item/'+result.id }"><small>{{{ result.name }}}</small><br>
-			<small class="u-thin" v-if="result.type_info.part_number">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>
-		</li>
-	</ul>
+	<section id="SideNav-search">
+		<ul v-if="focused">
+			<li v-for="result in results" :class="(selected == $index)?'u-light':''">
+				<a v-link="{ path: '/item/'+result.id }"><small>{{{ result.name }}}</small><br>
+				<small class="u-thin" v-if="result.type_info.part_number">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>
+			</li>
+		</ul>
+	</section>
 </template>
 
 <script>
@@ -13,7 +15,8 @@ module.exports = {
 		return {
 			focused: false,
 			selected: 0,
-			results: []
+			results: [],
+			searching: false,
 		}
 	},
 
@@ -27,8 +30,10 @@ module.exports = {
 					if (response.data.length > 0) {
 						// TODO: log succesful query
 						$('#Head-searchIcon i').addClass('fa-check')
+						this.searching = false
 					} else {
 						$('#Head-searchIcon i').addClass('fa-times')
+						this.searching = false
 					}
 					
 					this.$set('results', response.data)
@@ -60,7 +65,9 @@ module.exports = {
       		this.selected = this.results.length - 1
       	}
       } else if (data.key == 'Enter') {
-      	this.$router.go({ path: '/item/'+this.results[this.selected].id })
+      	if (!this.searching) {
+      		this.$router.go({ path: '/item/'+this.results[this.selected].id })	
+      	}
       }
     },
 

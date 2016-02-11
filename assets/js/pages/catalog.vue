@@ -31,12 +31,23 @@
 		<section>
 			<div class="u-floatLeft" v-if="selected.pages > 1">
 				<span class="fa fa-chevron-left u-active" @click="changePage(selected.page - 1)"></span>&nbsp;
+				<span :class="(selected.page == 1)?'u-highlight':'u-active'" @click="changePage(1)">1</span>
+				<span v-if="selected.page > 3">...</span>
+				<span class="u-active" @click="changePage(selected.page - 1)" v-if="selected.page > 2">{{ selected.page - 1}}</span>
+				<span class="u-highlight" v-if="selected.page > 1 && selected.page < selected.pages">{{ selected.page}}</span>
+				<span class="u-active" @click="changePage(selected.page + 1)" v-if="selected.page < selected.pages - 1">{{ selected.page + 1}}</span>
+				<span v-if="selected.page < selected.pages - 2">...</span>
+				<span :class="(selected.page == selected.pages)?'u-highlight':'u-active'" @click="changePage(selected.pages)">{{ selected.pages }}</span>
+				<span class="fa fa-chevron-right u-active" @click="changePage(selected.page + 1)"></span>
+			</div>
+			<!-- <div class="u-floatLeft" v-if="selected.pages > 1">
+				<span class="fa fa-chevron-left u-active" @click="changePage(selected.page - 1)"></span>&nbsp;
 				<span v-for="p in selected.pages">
 					<span class="u-highlight" v-if="p + 1 == selected.page">{{ p + 1 }}</span>
 					<span class="u-active" v-else @click="changePage(p + 1)">{{ p + 1 }}</span>&nbsp;
 				</span>
 				<span class="fa fa-chevron-right u-active" @click="changePage(selected.page + 1)"></span>
-			</div>
+			</div> -->
 			<div class="u-floatRight">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>
 			<br><br>
 
@@ -91,10 +102,13 @@
 			<br>
 			<div class="u-floatRight" v-if="selected.pages > 1">
 				<span class="fa fa-chevron-left u-active" @click="changePage(selected.page - 1)"></span>&nbsp;
-				<span v-for="p in selected.pages">
-					<span class="u-highlight" v-if="p + 1 == selected.page">{{ p + 1 }}</span>
-					<span class="u-active" v-else @click="changePage(p + 1)">{{ p + 1 }}</span>&nbsp;
-				</span>
+				<span :class="(selected.page == 1)?'u-highlight':'u-active'" @click="changePage(1)">1</span>
+				<span v-if="selected.page > 3">...</span>
+				<span class="u-active" @click="changePage(selected.page - 1)" v-if="selected.page > 2">{{ selected.page - 1}}</span>
+				<span class="u-highlight" v-if="selected.page > 1 && selected.page < selected.pages">{{ selected.page}}</span>
+				<span class="u-active" @click="changePage(selected.page + 1)" v-if="selected.page < selected.pages - 1">{{ selected.page + 1}}</span>
+				<span v-if="selected.page < selected.pages - 2">...</span>
+				<span :class="(selected.page == selected.pages)?'u-highlight':'u-active'" @click="changePage(selected.pages)">{{ selected.pages }}</span>
 				<span class="fa fa-chevron-right u-active" @click="changePage(selected.page + 1)"></span>
 			</div>
 		</section>

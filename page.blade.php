@@ -65,7 +65,8 @@
 					<br>
 					Sidebar
 					<div class="u-thin">
-						Uncheck Enable Sidebar <br>to hide this.
+						Uncheck 'Enable Sidebar' <br>
+						to hide this.
 						<br><br>
 						Note: Disabling the sidebar will<br>
 						also disable searching and cart<br> 

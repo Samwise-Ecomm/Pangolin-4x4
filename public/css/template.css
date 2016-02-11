@@ -424,35 +424,17 @@ div.u-active {
   color: #ce3229; }
 
 #SideNav ul li {
-  margin-top: 15px;
-  margin-bottom: 15px; }
+  padding: 10px 0; }
+
+#SideNav-catalogs {
+  padding: 13px; }
 
 /* 3.4 Search */
-#Search {
-  width: 100%;
-  font-weight: 200;
-  color: white; }
+#SideNav-search {
+  background: #DCDCDC; }
 
-#Search a {
-  font-weight: 200;
-  color: white; }
-
-#Search a:hover {
-  color: white; }
-
-.Search-result {
-  width: 100%;
-  padding: 5px 10px 5px 10px;
-  text-align: left; }
-
-.Search-result:hover {
-  color: #dd8131; }
-
-.Search-result.is-even {
-  background: #404040; }
-
-.Search-result.is-odd {
-  background: #252525; }
+#SideNav-search li:nth-child(even) {
+  background: rgba(0, 0, 0, 0.05); }
 
 /* 3.5 Cart */
 #Cart {

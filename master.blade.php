@@ -13,6 +13,11 @@
 </head>
 <body>
 	<div id="app"></div>
+	<noscript>
+		<h1>Pangolin 4x4 requires javascript to function.</h1>
+		<h4>Though it appears that your browser either does not support javascript or has it disabled.<br>
+		To use Pangolin4x4 enable Javascript in your options and <a href="/">try again</a></h4>
+	</noscript>
 
 	{{-- <script src="/js/store/cart.js"></script>
 	<script src="/js/store/debounce.min.js"></script> --}}

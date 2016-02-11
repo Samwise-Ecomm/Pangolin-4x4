@@ -40,14 +40,15 @@
 					<router-view></router-view>
 				</div>
 				<div id="SideNav" v-if="search">
-					<search :query.sync="query"></search>
+					<search v-ref:search :query.sync="query"></search>
 					<cart v-ref:cart :checkout="false"></cart>
-					<br>
-					<span v-for="link in settings.menus.sidebar">
-						<b v-if="link.label">{{ link.name }}</b>
-						<a v-else v-link="{ path: '/catalog/'+link.slug }">{{ link.name }}</a>
-						<br><br>
-					</span>
+					<section id="SideNav-catalogs">
+						<span v-for="link in settings.menus.sidebar">
+							<b v-if="link.label">{{ link.name }}</b>
+							<a v-else v-link="{ path: '/catalog/'+link.slug }">{{ link.name }}</a>
+							<br><br>
+						</span>
+					</section>
 				</div>
 			</div>
 		</div>
@@ -107,6 +108,7 @@ module.exports = {
 			if (event.keyCode == 8 || (46 < event.keyCode && event.keyCode < 91) || event.keyCode > 145) {
 				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-search')
 				$('#Head-searchIcon i').addClass('fa-cog fa-spin')
+				this.$refs.search.searching = true
 			}
 		}
 	},
