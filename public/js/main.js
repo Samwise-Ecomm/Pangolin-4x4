@@ -14549,7 +14549,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":57,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"../store/geoInfo.js":58,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14714,7 +14714,14 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":58,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+},{"../store/invoiceInfo.js":59,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+'use strict';
+
+module.exports = function (input) {
+	return (input + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
+};
+
+},{}],54:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14736,6 +14743,25 @@ module.exports = {
 	route: {
 		data: function data() {
 			this.getCatalog();
+		}
+	},
+
+	computed: {
+		trim: function trim() {
+			if (this.catalog.tags.length <= 1) {
+				return 0;
+			}
+
+			var chunk = this.compareStartingChunks(this.catalog.tags[0], this.catalog.tags[1]);
+			if (this.catalog.tags.length == 2) {
+				return chunk.length;
+			}
+
+			for (var i = 2; i < this.catalog.tags.length; i++) {
+				var tag = this.catalog.tags[i];
+				chunk = this.compareStartingChunks(chunk, tag);
+			}
+			return chunk.length;
 		}
 	},
 
@@ -14851,10 +14877,30 @@ module.exports = {
 			this.$parent.$refs.cart.addToCart(cartItem, item.id, variant.id);
 
 			return 1;
+		},
+
+		compareStartingChunks: function compareStartingChunks(stringOne, stringTwo) {
+			var firstDash = stringOne.indexOf('-');
+			if (firstDash == -1) {
+				return "";
+			}
+
+			var firstChunk = stringOne.substring(0, firstDash);
+
+			var firstDash = stringTwo.indexOf('-');
+			if (firstDash == -1) {
+				return "";
+			}
+
+			if (stringTwo.substring(0, firstDash) == firstChunk) {
+				return firstChunk + '-';
+			} else {
+				return "";
+			}
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<section>\n\t\t\t<div class=\"u-floatLeft\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t\t<!-- <div class=\"u-floatLeft\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span v-for=\"p in selected.pages\">\n\t\t\t\t\t<span class=\"u-highlight\" v-if=\"p + 1 == selected.page\">{{ p + 1 }}</span>\n\t\t\t\t\t<span class=\"u-active\" v-else @click=\"changePage(p + 1)\">{{ p + 1 }}</span>&nbsp;\n\t\t\t\t</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div> -->\n\t\t\t<div class=\"u-floatRight\">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>\n\t\t\t<br><br>\n\n\t\t\t<div class=\"CatalogItem\" v-for=\"item in selected.items\">\n\t\t\t\t<a v-link=\"{ path: '/item/'+item.id }\">\n\t\t\t\t\t<img :src=\"'/img/'+item.images.medium[0]\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t\t\t</a>\n\t\t\t\t<div class=\"CatalogItem-description\">\n\t\t\t\t\t<h2><a v-link=\"{ path: '/item/'+item.id }\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t\t<br>\n\t\t\t\t\t<p>\n\t\t\t\t\t\t{{{ item.description }}}\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t</p>\n\t\t\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t\t        \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t        \t</div>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t\t</div>\n\t        \t<a v-link=\"{ path: '/item/'+item.id }\">\n\t        \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t        \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t        \t\t</div>\n\t        \t</a>\n\t        \t<span class=\"CatalogItem-price\">\n\t        \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t        \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t        \t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr class=\"u-clear\">\n\t\t\t</div>\n\n\t\t\t<br>\n\t\t\t<div class=\"u-floatRight\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t</section>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<section>\n\t\t\t<div class=\"u-floatLeft\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t\t<div class=\"u-floatRight\">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>\n\t\t\t<br><br>\n\n\t\t\t<div class=\"CatalogItem\" v-for=\"item in selected.items\">\n\t\t\t\t<a v-link=\"{ path: '/item/'+item.id }\">\n\t\t\t\t\t<img :src=\"'/img/'+item.images.medium[0]\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t\t\t</a>\n\t\t\t\t<div class=\"CatalogItem-description\">\n\t\t\t\t\t<h2><a v-link=\"{ path: '/item/'+item.id }\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t\t<br>\n\t\t\t\t\t<p>\n\t\t\t\t\t\t{{{ item.description }}}\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t</p>\n\t\t\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t\t        \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t        \t</div>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t\t</div>\n\t        \t<a v-link=\"{ path: '/item/'+item.id }\">\n\t        \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t        \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t        \t\t</div>\n\t        \t</a>\n\t        \t<span class=\"CatalogItem-price\">\n\t        \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t        \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t        \t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr class=\"u-clear\">\n\t\t\t</div>\n\n\t\t\t<br>\n\t\t\t<div class=\"u-floatRight\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t</section>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14866,7 +14912,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15003,7 +15049,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":49,"../components/contactInfo.vue":50,"../components/submitCheckout.vue":52,"../store/invoiceInfo.js":58,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"../components/cart.vue":49,"../components/contactInfo.vue":50,"../components/submitCheckout.vue":52,"../store/invoiceInfo.js":59,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15062,7 +15108,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{{ item.name + ', ' + item.type_info.state }}}</h1>\n\t\t<h4 v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<a :href=\"'/img/'+pic.path\" id=\"js-currentPicLink\" data-lightbox=\"pic\" v-for=\"pic in item.images.large\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[$index]\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"pic.selected\">\n\t\t</a>\n\t  <img :src=\"'/img/'+pic\" class=\"u-activeImg Pictures-thumb\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" v-for=\"pic in item.images.small\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ item.description }}}\n\t\t\t<br><br>\n\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"item.variants.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ item.variants[0].price | currency }}\n\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"item.variants[0].stock > 0 || item.variants[0].infinite\" :variant-id=\"item.variants[0].id\" @click=\"addToCart(item.variants[0])\">\n\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t</div>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\tOut of Stock\n\t\t\t</div>\n\t\t</section>\n\t\t\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"variant in item.variants\">\n\t\t\t\t<td>{{ variant.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ variant.price | currency }}\n\t\t\t\t\t<span v-if=\"variant.unit != 'Unit'\" class=\"u-thin\"> / {{ variant.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"variant.stock > 0 || variant.infinite\" :variant-id=\"variant.id\" @click=\"addToCart(variant)\">\n\t\t\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Specs\">\n\t\t<div v-if=\"item.x\"> Dimensions: {{ item.x }}\"\n\t\t\t<span v-if=\"item.y\"> x {{ item.y }}\"\n\t\t\t\t<span v-if=\"item.z\"> x {{ item.z }}\"</span>\n\t\t\t</span>\n\t\t</div>\n\t\t<div v-if=\"item.weight\">{{ item.weight }} lbs.</div>\n\t\t<hr v-if=\"item.weight || item.x\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"item.type_info.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in item.type_info.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{{ item.name + ', ' + item.type_info.state }}}</h1>\n\t\t<h4 v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<a :href=\"'/img/'+pic.path\" id=\"js-currentPicLink\" data-lightbox=\"pic\" v-for=\"pic in item.images.large\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[$index]\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"pic.selected\">\n\t\t</a>\n\t  <img :src=\"'/img/'+pic\" class=\"u-activeImg Pictures-thumb\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" v-for=\"pic in item.images.small\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ item.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"item.variants.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ item.variants[0].price | currency }}\n\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"item.variants[0].stock > 0 || item.variants[0].infinite\" :variant-id=\"item.variants[0].id\" @click=\"addToCart(item.variants[0])\">\n\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t</div>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\tOut of Stock\n\t\t\t</div>\n\t\t</section>\n\t\t\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"variant in item.variants\">\n\t\t\t\t<td>{{ variant.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ variant.price | currency }}\n\t\t\t\t\t<span v-if=\"variant.unit != 'Unit'\" class=\"u-thin\"> / {{ variant.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"variant.stock > 0 || variant.infinite\" :variant-id=\"variant.id\" @click=\"addToCart(variant)\">\n\t\t\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Specs\">\n\t\t<div v-if=\"item.x\"> Dimensions: {{ item.x }}\"\n\t\t\t<span v-if=\"item.y\"> x {{ item.y }}\"\n\t\t\t\t<span v-if=\"item.z\"> x {{ item.z }}\"</span>\n\t\t\t</span>\n\t\t</div>\n\t\t<div v-if=\"item.weight\">{{ item.weight }} lbs.</div>\n\t\t<hr v-if=\"item.weight || item.x\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"item.type_info.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in item.type_info.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15074,7 +15120,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15113,7 +15159,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15364,7 +15410,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15446,7 +15492,7 @@ module.exports = {
 	}
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15455,6 +15501,10 @@ var VueRouter = require('vue-router');
 var VueResource = require('vue-resource');
 Vue.use(VueRouter);
 Vue.use(VueResource);
+
+// Vue-filters
+var nl2br = require('./filters/nl2br.js');
+Vue.filter('nl2br', nl2br);
 
 var App = require('./app.vue');
 var Page = require('./pages/page.vue');
@@ -15505,6 +15555,6 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./pages/catalog.vue":53,"./pages/checkout.vue":54,"./pages/item.vue":55,"./pages/page.vue":56,"vue":47,"vue-resource":35,"vue-router":46}]},{},[59]);
+},{"./app.vue":48,"./filters/nl2br.js":53,"./pages/catalog.vue":54,"./pages/checkout.vue":55,"./pages/item.vue":56,"./pages/page.vue":57,"vue":47,"vue-resource":35,"vue-router":46}]},{},[60]);
 
 //# sourceMappingURL=main.js.map

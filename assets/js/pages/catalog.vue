@@ -9,7 +9,7 @@
 				<li v-for="tag in catalog.tags">
 					<label for='{{ tag }}'} class='Checkbox'>
 						<input type='checkbox' id='{{ tag }}' checked @click='toggleTag(tag)'>
-						<i class="fa fa-fw" :class="(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'"></i> {{ tag }}
+						<i class="fa fa-fw" :class="(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'"></i> {{ tag.substring(trim) }}
 					</label>
 				</li>
 			</ul>
@@ -40,14 +40,6 @@
 				<span :class="(selected.page == selected.pages)?'u-highlight':'u-active'" @click="changePage(selected.pages)">{{ selected.pages }}</span>
 				<span class="fa fa-chevron-right u-active" @click="changePage(selected.page + 1)"></span>
 			</div>
-			<!-- <div class="u-floatLeft" v-if="selected.pages > 1">
-				<span class="fa fa-chevron-left u-active" @click="changePage(selected.page - 1)"></span>&nbsp;
-				<span v-for="p in selected.pages">
-					<span class="u-highlight" v-if="p + 1 == selected.page">{{ p + 1 }}</span>
-					<span class="u-active" v-else @click="changePage(p + 1)">{{ p + 1 }}</span>&nbsp;
-				</span>
-				<span class="fa fa-chevron-right u-active" @click="changePage(selected.page + 1)"></span>
-			</div> -->
 			<div class="u-floatRight">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>
 			<br><br>
 
@@ -136,6 +128,25 @@ module.exports = {
 		data () {
 			this.getCatalog()
 		},
+	},
+
+	computed: {
+		trim () {
+			if (this.catalog.tags.length <= 1) {
+				return 0
+			}
+
+			var chunk = this.compareStartingChunks(this.catalog.tags[0], this.catalog.tags[1])
+			if (this.catalog.tags.length == 2) {
+				return chunk.length
+			}
+
+			for (var i = 2; i < this.catalog.tags.length; i++) {
+				var tag = this.catalog.tags[i]
+				chunk = this.compareStartingChunks(chunk, tag)
+			}
+			return chunk.length
+		}
 	},
 
 	watch: {
@@ -250,6 +261,26 @@ module.exports = {
 			this.$parent.$refs.cart.addToCart(cartItem, item.id, variant.id)
 
 			return 1
+		},
+
+		compareStartingChunks(stringOne, stringTwo) {
+			var firstDash = stringOne.indexOf('-')
+			if (firstDash == -1) {
+				return ""
+			}
+
+			var firstChunk = stringOne.substring(0,firstDash)
+
+			var firstDash = stringTwo.indexOf('-')
+			if (firstDash == -1) {
+				return ""
+			}
+
+			if (stringTwo.substring(0,firstDash) == firstChunk) {
+				return firstChunk+'-'
+			} else {
+				return ""
+			}
 		}
 	},
 }

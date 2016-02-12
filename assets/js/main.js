@@ -5,6 +5,10 @@ var VueResource = 	require('vue-resource')
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
+// Vue-filters
+var nl2br 		= require('./filters/nl2br.js')
+Vue.filter('nl2br', nl2br)
+
 var App 			=	require('./app.vue')
 var Page 			= require('./pages/page.vue')
 var Catalog 	= require('./pages/catalog.vue')

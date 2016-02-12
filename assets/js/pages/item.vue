@@ -25,7 +25,7 @@
 		<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>
 		<br>
 		<p>
-			{{{ item.description }}}
+			{{{ item.description | nl2br }}}
 			<br><br>
 			{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.
 			<span v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>
