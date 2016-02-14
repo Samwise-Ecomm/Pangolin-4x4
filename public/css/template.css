@@ -140,6 +140,11 @@ h6 {
 .u-hide {
   display: none; }
 
+input.u-hide {
+  display: block;
+  position: fixed;
+  left: -9000px; }
+
 .u-floatRight {
   float: right; }
 
@@ -182,10 +187,10 @@ h6 {
   -ms-user-select: none;
   user-select: none; }
 
-i.u-active {
+i.u-active, li.u-active {
   color: #dd8131; }
 
-i.u-active:hover {
+i.u-active:hover, li.u-active:hover {
   color: #ce3229;
   cursor: pointer; }
 
@@ -1075,5 +1080,48 @@ ul.u-cols-2 {
 li.u-active:hover {
   cursor: pointer;
   color: #dd8131; }
+
+.upload-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity .3s ease; }
+
+.upload-wrapper {
+  display: table-cell;
+  vertical-align: middle; }
+
+.upload-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all .3s ease;
+  font-family: Helvetica, Arial, sans-serif; }
+
+.upload-header h3 {
+  margin-top: 0;
+  color: #42b983; }
+
+.upload-body {
+  margin: 20px 0; }
+
+.upload-default-button {
+  float: right; }
+
+.upload-enter, .upload-leave {
+  opacity: 0; }
+
+.upload-enter .upload-container,
+.upload-leave .upload-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1); }
 
 /*# sourceMappingURL=template.css.map */
