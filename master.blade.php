@@ -19,8 +19,6 @@
 		To use Pangolin4x4 enable Javascript in your options and <a href="/">try again</a></h4>
 	</noscript>
 
-	{{-- <script src="/js/store/cart.js"></script>
-	<script src="/js/store/debounce.min.js"></script> --}}
 	<script src="/js/store/jquery.min.js"></script>
 	<script src="/js/store/lightbox.min.js"></script>
 	<script src="/js/store/main.js"></script>
