@@ -108,6 +108,12 @@ module.exports = {
 		upload: require('./components/upload.vue')
 	},
 
+	events: {
+		insert (htm) {
+			ace.edit("editor").insert(htm)
+		}
+	},
+
 	methods: {
 		loadPage () {
 			var id = window.location.href.split('/')[window.location.href.split('/').length - 1]
