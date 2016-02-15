@@ -18,8 +18,8 @@
 							<label for="uploader">
 								<span class="u-active">[<span class="fa fa-plus"></span>] Upload new Image</span>
 							</label>
-							<input type="file" name="img" accept="image/bmp,image/gif,image/jpeg,image/png" id="uploader" class="u-hide" 
-								@change="upload"
+							<input type="file" name="img" accept="image/bmp,image/gif,image/jpeg,image/png" id="uploader" class="u-hide" multiple 
+								@change="startUpload"
 								v-el:uploader>
           	</li>
           </ul>
@@ -94,7 +94,8 @@
 		data: function() {
 			this.getImages()
 			return {
-				images: []
+				images: [],
+        index: 0,
 			}
 		},
 	  props: {
@@ -122,13 +123,23 @@
 	  		this.show = false
 	  	},
 
+      startUpload() {
+        this.index = 0
+        this.upload()
+      },
+
 	  	upload () {
+        if (this.index >= this.$els.uploader.files.length) {
+          return 1
+        }
 	  		var request = new FormData()
-      	request.append('uploader', this.$els.uploader.files[0])
+      	request.append('uploader', this.$els.uploader.files[this.index])
+        this.index++
 
       	this.$http.post('/admin/upload', request).then(function(response) {
       		if (response.data !== 0) {
       			this.images.push(response.data)
+            this.upload()
       		}
       	})
 	  	}

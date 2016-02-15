@@ -11530,50 +11530,61 @@ var __vueify_style__ = require("vueify-insert-css").insert("\n.upload-mask {\n  
 'use strict';
 
 module.exports = {
-	data: function data() {
-		this.getImages();
-		return {
-			images: []
-		};
-	},
-	props: {
-		show: {
-			type: Boolean,
-			required: true,
-			twoWay: true
-		}
-	},
-	methods: {
-		getImages: function getImages() {
-			this.$http.get('/admin/upload').then(function (response) {
-				this.$set('images', response.data);
-			});
-		},
-
-		deleteImage: function deleteImage(image) {
-			this.$http['delete']('/admin/upload', { image: image }).then(function (response) {
+		data: function data() {
 				this.getImages();
-			});
+				return {
+						images: [],
+						index: 0
+				};
 		},
-
-		insertImage: function insertImage(image) {
-			this.$dispatch('insert', '/img/uploads/' + image);
-			this.show = false;
-		},
-
-		upload: function upload() {
-			var request = new FormData();
-			request.append('uploader', this.$els.uploader.files[0]);
-
-			this.$http.post('/admin/upload', request).then(function (response) {
-				if (response.data !== 0) {
-					this.images.push(response.data);
+		props: {
+				show: {
+						type: Boolean,
+						required: true,
+						twoWay: true
 				}
-			});
+		},
+		methods: {
+				getImages: function getImages() {
+						this.$http.get('/admin/upload').then(function (response) {
+								this.$set('images', response.data);
+						});
+				},
+
+				deleteImage: function deleteImage(image) {
+						this.$http['delete']('/admin/upload', { image: image }).then(function (response) {
+								this.getImages();
+						});
+				},
+
+				insertImage: function insertImage(image) {
+						this.$dispatch('insert', '/img/uploads/' + image);
+						this.show = false;
+				},
+
+				startUpload: function startUpload() {
+						this.index = 0;
+						this.upload();
+				},
+
+				upload: function upload() {
+						if (this.index >= this.$els.uploader.files.length) {
+								return 1;
+						}
+						var request = new FormData();
+						request.append('uploader', this.$els.uploader.files[this.index]);
+						this.index++;
+
+						this.$http.post('/admin/upload', request).then(function (response) {
+								if (response.data !== 0) {
+										this.images.push(response.data);
+										this.upload();
+								}
+						});
+				}
 		}
-	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"upload-mask\" v-show=\"show\" transition=\"upload\">\n    <div class=\"upload-wrapper\">\n      <div class=\"upload-container\">\n\n        <div class=\"upload-header\">\n          <i class=\"fa fa-upload\"></i> Image Upload<br>\n          <i class=\"u-thin\">Select image below to insert.</i>\n        </div>\n        \n        <div class=\"upload-body\">\n          <ul>\n          \t<li v-for=\"image in images\">\n          \t\t[<span class=\"fa fa-minus fa-sm u-active\" @click=\"deleteImage(image)\"></span>]\n          \t\t<span class=\"u-active\" @click=\"insertImage(image)\">{{ image }}</span>\n          \t</li>\n          \t<li>\n\t\t\t\t\t\t\t<label for=\"uploader\">\n\t\t\t\t\t\t\t\t<span class=\"u-active\">[<span class=\"fa fa-plus\"></span>] Upload new Image</span>\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t<input type=\"file\" name=\"img\" accept=\"image/bmp,image/gif,image/jpeg,image/png\" id=\"uploader\" class=\"u-hide\" @change=\"upload\" v-el:uploader=\"\">\n          \t</li>\n          </ul>\n        </div>\n\n        <div class=\"upload-footer\">\n          <slot name=\"footer\">\n            <div class=\"Button Button--thin Button--dark\" @click=\"show = false\">\n\t\t\t\t\t\t\tCancel</div>\n          </slot>\n        </div>\n      </div>\n    </div>\n  </div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"upload-mask\" v-show=\"show\" transition=\"upload\">\n    <div class=\"upload-wrapper\">\n      <div class=\"upload-container\">\n\n        <div class=\"upload-header\">\n          <i class=\"fa fa-upload\"></i> Image Upload<br>\n          <i class=\"u-thin\">Select image below to insert.</i>\n        </div>\n        \n        <div class=\"upload-body\">\n          <ul>\n          \t<li v-for=\"image in images\">\n          \t\t[<span class=\"fa fa-minus fa-sm u-active\" @click=\"deleteImage(image)\"></span>]\n          \t\t<span class=\"u-active\" @click=\"insertImage(image)\">{{ image }}</span>\n          \t</li>\n          \t<li>\n\t\t\t\t\t\t\t<label for=\"uploader\">\n\t\t\t\t\t\t\t\t<span class=\"u-active\">[<span class=\"fa fa-plus\"></span>] Upload new Image</span>\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t<input type=\"file\" name=\"img\" accept=\"image/bmp,image/gif,image/jpeg,image/png\" id=\"uploader\" class=\"u-hide\" multiple=\"\" @change=\"startUpload\" v-el:uploader=\"\">\n          \t</li>\n          </ul>\n        </div>\n\n        <div class=\"upload-footer\">\n          <slot name=\"footer\">\n            <div class=\"Button Button--thin Button--dark\" @click=\"show = false\">\n\t\t\t\t\t\t\tCancel</div>\n          </slot>\n        </div>\n      </div>\n    </div>\n  </div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
