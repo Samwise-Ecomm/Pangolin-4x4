@@ -4,19 +4,27 @@
       <div class="upload-container">
 
         <div class="upload-header">
-          <i class="fa fa-upload"></i> Image Upload<br>
+          <i class="fa fa-file-image-o"></i> Image Upload<br>
           <i class="u-thin">Select image below to insert.</i>
         </div>
         
         <div class="upload-body">
           <ul>
           	<li v-for="image in images">
-          		[<span class="fa fa-minus fa-sm u-active" @click="deleteImage(image)"></span>]
+          		[<span class="fa fa-minus fa-fw u-active" @click="deleteImage(image)"></span>]
           		<span class="u-active" @click="insertImage(image)">{{ image }}</span>
           	</li>
+            <li>
+              [<span class="fa fa-fw u-active" :class="adding?'fa-times':'fa-plus'" @click="adding = !adding"></span>]
+              <span v-if="adding">
+                <input type='text' name='newDirectory' maxlength='64' placeholder="New Directory Name"
+                  v-model='newDirectory'>
+              </span>
+              <span v-else class="u-active" @click="adding = true">New directory</span>
+            </li>
           	<li>
 							<label for="uploader">
-								<span class="u-active">[<span class="fa fa-plus"></span>] Upload new Image</span>
+								<span class="u-active">[<span class="fa fa-upload fa-fw"></span>] Upload new Image</span>
 							</label>
 							<input type="file" name="img" accept="image/bmp,image/gif,image/jpeg,image/png" id="uploader" class="u-hide" multiple 
 								@change="startUpload"
@@ -27,6 +35,7 @@
 
         <div class="upload-footer">
           <slot name="footer">
+            
             <div class="Button Button--thin Button--dark"
 							@click='show = false'>
 							Cancel</div>
@@ -38,6 +47,21 @@
 </template>
 
 <style>
+input[type=text] {
+  height:15px;
+  margin-bottom: 2px;
+  border: 0;
+  width: 90%;
+  margin-left:1px;
+  box-shadow: -8px 10px 0px -7px #666, 8px 10px 0px -7px #666;
+  -webkit-transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s;
+}
+input[type=text]:focus {
+  outline: none;
+  box-shadow: -8px 10px 0px -7px #000, 8px 10px 0px -7px #000;
+}
+
 .upload-mask {
   position: fixed;
   z-index: 9998;
@@ -96,6 +120,8 @@
 			return {
 				images: [],
         index: 0,
+        adding: false,
+        newDirectory: "",
 			}
 		},
 	  props: {
