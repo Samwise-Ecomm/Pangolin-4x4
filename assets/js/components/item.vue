@@ -1,7 +1,7 @@
 <template>
 <div class='CatalogItem' v-if='loaded && style == "rows"'>
 	<a @click="go(item.id)">
-		<img :src="'/img/'+item.images.medium[0]" class='CatalogItem-thumb u-activeImg'>
+		<img :src="'/img/'+item.images.medium[0]+'?u='+item.updated" class='CatalogItem-thumb u-activeImg'>
 	</a>
 	<div class='CatalogItem-description'>
 		<h2><a @click="go(item.id)">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>
@@ -48,7 +48,7 @@
 </div>
 <a @click="go(item.id)" v-if="loaded && style == 'grid'">
 	<div class="CatalogGridItem">
-		<img :src="'/img/'+item.images.small[0]" class='CatalogGridItem-thumb'>
+		<img :src="'/img/'+item.images.small[0]+'?u='+item.updated" class='CatalogGridItem-thumb'>
 		<br>
 		<div class="CatalogGridItem-name">
 			<b>{{{ item.name + ', ' + item.type_info.state }}}</b>

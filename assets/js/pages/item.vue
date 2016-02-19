@@ -12,10 +12,10 @@
 	</div>
 
 	<div id="Pictures">
-		<a :href="'/img/'+pic.path" id='js-currentPicLink' data-lightbox="pic" v-for="pic in item.images.large">
-			<img :src="'/img/'+item.images.medium[$index]" id='Pictures-current' class="u-activeImg" v-if="pic.selected">
+		<a :href="'/img/'+pic.path+'?u='+item.updated" id='js-currentPicLink' data-lightbox="pic" v-for="pic in item.images.large">
+			<img :src="'/img/'+item.images.medium[$index]+'?u='+item.updated" id='Pictures-current' class="u-activeImg" v-if="pic.selected">
 		</a>
-	  <img :src="'/img/'+pic" class="u-activeImg Pictures-thumb" 
+	  <img :src="'/img/'+pic+'?u='+item.updated" class="u-activeImg Pictures-thumb" 
 	  	:class="($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'"
 	  	v-for="pic in item.images.small"
 	  	@click="selectPic($index)">
