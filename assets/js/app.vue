@@ -83,7 +83,7 @@ module.exports = {
 
 	components: {
 		search: require('./components/search.vue'),
-		cart: require('./components/cart.vue')
+		cart: require('./components/cart.vue'),
 	},
 
 	methods: {

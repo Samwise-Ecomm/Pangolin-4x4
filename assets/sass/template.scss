@@ -641,6 +641,39 @@ div.u-active {
 
 /* Catalog Item, styling for each individual item within a catalog */
 
+.CatalogGridItem {
+	font-size: 14px;
+	color: black;
+	padding: 5px;
+	border: 1px solid $light;
+	width: 32%;
+	margin: 4px;
+	float: left;
+}
+
+.CatalogGridItem:hover {
+	color: $active;
+	border: 1px solid $active;
+}
+
+.CatalogGridItem-price {
+	color: green;
+	height: 42px;
+	line-height: 30px;
+	font-size: 18px;
+	margin-right: 10px;
+}
+
+.CatalogGridItem-thumb {
+	width: 195px;
+	height: 195px;
+	margin-bottom: 10px;
+}
+
+.CatalogGridItem-name {
+	height: 50px;
+}
+
 .CatalogItem {
 	width: 100%;
 }

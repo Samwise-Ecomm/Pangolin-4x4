@@ -14239,7 +14239,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/cart.vue":49,"./components/search.vue":51,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+},{"./components/cart.vue":49,"./components/search.vue":54,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -14435,6 +14435,130 @@ if (module.hot) {(function () {  module.hot.accept()
 },{"babel-runtime/core-js/object/assign":1,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
 'use strict';
 
+module.exports = {
+	data: function data() {
+		this.getItems();
+
+		return {
+			loaded: false,
+			items: [],
+			count: 0,
+			pages: 1,
+			page: 1
+		};
+	},
+
+	props: {
+		tags: {
+			type: Array,
+			'default': function _default() {
+				return [];
+			},
+			coerce: function coerce(value) {
+				if (typeof value == 'string') {
+					return value.split(',');
+				} else {
+					return value;
+				}
+			}
+		},
+
+		limit: {
+			type: Number,
+			'default': 10,
+			coerce: function coerce(input) {
+				return parseInt(input);
+			}
+		},
+
+		hideCount: {
+			type: Boolean,
+			'default': false
+		},
+
+		hidePages: {
+			type: Boolean,
+			'default': false
+		},
+
+		style: {
+			type: String,
+			'default': 'rows'
+		},
+
+		sort: {
+			type: String,
+			'default': 'name'
+		}
+	},
+
+	components: {
+		item: require('./item.vue'),
+		pageCounter: require('./pageCounter.vue')
+	},
+
+	watch: {
+		tags: function tags() {
+			this.page = 1;
+			this.getItems();
+		}
+	},
+
+	events: {
+		changePage: function changePage(page) {
+			if (page < 1) {
+				page = this.pages;
+			}
+			if (page > this.pages) {
+				page = 1;
+			}
+
+			this.page = page;
+			this.getItems();
+		}
+	},
+
+	methods: {
+		getItems: function getItems() {
+			var request = {
+				tags: this.tags,
+				page: this.page,
+				limit: this.limit
+			};
+			this.$http.post('/api/search/item-tags', request).then(function (response) {
+				for (var i in response.data.items) {
+					response.data.items[i].selected = 0;
+				}
+
+				this.items = response.data.items;
+				this.count = response.data.count;
+				this.pages = response.data.pages;
+				this.page = response.data.page;
+				this.limit = response.data.limit;
+				this.loaded = true;
+
+				this.$nextTick(function () {
+					this.$root.$refs.cart.setAddToCartButtons();
+				});
+			});
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section v-if=\"loaded\">\n\t\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :page.sync=\"page\">\n\t\t</page-counter>\n\t\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'item' }} found.</div>\n\t\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t\t<item v-for=\"item in items\" :item=\"item\" :style=\"style\"></item>\n\n\t\t<br>\n\t\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :page.sync=\"page\">\n\t\t</page-counter>\n\t</section>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/catalog.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"./item.vue":52,"./pageCounter.vue":53,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+'use strict';
+
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
 
 module.exports = {
@@ -14549,7 +14673,119 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":58,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"../store/geoInfo.js":61,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			loaded: true
+		};
+	},
+
+	props: {
+		item: {
+			type: Object,
+			'default': {}
+		},
+
+		id: {
+			type: Number,
+			'default': null
+		},
+
+		style: {
+			type: String,
+			'default': 'rows'
+		}
+	},
+
+	methods: {
+		go: function go(id) {
+			this.$root.$router.go({ path: '/item/' + id });
+		},
+
+		addToCart: function addToCart(item) {
+			var variantId = item.variants[item.selected].id;
+			var variant = item.variants[item.selected];
+
+			if (!variant.infinite && variant.stock == 0) {
+				return 0;
+			}
+
+			var cartItem = {
+				name: item.name,
+				images: item.images,
+				part_number: item.type_info.part_number,
+				state: item.type_info.state,
+				variants: {}
+			};
+
+			cartItem.variants[variant.id] = {
+				name: variant.name,
+				price: variant.price,
+				unit: variant.unit,
+				stock: variant.stock,
+				infinite: variant.infinite,
+				count: 1
+			};
+
+			this.$root.$refs.cart.addToCart(cartItem, item.id, variant.id);
+
+			return 1;
+		},
+
+		changedVariant: function changedVariant(item) {
+			var itemId = item.id;
+			var variantId = item.selected;
+
+			$('.js-addToCart[item-id=' + itemId + ']').removeClass('isDisabled');
+			$('.js-addToCart[item-id=' + itemId + ']').addClass('Button--active');
+			$('.js-addToCart[item-id=' + itemId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart');
+
+			this.$nextTick(function () {
+				this.$root.$refs.cart.setAddToCartButtons();
+			});
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"CatalogItem\" v-if=\"loaded &amp;&amp; style == &quot;rows&quot;\">\n\t<a @click=\"go(item.id)\">\n\t\t<img :src=\"'/img/'+item.images.medium[0]\" class=\"CatalogItem-thumb u-activeImg\">\n\t</a>\n\t<div class=\"CatalogItem-description\">\n\t\t<h2><a @click=\"go(item.id)\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ item.description }}}\n\t\t\t<br><br>\n\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t</p>\n\t\t<div class=\"CatalogItem-controls\">\n\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t</select>\n\t\t\t<br><br>\n\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n      \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n    \t</div>\n\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\tOut of Stock\n\t\t\t</div>\n    \t<a @click=\"go(item.id)\">\n    \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n    \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n    \t\t</div>\n    \t</a>\n    \t<span class=\"CatalogItem-price\">\n    \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n    \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n    \t</span>\n\t\t</div>\n\t</div>\n\t<hr class=\"u-clear\">\n</div>\n<a @click=\"go(item.id)\" v-if=\"loaded &amp;&amp; style == 'grid'\">\n\t<div class=\"CatalogGridItem\">\n\t\t<img :src=\"'/img/'+item.images.small[0]\" class=\"CatalogGridItem-thumb\">\n\t\t<br>\n\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t<b>{{{ item.name + ', ' + item.type_info.state }}}</b>\n\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t</div>\n\t\t<br>\n\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t<b>{{ item.variants[0].price | currency }}</b>\n\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t</span>\n\t</div>\n</a>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/item.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['page', 'pages'],
+
+	methods: {
+		changePage: function changePage(page) {
+			this.$dispatch('changePage', page);
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div>\n\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(page - 1)\"></span>&nbsp;\n\t<span :class=\"(page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t<span v-if=\"page > 3\">...</span>\n\t<span class=\"u-active\" @click=\"changePage(page - 1)\" v-if=\"page > 2\">{{ page - 1}}</span>\n\t<span class=\"u-highlight\" v-if=\"page > 1 &amp;&amp; page < pages\">{{ page }}</span>\n\t<span class=\"u-active\" @click=\"changePage(page + 1)\" v-if=\"page < pages - 1\">{{ page + 1 }}</span>\n\t<span v-if=\"page < pages - 2\">...</span>\n\t<span :class=\"(page == pages)?'u-highlight':'u-active'\" @click=\"changePage(pages)\">{{ pages }}</span>\n\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(page + 1)\"></span>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/components/pageCounter.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14637,7 +14873,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
 'use strict';
 
 var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
@@ -14714,30 +14950,27 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":59,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+},{"../store/invoiceInfo.js":62,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
 'use strict';
 
 module.exports = function (input) {
 	return (input + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
 };
 
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 module.exports = {
 	data: function data() {
 		return {
 			catalog: {},
-			selected: {
-				tags: [],
-				items: [],
-				count: 0,
-				pages: 0,
-				page: 1,
-				limit: 10
-			},
+			selected: [],
 			loaded: false
 		};
+	},
+
+	components: {
+		catalog: require('../components/catalog.vue')
 	},
 
 	route: {
@@ -14765,13 +14998,6 @@ module.exports = {
 		}
 	},
 
-	watch: {
-		'selected.tags': function selectedTags() {
-			this.selected.page = 1;
-			this.getItems();
-		}
-	},
-
 	methods: {
 		getCatalog: function getCatalog() {
 			this.$http.get('/api/catalog/' + this.$route.params.id).then(function (response) {
@@ -14781,102 +15007,24 @@ module.exports = {
 			});
 		},
 
-		getItems: function getItems() {
-			var request = {
-				tags: this.selected.tags,
-				page: this.selected.page,
-				limit: this.selected.limit
-			};
-			this.$http.post('/api/search/item-tags', request).then(function (response) {
-				for (var i in response.data.items) {
-					response.data.items[i].selected = 0;
-				}
-
-				this.selected.items = response.data.items;
-				this.selected.count = response.data.count;
-				this.selected.pages = response.data.pages;
-				this.selected.page = response.data.page;
-				this.selected.limit = response.data.limit;
-
-				this.$nextTick(function () {
-					this.$parent.$refs.cart.setAddToCartButtons();
-				});
-			});
-		},
-
-		changePage: function changePage(page) {
-			if (page < 1) {
-				page = this.selected.pages;
-			}
-			if (page > this.selected.pages) {
-				page = 1;
-			}
-
-			this.selected.page = page;
-			this.getItems();
-		},
-
-		changedVariant: function changedVariant(item) {
-			var itemId = item.id;
-			var variantId = item.selected;
-
-			$('.js-addToCart[item-id=' + itemId + ']').removeClass('isDisabled');
-			$('.js-addToCart[item-id=' + itemId + ']').addClass('Button--active');
-			$('.js-addToCart[item-id=' + itemId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart');
-
-			this.$nextTick(function () {
-				this.$parent.$refs.cart.setAddToCartButtons();
-			});
-		},
-
 		fillTags: function fillTags() {
-			this.selected.tags = [];
+			this.selected = [];
 			for (var i = 0; i < this.catalog.tags.length; i++) {
-				this.selected.tags.push(this.catalog.tags[i]);
+				this.selected.push(this.catalog.tags[i]);
 			};
 		},
 
 		clearTags: function clearTags() {
-			this.selected.tags = [];
+			this.selected = [];
 		},
 
 		toggleTag: function toggleTag(tag) {
-			var index = this.selected.tags.indexOf(tag);
+			var index = this.selected.indexOf(tag);
 			if (index != -1) {
-				this.selected.tags.splice(index, 1);
+				this.selected.splice(index, 1);
 			} else {
-				this.selected.tags.push(tag);
+				this.selected.push(tag);
 			}
-		},
-
-		addToCart: function addToCart(item) {
-			var variantId = item.variants[item.selected].id;
-			var variant = item.variants[item.selected];
-
-			if (!variant.infinite && variant.stock == 0) {
-				return 0;
-			}
-
-			var cartItem = {
-				name: item.name,
-				images: item.images,
-				part_number: item.type_info.part_number,
-				state: item.type_info.state,
-				variants: {}
-			};
-
-			cartItem.variants[variant.id] = {
-				name: variant.name,
-				price: variant.price,
-				unit: variant.unit,
-				stock: variant.stock,
-				infinite: variant.infinite,
-				count: 1
-			};
-
-			this.$parent.$refs.cart.addToCart(cartItem, item.id, variant.id);
-
-			return 1;
 		},
 
 		compareStartingChunks: function compareStartingChunks(stringOne, stringTwo) {
@@ -14900,7 +15048,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.tags.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<section>\n\t\t\t<div class=\"u-floatLeft\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t\t<div class=\"u-floatRight\">{{ selected.count }} {{ selected.count | pluralize 'item' }} found.</div>\n\t\t\t<br><br>\n\n\t\t\t<div class=\"CatalogItem\" v-for=\"item in selected.items\">\n\t\t\t\t<a v-link=\"{ path: '/item/'+item.id }\">\n\t\t\t\t\t<img :src=\"'/img/'+item.images.medium[0]\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t\t\t</a>\n\t\t\t\t<div class=\"CatalogItem-description\">\n\t\t\t\t\t<h2><a v-link=\"{ path: '/item/'+item.id }\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t\t<br>\n\t\t\t\t\t<p>\n\t\t\t\t\t\t{{{ item.description }}}\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t\t\t</p>\n\t\t\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t\t\t</select>\n\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t\t        \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t        \t</div>\n\t\t\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t\t</div>\n\t        \t<a v-link=\"{ path: '/item/'+item.id }\">\n\t        \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t        \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t        \t\t</div>\n\t        \t</a>\n\t        \t<span class=\"CatalogItem-price\">\n\t        \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t        \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t        \t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr class=\"u-clear\">\n\t\t\t</div>\n\n\t\t\t<br>\n\t\t\t<div class=\"u-floatRight\" v-if=\"selected.pages > 1\">\n\t\t\t\t<span class=\"fa fa-chevron-left u-active\" @click=\"changePage(selected.page - 1)\"></span>&nbsp;\n\t\t\t\t<span :class=\"(selected.page == 1)?'u-highlight':'u-active'\" @click=\"changePage(1)\">1</span>\n\t\t\t\t<span v-if=\"selected.page > 3\">...</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page - 1)\" v-if=\"selected.page > 2\">{{ selected.page - 1}}</span>\n\t\t\t\t<span class=\"u-highlight\" v-if=\"selected.page > 1 &amp;&amp; selected.page < selected.pages\">{{ selected.page}}</span>\n\t\t\t\t<span class=\"u-active\" @click=\"changePage(selected.page + 1)\" v-if=\"selected.page < selected.pages - 1\">{{ selected.page + 1}}</span>\n\t\t\t\t<span v-if=\"selected.page < selected.pages - 2\">...</span>\n\t\t\t\t<span :class=\"(selected.page == selected.pages)?'u-highlight':'u-active'\" @click=\"changePage(selected.pages)\">{{ selected.pages }}</span>\n\t\t\t\t<span class=\"fa fa-chevron-right u-active\" @click=\"changePage(selected.page + 1)\"></span>\n\t\t\t</div>\n\t\t</section>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<catalog :tags.sync=\"selected\"></catalog>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14912,7 +15060,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15049,7 +15197,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":49,"../components/contactInfo.vue":50,"../components/submitCheckout.vue":52,"../store/invoiceInfo.js":59,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":62,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15120,7 +15268,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15134,6 +15282,14 @@ module.exports = {
 	route: {
 		data: function data() {
 			this.getPage();
+		},
+
+		canReuse: false
+	},
+
+	components: {
+		'default': {
+			template: '<div>Loading</div>'
 		}
 	},
 
@@ -15141,13 +15297,31 @@ module.exports = {
 		getPage: function getPage() {
 			this.$http.get('/api/page' + this.$route.path).then(function (response) {
 				this.$set('page', response.data);
+
+				var vue = require('vue');
+				var pageContent = vue.component('page' + this.page.id, {
+					template: this.page.content,
+					components: {
+						catalog: require('../components/catalog.vue')
+					}
+				});
+				var thisPage = new pageContent();
+
+				// TODO: Find the correct way to apped thisPage as a child to 'this'
+				thisPage.$mount().$appendTo('#page');
+				// HACK the correct root into these children
+				for (var i = 0; i < thisPage.$children.length; i++) {
+					thisPage.$children[i].$root = this.$root;
+				}
+				this.$children.push(thisPage);
+
 				this.$parent.search = response.data.search;
 				this.loaded = true;
 			});
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t{{{ page.content }}}\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" id=\"page\">\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15159,7 +15333,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15410,7 +15584,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15492,7 +15666,7 @@ module.exports = {
 	}
 };
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15520,6 +15694,7 @@ var router = new VueRouter({
 // config Vue global settings
 Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content');
 Vue.config.debug = true;
+// Vue.config.async = false
 
 router.map({
 	'item/:id': {
@@ -15555,6 +15730,6 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./filters/nl2br.js":53,"./pages/catalog.vue":54,"./pages/checkout.vue":55,"./pages/item.vue":56,"./pages/page.vue":57,"vue":47,"vue-resource":35,"vue-router":46}]},{},[60]);
+},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/catalog.vue":57,"./pages/checkout.vue":58,"./pages/item.vue":59,"./pages/page.vue":60,"vue":47,"vue-resource":35,"vue-router":46}]},{},[63]);
 
 //# sourceMappingURL=main.js.map

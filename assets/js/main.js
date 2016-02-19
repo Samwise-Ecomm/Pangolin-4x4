@@ -23,6 +23,7 @@ var router = new VueRouter({
 // config Vue global settings
 Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content')
 Vue.config.debug = true
+// Vue.config.async = false
 
 router.map({
 	'item/:id': {
