@@ -12,7 +12,7 @@
 			:item="item"
 			:style="style"></item>
 
-		<br>
+		<br class="u-clear">
 		<page-counter class="u-floatRight" 
 			v-if="pages > 1 && !hidePages"
 			:pages="pages"

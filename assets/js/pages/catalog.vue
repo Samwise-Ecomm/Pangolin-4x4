@@ -28,7 +28,7 @@
 		<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>
 		<hr>
 
-		<catalog :tags.sync="selected" ></catalog>
+		<catalog :tags.sync="selected" style="grid" limit="15"></catalog>
 	</div>
 </template>
 

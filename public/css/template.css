@@ -522,6 +522,10 @@ div.u-active {
   margin: 4px;
   float: left; }
 
+.noSearch .CatalogGridItem {
+  width: 24%;
+  padding: 7px; }
+
 .CatalogGridItem:hover {
   color: #dd8131;
   border: 1px solid #dd8131; }
