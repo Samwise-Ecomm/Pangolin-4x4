@@ -14463,6 +14463,11 @@ module.exports = {
 			}
 		},
 
+		allItems: {
+			type: Boolean,
+			'default': false
+		},
+
 		limit: {
 			type: Number,
 			'default': 10,
@@ -14520,6 +14525,15 @@ module.exports = {
 
 	methods: {
 		getItems: function getItems() {
+			if (this.tags.length == 0 && !this.allItems) {
+				this.items = [];
+				this.count = 0;
+				this.pages = 0;
+				this.page = 1;
+				this.loaded = true;
+				return 1;
+			}
+
 			var request = {
 				tags: this.tags,
 				page: this.page,
