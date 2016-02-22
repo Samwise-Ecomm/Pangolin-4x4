@@ -9,6 +9,12 @@
 		 <span class="u-active" @click="insert()">{{ file.name }}</span>
 	</div>
 	<ul v-if="file.children && expanded">
+		<li v-if="file.path != 'uploads'">
+			<div class="u-active" @click="deleteDirectory()">
+				[<i class="fa fa-fw fa-trash"></i>]
+				 Delete This Directory
+			</div>
+		</li>
 		<file v-for="child in file.children" :file="child" :i="$index"></file>
 		<li class="bump">
 			<label :for="file.path" class="u-active">
@@ -25,12 +31,6 @@
 				 <input type='text' name='newDirectory' maxlength='64' placeholder="Add New Directory" 
 				 	@keyup.enter="createDirectory()"
 				 	v-model='newDirectory'>
-			</div>
-		</li>
-		<li v-if="file.path != 'uploads'">
-			<div class="u-active" @click="deleteDirectory()">
-				[<i class="fa fa-fw fa-trash"></i>]
-				 Delete This Directory
 			</div>
 		</li>
 	</ul>
