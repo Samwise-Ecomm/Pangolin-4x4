@@ -10,32 +10,14 @@
         
         <div class="upload-body">
           <ul>
-          	<li v-for="image in images">
-          		[<span class="fa fa-minus fa-fw u-active" @click="deleteImage(image)"></span>]
-          		<span class="u-active" @click="insertImage(image)">{{ image }}</span>
-          	</li>
-            <li>
-              [<span class="fa fa-fw u-active" :class="adding?'fa-times':'fa-plus'" @click="adding = !adding"></span>]
-              <span v-if="adding">
-                <input type='text' name='newDirectory' maxlength='64' placeholder="New Directory Name"
-                  v-model='newDirectory'>
-              </span>
-              <span v-else class="u-active" @click="adding = true">New directory</span>
-            </li>
-          	<li>
-							<label for="uploader">
-								<span class="u-active">[<span class="fa fa-upload fa-fw"></span>] Upload new Image</span>
-							</label>
-							<input type="file" name="img" accept="image/bmp,image/gif,image/jpeg,image/png" id="uploader" class="u-hide" multiple 
-								@change="startUpload"
-								v-el:uploader>
-          	</li>
+            <file :file="files" expanded></file>
           </ul>
         </div>
 
         <div class="upload-footer">
+          <div class="error-message">{{ error }}&nbsp;</div>
+          <br>
           <slot name="footer">
-            
             <div class="Button Button--thin Button--dark"
 							@click='show = false'>
 							Cancel</div>
@@ -46,20 +28,88 @@
   </div>
 </template>
 
+<script>
+module.exports = {
+	data: function() {
+		this.getFiles()
+		return {
+			files: {},
+      error: "",
+      errorDebouncer: 0,
+		}
+	},
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
+      twoWay: true    
+    }
+  },
+  events: {
+    error (message) {
+      this.error = message
+      this.errorDebouncer = Date.now() + 4500
+      setTimeout(function() {
+        if (this.errorDebouncer < Date.now()) {
+          this.error = ""
+        }
+      }.bind(this), 5000)
+    },
+    
+    closeUploads () {
+      this.show = false
+    }
+  },
+  methods: {
+  	getFiles () {
+  		this.$http.get('/admin/upload').then(function(response) {
+  			this.$set('files',response.data)
+  		})
+  	},
+  },
+}
+</script>
+
 <style>
 input[type=text] {
-  height:15px;
-  margin-bottom: 2px;
   border: 0;
-  width: 90%;
+  width: 40%;
   margin-left:1px;
-  box-shadow: -8px 10px 0px -7px #666, 8px 10px 0px -7px #666;
-  -webkit-transition: box-shadow 0.3s;
-  transition: box-shadow 0.3s;
+  border-bottom: 1px solid #ccc;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
 }
+
 input[type=text]:focus {
   outline: none;
-  box-shadow: -8px 10px 0px -7px #000, 8px 10px 0px -7px #000;
+  border-bottom: 1px solid #000;
+}
+
+ul > li {
+  margin-left: 10px;
+}
+
+li div.u-active, li label.u-active, li i.u-active {
+  color: black;
+  background: white;
+}
+
+li div.u-active:hover, li label.u-active:hover {
+  cursor: pointer;
+  color: #ce3229;
+}
+
+.u-inActive {
+  color: #666;
+}
+
+.bump {
+  margin-top: 3px;
+}
+
+.error-message {
+  margin-top: 8px;
+  color: red;
 }
 
 .upload-mask {
@@ -96,10 +146,20 @@ input[type=text]:focus {
 
 .upload-body {
   margin: 20px 0;
+  overflow-y: scroll;
+  height: 400px;
 }
 
 .upload-default-button {
   float: right;
+}
+
+.grow-enter, .grow-leave {
+  height: 0;
+}
+
+.grow-transition {
+  transition: all .3s ease;
 }
 
 .upload-enter, .upload-leave {
@@ -112,63 +172,3 @@ input[type=text]:focus {
   transform: scale(1.1);
 }
 </style>
-
-<script>
-	module.exports = {
-		data: function() {
-			this.getImages()
-			return {
-				images: [],
-        index: 0,
-        adding: false,
-        newDirectory: "",
-			}
-		},
-	  props: {
-	    show: {
-	      type: Boolean,
-	      required: true,
-	      twoWay: true    
-	    }
-	  },
-	  methods: {
-	  	getImages () {
-	  		this.$http.get('/admin/upload').then(function(response) {
-	  			this.$set('images',response.data)
-	  		})
-	  	},
-
-	  	deleteImage (image) {
-	  		this.$http.delete('/admin/upload', { image: image }).then(function(response) {
-	  			this.getImages()
-	  		})
-	  	},
-
-	  	insertImage (image) {
-	  		this.$dispatch('insert', '/img/uploads/'+image)
-	  		this.show = false
-	  	},
-
-      startUpload() {
-        this.index = 0
-        this.upload()
-      },
-
-	  	upload () {
-        if (this.index >= this.$els.uploader.files.length) {
-          return 1
-        }
-	  		var request = new FormData()
-      	request.append('uploader', this.$els.uploader.files[this.index])
-        this.index++
-
-      	this.$http.post('/admin/upload', request).then(function(response) {
-      		if (response.data !== 0) {
-      			this.images.push(response.data)
-            this.upload()
-      		}
-      	})
-	  	}
-	  },
-	}
-</script>

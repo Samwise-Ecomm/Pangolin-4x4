@@ -5,6 +5,9 @@ Vue.use(VueResource)
 
 var App =	require('./app.vue')
 
+// Components
+Vue.component('file', require('./components/file.vue'))
+
 // config Vue global settings
 Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content')
 Vue.config.debug = true

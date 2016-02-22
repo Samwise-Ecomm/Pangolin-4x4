@@ -11525,75 +11525,188 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/upload.vue":30,"vue":27,"vue-hot-reload-api":2,"vueify-insert-css":28}],30:[function(require,module,exports){
-var __vueify_style__ = require("vueify-insert-css").insert("\ninput[type=text] {\n  height:15px;\n  margin-bottom: 2px;\n  border: 0;\n  width: 90%;\n  margin-left:1px;\n  box-shadow: -8px 10px 0px -7px #666, 8px 10px 0px -7px #666;\n  -webkit-transition: box-shadow 0.3s;\n  transition: box-shadow 0.3s;\n}\ninput[type=text]:focus {\n  outline: none;\n  box-shadow: -8px 10px 0px -7px #000, 8px 10px 0px -7px #000;\n}\n\n.upload-mask {\n  position: fixed;\n  z-index: 9998;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, .5);\n  display: table;\n  -webkit-transition:opacity .3s ease;\n  transition: opacity .3s ease;\n}\n\n.upload-wrapper {\n  display: table-cell;\n  vertical-align: middle;\n}\n\n.upload-container {\n  width: 600px;\n  margin: 0px auto;\n  padding: 20px 30px;\n  background-color: #fff;\n  border-radius: 2px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);\n  -webkit-transition:all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-header h3 {\n  margin-top: 0;\n  color: #42b983;\n}\n\n.upload-body {\n  margin: 20px 0;\n}\n\n.upload-default-button {\n  float: right;\n}\n\n.upload-enter, .upload-leave {\n  opacity: 0;\n}\n\n.upload-enter .upload-container,\n.upload-leave .upload-container {\n  -webkit-transform: scale(1.1);\n  transform: scale(1.1);\n}\n")
+},{"./components/upload.vue":31,"vue":27,"vue-hot-reload-api":2,"vueify-insert-css":28}],30:[function(require,module,exports){
 'use strict';
 
 module.exports = {
-		data: function data() {
-				this.getImages();
-				return {
-						images: [],
-						index: 0,
-						adding: false,
-						newDirectory: ""
-				};
-		},
-		props: {
-				show: {
-						type: Boolean,
-						required: true,
-						twoWay: true
-				}
-		},
-		methods: {
-				getImages: function getImages() {
-						this.$http.get('/admin/upload').then(function (response) {
-								this.$set('images', response.data);
-						});
-				},
+  data: function data() {
+    return {
+      progress: 0,
+      newDirectory: ""
+    };
+  },
 
-				deleteImage: function deleteImage(image) {
-						this.$http['delete']('/admin/upload', { image: image }).then(function (response) {
-								this.getImages();
-						});
-				},
+  computed: {
+    validDirectory: function validDirectory() {
+      if (this.newDirectory) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
 
-				insertImage: function insertImage(image) {
-						this.$dispatch('insert', '/img/uploads/' + image);
-						this.show = false;
-				},
+  props: {
+    file: Object,
 
-				startUpload: function startUpload() {
-						this.index = 0;
-						this.upload();
-				},
+    expanded: {
+      type: Boolean,
+      'default': false
+    },
 
-				upload: function upload() {
-						if (this.index >= this.$els.uploader.files.length) {
-								return 1;
-						}
-						var request = new FormData();
-						request.append('uploader', this.$els.uploader.files[this.index]);
-						this.index++;
+    i: {
+      type: Number,
+      'default': 0
+    }
+  },
 
-						this.$http.post('/admin/upload', request).then(function (response) {
-								if (response.data !== 0) {
-										this.images.push(response.data);
-										this.upload();
-								}
-						});
-				}
-		}
+  methods: {
+    startUpload: function startUpload() {
+      this.progress = 0;
+      this.upload();
+    },
+
+    upload: function upload() {
+      if (this.progress >= this.$els.uploader.files.length) {
+        return 1;
+      }
+
+      var request = new FormData();
+      request.append('uploader', this.$els.uploader.files[this.progress]);
+      request.append('path', this.file.path);
+      this.progress++;
+
+      this.$http.post('/admin/upload', request).then(function (response) {
+        if (response.data.result == 'error') {
+          this.$dispatch('error', response.data.body);
+        }
+
+        if (response.data.result == 'success') {
+          this.file.children.push(response.data.body);
+        }
+
+        this.upload();
+      });
+    },
+
+    deleteFile: function deleteFile(path) {
+      var request = {
+        file: path
+      };
+
+      this.$http['delete']('/admin/upload', request).then(function (response) {
+        if (response.data.result == 'error') {
+          this.$dispatch('error', response.data.body);
+        }
+
+        if (response.data.result == 'success') {
+          this.$parent.file.children.splice(this.i, 1);
+        }
+      });
+    },
+
+    createDirectory: function createDirectory() {
+      var request = {
+        path: this.file.path,
+        name: this.newDirectory
+      };
+
+      this.$http.post('/admin/upload/directory', request).then(function (response) {
+        if (response.data.result == 'error') {
+          this.$dispatch('error', response.data.body);
+        }
+
+        if (response.data.result == 'success') {
+          this.file.children.push(response.data.body);
+        }
+
+        this.newDirectory = "";
+      });
+    },
+
+    deleteDirectory: function deleteDirectory() {
+      if (confirm("Are you sure you want to delete '" + this.file.name + "' along with all it's files?")) {
+        this.$http['delete']('/admin/upload/directory', { path: this.file.path }).then(function (response) {
+          if (response.data.result == 'error') {
+            this.$dispatch('error', response.data.body);
+          }
+
+          if (response.data.result == 'success') {
+            this.$parent.file.children.splice(this.i, 1);
+          }
+        });
+      }
+    },
+
+    insert: function insert() {
+      this.$dispatch('insert', '/img/' + this.file.path);
+      this.$dispatch('closeUploads');
+    }
+  }
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"upload-mask\" v-show=\"show\" transition=\"upload\">\n    <div class=\"upload-wrapper\">\n      <div class=\"upload-container\">\n\n        <div class=\"upload-header\">\n          <i class=\"fa fa-file-image-o\"></i> Image Upload<br>\n          <i class=\"u-thin\">Select image below to insert.</i>\n        </div>\n        \n        <div class=\"upload-body\">\n          <ul>\n          \t<li v-for=\"image in images\">\n          \t\t[<span class=\"fa fa-minus fa-fw u-active\" @click=\"deleteImage(image)\"></span>]\n          \t\t<span class=\"u-active\" @click=\"insertImage(image)\">{{ image }}</span>\n          \t</li>\n            <li>\n              [<span class=\"fa fa-fw u-active\" :class=\"adding?'fa-times':'fa-plus'\" @click=\"adding = !adding\"></span>]\n              <span v-if=\"adding\">\n                <input type=\"text\" name=\"newDirectory\" maxlength=\"64\" placeholder=\"New Directory Name\" v-model=\"newDirectory\">\n              </span>\n              <span v-else=\"\" class=\"u-active\" @click=\"adding = true\">New directory</span>\n            </li>\n          \t<li>\n\t\t\t\t\t\t\t<label for=\"uploader\">\n\t\t\t\t\t\t\t\t<span class=\"u-active\">[<span class=\"fa fa-upload fa-fw\"></span>] Upload new Image</span>\n\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t<input type=\"file\" name=\"img\" accept=\"image/bmp,image/gif,image/jpeg,image/png\" id=\"uploader\" class=\"u-hide\" multiple=\"\" @change=\"startUpload\" v-el:uploader=\"\">\n          \t</li>\n          </ul>\n        </div>\n\n        <div class=\"upload-footer\">\n          <slot name=\"footer\">\n            \n            <div class=\"Button Button--thin Button--dark\" @click=\"show = false\">\n\t\t\t\t\t\t\tCancel</div>\n          </slot>\n        </div>\n      </div>\n    </div>\n  </div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<li>\n\t<div v-if=\"file.children\" @click=\"expanded = !expanded\" class=\"u-active\">\n\t\t[<i class=\"fa fa-fw\" :class=\"expanded?'fa-folder-open-o':'fa-folder-o'\"></i>]\n\t\t {{ file.name }}\n\t</div>\n\t<div v-else=\"\">\n\t\t[<i class=\"fa fa-fw fa-minus u-active\" @click=\"deleteFile(file.path)\"></i>]\n\t\t <span class=\"u-active\" @click=\"insert()\">{{ file.name }}</span>\n\t</div>\n\t<ul v-if=\"file.children &amp;&amp; expanded\">\n\t\t<file v-for=\"child in file.children\" :file=\"child\" :i=\"$index\"></file>\n\t\t<li class=\"bump\">\n\t\t\t<label :for=\"file.path\" class=\"u-active\">\n\t\t\t\t[<i class=\"fa fa-fw fa-upload\" @click=\"\"></i>]\n\t\t\t\t Upload New Image\n\t\t\t</label>\n\t\t\t<input type=\"file\" accept=\"image/bmp,image/gif,image/jpeg,image/png\" :id=\"file.path\" class=\"u-hide\" multiple=\"\" @change=\"startUpload\" v-el:uploader=\"\">\n\t\t</li>\n\t\t<li>\n\t\t\t<div>\n\t\t\t\t[<i class=\"fa fa-fw fa-plus\" :class=\"validDirectory?'u-active':'u-inActive'\" @click=\"createDirectory()\"></i>]\n\t\t\t\t <input type=\"text\" name=\"newDirectory\" maxlength=\"64\" placeholder=\"Add New Directory\" @keyup.enter=\"createDirectory()\" v-model=\"newDirectory\">\n\t\t\t</div>\n\t\t</li>\n\t\t<li v-if=\"file.path != 'uploads'\">\n\t\t\t<div class=\"u-active\" @click=\"deleteDirectory()\">\n\t\t\t\t[<i class=\"fa fa-fw fa-trash\"></i>]\n\t\t\t\t Delete This Directory\n\t\t\t</div>\n\t\t</li>\n\t</ul>\n</li>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/page_editor/components/file.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":27,"vue-hot-reload-api":2}],31:[function(require,module,exports){
+var __vueify_style__ = require("vueify-insert-css").insert("\ninput[type=text] {\n  border: 0;\n  width: 40%;\n  margin-left:1px;\n  border-bottom: 1px solid #ccc;\n  -webkit-transition: all 0.3s;\n  transition: all 0.3s;\n}\n\ninput[type=text]:focus {\n  outline: none;\n  border-bottom: 1px solid #000;\n}\n\nul > li {\n  margin-left: 10px;\n}\n\nli div.u-active, li label.u-active, li i.u-active {\n  color: black;\n  background: white;\n}\n\nli div.u-active:hover, li label.u-active:hover {\n  cursor: pointer;\n  color: #ce3229;\n}\n\n.u-inActive {\n  color: #666;\n}\n\n.bump {\n  margin-top: 3px;\n}\n\n.error-message {\n  margin-top: 8px;\n  color: red;\n}\n\n.upload-mask {\n  position: fixed;\n  z-index: 9998;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, .5);\n  display: table;\n  -webkit-transition: opacity .3s ease;\n  transition: opacity .3s ease;\n}\n\n.upload-wrapper {\n  display: table-cell;\n  vertical-align: middle;\n}\n\n.upload-container {\n  width: 600px;\n  margin: 0px auto;\n  padding: 20px 30px;\n  background-color: #fff;\n  border-radius: 2px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);\n  -webkit-transition: all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-header h3 {\n  margin-top: 0;\n  color: #42b983;\n}\n\n.upload-body {\n  margin: 20px 0;\n  overflow-y: scroll;\n  height: 400px;\n}\n\n.upload-default-button {\n  float: right;\n}\n\n.grow-enter, .grow-leave {\n  height: 0;\n}\n\n.grow-transition {\n  -webkit-transition: all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-enter, .upload-leave {\n  opacity: 0;\n}\n\n.upload-enter .upload-container,\n.upload-leave .upload-container {\n  -webkit-transform: scale(1.1);\n  transform: scale(1.1);\n}\n")
+"use strict";
+
+module.exports = {
+  data: function data() {
+    this.getFiles();
+    return {
+      files: {},
+      error: "",
+      errorDebouncer: 0
+    };
+  },
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
+      twoWay: true
+    }
+  },
+  events: {
+    error: function error(message) {
+      this.error = message;
+      this.errorDebouncer = Date.now() + 4500;
+      setTimeout((function () {
+        if (this.errorDebouncer < Date.now()) {
+          this.error = "";
+        }
+      }).bind(this), 5000);
+    },
+
+    closeUploads: function closeUploads() {
+      this.show = false;
+    }
+  },
+  methods: {
+    getFiles: function getFiles() {
+      this.$http.get('/admin/upload').then(function (response) {
+        this.$set('files', response.data);
+      });
+    }
+  }
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"upload-mask\" v-show=\"show\" transition=\"upload\">\n    <div class=\"upload-wrapper\">\n      <div class=\"upload-container\">\n\n        <div class=\"upload-header\">\n          <i class=\"fa fa-file-image-o\"></i> Image Upload<br>\n          <i class=\"u-thin\">Select image below to insert.</i>\n        </div>\n        \n        <div class=\"upload-body\">\n          <ul>\n            <file :file=\"files\" expanded=\"\"></file>\n          </ul>\n        </div>\n\n        <div class=\"upload-footer\">\n          <div class=\"error-message\">{{ error }}&nbsp;</div>\n          <br>\n          <slot name=\"footer\">\n            <div class=\"Button Button--thin Button--dark\" @click=\"show = false\">\n\t\t\t\t\t\t\tCancel</div>\n          </slot>\n        </div>\n      </div>\n    </div>\n  </div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/page_editor/components/upload.vue"
   module.hot.dispose(function () {
-    require("vueify-insert-css").cache["\ninput[type=text] {\n  height:15px;\n  margin-bottom: 2px;\n  border: 0;\n  width: 90%;\n  margin-left:1px;\n  box-shadow: -8px 10px 0px -7px #666, 8px 10px 0px -7px #666;\n  -webkit-transition: box-shadow 0.3s;\n  transition: box-shadow 0.3s;\n}\ninput[type=text]:focus {\n  outline: none;\n  box-shadow: -8px 10px 0px -7px #000, 8px 10px 0px -7px #000;\n}\n\n.upload-mask {\n  position: fixed;\n  z-index: 9998;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, .5);\n  display: table;\n  -webkit-transition:opacity .3s ease;\n  transition: opacity .3s ease;\n}\n\n.upload-wrapper {\n  display: table-cell;\n  vertical-align: middle;\n}\n\n.upload-container {\n  width: 600px;\n  margin: 0px auto;\n  padding: 20px 30px;\n  background-color: #fff;\n  border-radius: 2px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);\n  -webkit-transition:all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-header h3 {\n  margin-top: 0;\n  color: #42b983;\n}\n\n.upload-body {\n  margin: 20px 0;\n}\n\n.upload-default-button {\n  float: right;\n}\n\n.upload-enter, .upload-leave {\n  opacity: 0;\n}\n\n.upload-enter .upload-container,\n.upload-leave .upload-container {\n  -webkit-transform: scale(1.1);\n  transform: scale(1.1);\n}\n"] = false
+    require("vueify-insert-css").cache["\ninput[type=text] {\n  border: 0;\n  width: 40%;\n  margin-left:1px;\n  border-bottom: 1px solid #ccc;\n  -webkit-transition: all 0.3s;\n  transition: all 0.3s;\n}\n\ninput[type=text]:focus {\n  outline: none;\n  border-bottom: 1px solid #000;\n}\n\nul > li {\n  margin-left: 10px;\n}\n\nli div.u-active, li label.u-active, li i.u-active {\n  color: black;\n  background: white;\n}\n\nli div.u-active:hover, li label.u-active:hover {\n  cursor: pointer;\n  color: #ce3229;\n}\n\n.u-inActive {\n  color: #666;\n}\n\n.bump {\n  margin-top: 3px;\n}\n\n.error-message {\n  margin-top: 8px;\n  color: red;\n}\n\n.upload-mask {\n  position: fixed;\n  z-index: 9998;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, .5);\n  display: table;\n  -webkit-transition: opacity .3s ease;\n  transition: opacity .3s ease;\n}\n\n.upload-wrapper {\n  display: table-cell;\n  vertical-align: middle;\n}\n\n.upload-container {\n  width: 600px;\n  margin: 0px auto;\n  padding: 20px 30px;\n  background-color: #fff;\n  border-radius: 2px;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);\n  -webkit-transition: all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-header h3 {\n  margin-top: 0;\n  color: #42b983;\n}\n\n.upload-body {\n  margin: 20px 0;\n  overflow-y: scroll;\n  height: 400px;\n}\n\n.upload-default-button {\n  float: right;\n}\n\n.grow-enter, .grow-leave {\n  height: 0;\n}\n\n.grow-transition {\n  -webkit-transition: all .3s ease;\n  transition: all .3s ease;\n}\n\n.upload-enter, .upload-leave {\n  opacity: 0;\n}\n\n.upload-enter .upload-container,\n.upload-leave .upload-container {\n  -webkit-transform: scale(1.1);\n  transform: scale(1.1);\n}\n"] = false
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
@@ -11602,7 +11715,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":27,"vue-hot-reload-api":2,"vueify-insert-css":28}],31:[function(require,module,exports){
+},{"vue":27,"vue-hot-reload-api":2,"vueify-insert-css":28}],32:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -11611,6 +11724,9 @@ var VueResource = require('vue-resource');
 Vue.use(VueResource);
 
 var App = require('./app.vue');
+
+// Components
+Vue.component('file', require('./components/file.vue'));
 
 // config Vue global settings
 Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content');
@@ -11630,6 +11746,6 @@ $(window).resize(function () {
 
 new Vue(App);
 
-},{"./app.vue":29,"vue":27,"vue-resource":16}]},{},[31]);
+},{"./app.vue":29,"./components/file.vue":30,"vue":27,"vue-resource":16}]},{},[32]);
 
 //# sourceMappingURL=pageEditor.js.map
