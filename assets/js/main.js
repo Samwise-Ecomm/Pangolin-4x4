@@ -9,11 +9,12 @@ Vue.use(VueResource)
 var nl2br 		= require('./filters/nl2br.js')
 Vue.filter('nl2br', nl2br)
 
-var App 			=	require('./app.vue')
-var Page 			= require('./pages/page.vue')
-var Catalog 	= require('./pages/catalog.vue')
-var Checkout 	= require('./pages/checkout.vue')
-var Item 			= require('./pages/item.vue')
+var App 					=	require('./app.vue')
+var Page 					= require('./pages/page.vue')
+var Catalog 			= require('./pages/catalog.vue')
+var Checkout 			= require('./pages/checkout.vue')
+var Item 					= require('./pages/item.vue')
+var fileNotFound 	= require('./pages/404.vue')
 
 // Set up routing and match routes to components
 var router = new VueRouter({
@@ -35,9 +36,23 @@ router.map({
 	'checkout/:step': {
 		component: Checkout
 	},
+	'404': {
+		component: fileNotFound
+	},
 	'*': {
 		component: Page
 	},
+})
+
+// Set http interceptor for errors returned
+Vue.http.interceptors.push({
+	response: function(response) {
+		if (response.status == 404) {
+			window.location.href = "/404"
+		} else if (response.status == 200) {
+			return response
+		}
+	}
 })
 
 router.beforeEach(function (transition) {

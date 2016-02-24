@@ -14687,7 +14687,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":61,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+},{"../store/geoInfo.js":62,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14964,7 +14964,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":62,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"../store/invoiceInfo.js":63,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
 'use strict';
 
 module.exports = function (input) {
@@ -14972,6 +14972,26 @@ module.exports = function (input) {
 };
 
 },{}],57:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+	data: function data() {
+		return {};
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<div style=\"font-size:300px;color:#252525;width:100%;text-align:center;\">404</div>\n\t\t<h1 style=\"width:100%;text-align:center;\">File Not Found</h1>\n\t\t<div style=\"width:100%;text-align:center;\">\n\t\t\tThe page you requested could not be found. Either we broke<br> \n\t\t\tsomething or the URL you typed/clicked was wrong or outdated.<br>\n\t\t\tWe apologize for the inconvenience.<br>\n\t\t\t<br>\n\t\t\t<a v-link=\"{ path: '/home' }\"><div class=\"Button Button--active u-center\">Return Home</div></a>\n\t\t</div>\n\t</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/lar_samwell/skins/moo_yukin/assets/js/pages/404.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15017,6 +15037,7 @@ module.exports = {
 			this.$http.get('/api/catalog/' + this.$route.params.id).then(function (response) {
 				this.$set('catalog', response.data);
 				this.fillTags();
+				document.title = "Pangolin 4x4 Catalog: " + this.catalog.name;
 				this.loaded = true;
 			});
 		},
@@ -15074,7 +15095,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15154,6 +15175,7 @@ module.exports = {
 					sessionStorage.cart = JSON.stringify(cart);
 				}
 
+				document.title = "Pangolin 4x4 Checkout";
 				this.loaded = true;
 			});
 		}
@@ -15211,7 +15233,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":62,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
+},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":63,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15233,6 +15255,7 @@ module.exports = {
 			this.$http.get('/api/item/' + this.$route.params.id).then(function (response) {
 				this.$set('item', response.data);
 				this.selectPic(0);
+				document.title = "Pangolin 4x4: " + this.item.name;
 
 				this.loaded = true;
 				this.$nextTick(function () {
@@ -15282,7 +15305,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15311,6 +15334,7 @@ module.exports = {
 		getPage: function getPage() {
 			this.$http.get('/api/page' + this.$route.path).then(function (response) {
 				this.$set('page', response.data);
+				document.title = "Pangolin 4x4: " + this.page.name;
 
 				var vue = require('vue');
 				var pageContent = vue.component('page' + this.page.id, {
@@ -15348,7 +15372,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15599,7 +15623,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15681,7 +15705,7 @@ module.exports = {
 	}
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15700,6 +15724,7 @@ var Page = require('./pages/page.vue');
 var Catalog = require('./pages/catalog.vue');
 var Checkout = require('./pages/checkout.vue');
 var Item = require('./pages/item.vue');
+var fileNotFound = require('./pages/404.vue');
 
 // Set up routing and match routes to components
 var router = new VueRouter({
@@ -15721,8 +15746,22 @@ router.map({
 	'checkout/:step': {
 		component: Checkout
 	},
+	'404': {
+		component: fileNotFound
+	},
 	'*': {
 		component: Page
+	}
+});
+
+// Set http interceptor for errors returned
+Vue.http.interceptors.push({
+	response: function response(_response) {
+		if (_response.status == 404) {
+			window.location.href = "/404";
+		} else if (_response.status == 200) {
+			return _response;
+		}
 	}
 });
 
@@ -15745,6 +15784,6 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/catalog.vue":57,"./pages/checkout.vue":58,"./pages/item.vue":59,"./pages/page.vue":60,"vue":47,"vue-resource":35,"vue-router":46}]},{},[63]);
+},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/404.vue":57,"./pages/catalog.vue":58,"./pages/checkout.vue":59,"./pages/item.vue":60,"./pages/page.vue":61,"vue":47,"vue-resource":35,"vue-router":46}]},{},[64]);
 
 //# sourceMappingURL=main.js.map

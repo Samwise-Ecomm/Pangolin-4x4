@@ -115,6 +115,7 @@ module.exports = {
 			this.$http.get('/api/item/'+this.$route.params.id).then(function(response) {
 		  	this.$set('item', response.data)
 		  	this.selectPic(0)
+		  	document.title = "Pangolin 4x4: "+this.item.name
 
 		  	this.loaded = true
 		  	this.$nextTick(function() {

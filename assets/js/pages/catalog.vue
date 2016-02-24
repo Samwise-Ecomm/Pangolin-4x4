@@ -76,6 +76,7 @@ module.exports = {
 			this.$http.get('/api/catalog/'+this.$route.params.id).then(function(response) {
 		  	this.$set('catalog', response.data)
 		  	this.fillTags()
+		  	document.title = "Pangolin 4x4 Catalog: "+this.catalog.name
 		  	this.loaded = true
 	    })
 		},

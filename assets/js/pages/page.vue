@@ -30,6 +30,7 @@ module.exports = {
 		getPage () {
 			this.$http.get('/api/page'+this.$route.path).then(function(response) {
 		  	this.$set('page', response.data)
+		  	document.title = "Pangolin 4x4: "+this.page.name
 
 		  	var vue = require('vue')
 		  	var pageContent = vue.component('page'+this.page.id, {

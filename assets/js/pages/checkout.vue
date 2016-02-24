@@ -133,6 +133,7 @@ module.exports = {
 					sessionStorage.cart = JSON.stringify(cart)
 				}
 
+				document.title = "Pangolin 4x4 Checkout"
 				this.loaded = true
 			})
 		},
