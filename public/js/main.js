@@ -15315,6 +15315,7 @@ module.exports = {
 				var vue = require('vue');
 				var pageContent = vue.component('page' + this.page.id, {
 					template: this.page.content,
+					created: function created() {},
 					components: {
 						catalog: require('../components/catalog.vue')
 					}
