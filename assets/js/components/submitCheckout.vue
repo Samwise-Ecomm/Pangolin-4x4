@@ -73,7 +73,8 @@
 
 		<div>
 			<div id='prev' class='Button Button--active u-width200 u-floatLeft' @click='$parent.prevStep'>< Edit Billing</div>
-			<div id='submit' class='Button Button--active u-width200 u-floatRight' @click='submitCheckout'>Submit</div>
+			<div class="Button Button--dark u-width200 u-floatRight" v-if="processing"><i class="fa fa-cog fa-spin"></i> Submitting</div>
+			<div id='submit' class='Button Button--active u-width200 u-floatRight' @click='submitCheckout' v-else><i class="fa fa-paper-plane"></i> Submit</div>
 		</div>
 	</div>
 </template>
@@ -88,7 +89,8 @@ module.exports = {
 		}
 
 		return {
-			cart: cart
+			cart: cart,
+			processing: false,
 		}
 	},
 
@@ -109,6 +111,7 @@ module.exports = {
 
 	methods: {
 		submitCheckout () {
+			this.processing = true
 			var request = Object.assign({}, this.shippingInfo)
 			var billing = Object.assign({}, this.billingInfo)
 			for (var field in billing) {
