@@ -14364,6 +14364,10 @@ module.exports = {
 		},
 
 		setAddToCartButtons: function setAddToCartButtons() {
+			$('.js-addToCart').removeClass('isDisabled');
+			$('.js-addToCart').addClass('Button--active');
+			$('.js-addToCart').html('<i class="fa fa-cart-plus"></i> Add to Cart');
+
 			for (var itemId in this.cart) {
 				for (var variantId in this.cart[itemId].variants) {
 					var variant = this.cart[itemId].variants[variantId];
