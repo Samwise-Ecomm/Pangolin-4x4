@@ -5,7 +5,7 @@
   <meta id="csrf-token" content="{{ csrf_token() }}" />
 	<title>Pangolin 4x4</title>
 
-	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:500,400,100' type='text/css'>
+	<link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto:500,400,100' type='text/css'>
 	<link rel="stylesheet" href="/css/store/template.css">
 	<link rel="stylesheet" href="/css/store/font-awesome.min.css">
 	<link rel="stylesheet" href="/css/store/lightbox.css">

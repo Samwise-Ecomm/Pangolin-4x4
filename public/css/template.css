@@ -95,7 +95,7 @@ b hr {
   border-bottom: 1px solid #252525; }
 
 h1 {
-  font-weight: 400;
+  font-weight: 500;
   font-size: 25px; }
 
 h2 {
@@ -108,14 +108,14 @@ h3 {
 
 h4 {
   font-size: 20px;
-  font-weight: 100; }
+  font-weight: 400; }
 
 h5 {
   font-size: 17px; }
 
 h6 {
   font-size: 17px;
-  font-weight: 100; }
+  font-weight: 400; }
 
 .u-highlight {
   color: #ce3229; }
@@ -124,7 +124,7 @@ h6 {
   color: #dd8131; }
 
 .u-thin {
-  font-weight: 200; }
+  font-weight: 400; }
 
 .u-contentWrapper {
   width: 900px;
@@ -847,7 +847,7 @@ i.resize {
   width: 200px;
   height: 25px;
   font-size: 18px;
-  font-weight: 100;
+  font-weight: 400;
   text-align: right; }
 
 .CheckoutShipping-warning {
@@ -859,7 +859,7 @@ i.resize {
   color: #fff;
   background: #dd8131;
   display: none;
-  font-weight: 200; }
+  font-weight: 400; }
 
 .CheckoutShipping-warning:before {
   content: '';
@@ -877,7 +877,7 @@ i.resize {
   line-height: 25px;
   margin: 10px;
   margin-left: 210px;
-  font-weight: 100; }
+  font-weight: 400; }
 
 .CheckoutShipping-radio span:hover {
   color: #dd8131;
@@ -949,7 +949,7 @@ i.resize {
 
 .CheckoutConfirm-itemNum {
   padding-left: 10px;
-  font-weight: 200;
+  font-weight: 400;
   float: left; }
 
 .CheckoutConfirm-variant, .CheckoutConfirm-price {
@@ -973,7 +973,7 @@ i.resize {
 
 .CheckoutConfirm-subTitle {
   text-align: right;
-  font-weight: 200; }
+  font-weight: 400; }
 
 .CheckoutConfirm-subTotal {
   width: 150px; }
@@ -988,13 +988,13 @@ i.resize {
   margin-left: 10px;
   margin-bottom: 10px;
   font-size: 20px;
-  font-weight: 200;
+  font-weight: 400;
   float: left; }
 
 .CheckoutConfirm-contact {
   margin-right: 10px;
   font-size: 20px;
-  font-weight: 200;
+  font-weight: 400;
   float: right;
   text-align: right; }
 
@@ -1003,7 +1003,7 @@ i.resize {
   width: 200px;
   height: 25px;
   font-size: 18px;
-  font-weight: 100;
+  font-weight: 400;
   text-align: right; }
 
 .js-formInput {
@@ -1072,7 +1072,7 @@ i.resize {
   padding-right: 20px;
   color: #fff;
   background: #dd8131;
-  font-weight: 200; }
+  font-weight: 400; }
 
 .js-formWarn:before {
   content: '';

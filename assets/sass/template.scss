@@ -119,7 +119,7 @@ b hr {
 }
 
 h1 {
-	font-weight: 400;
+	font-weight: 500;
 	font-size: 25px;
 }
 
@@ -135,7 +135,7 @@ h3 {
 
 h4 {
 	font-size: 20px;
-	font-weight: 100;
+	font-weight: 400;
 }
 
 h5 {
@@ -144,7 +144,7 @@ h5 {
 
 h6 {
 	font-size: 17px;
-	font-weight: 100;
+	font-weight: 400;
 }
 
 .u-highlight {
@@ -156,7 +156,7 @@ h6 {
 }
 
 .u-thin {
-	font-weight: 200;
+	font-weight: 400;
 }
 
 .u-contentWrapper {
@@ -1020,7 +1020,7 @@ i.resize {
 	width: 200px;
 	height: 25px;
 	font-size: 18px;
-	font-weight: 100;
+	font-weight: 400;
 	text-align: right;
 }
 .CheckoutShipping-warning {
@@ -1032,7 +1032,7 @@ i.resize {
 	color: #fff;
 	background: $active;
 	display: none;
-	font-weight: 200;
+	font-weight: 400;
 }
 .CheckoutShipping-warning:before {
 	content: '';
@@ -1050,7 +1050,7 @@ i.resize {
 	line-height: 25px;
 	margin: 10px;
 	margin-left: 210px;
-	font-weight: 100;
+	font-weight: 400;
 }
 .CheckoutShipping-radio span:hover {
 	color: $active;
@@ -1130,7 +1130,7 @@ i.resize {
 
 .CheckoutConfirm-itemNum {
 	padding-left: 10px;
-	font-weight: 200;
+	font-weight: 400;
 	float: left;
 }
 
@@ -1159,7 +1159,7 @@ i.resize {
 
 .CheckoutConfirm-subTitle {
 	text-align: right;
-	font-weight: 200;
+	font-weight: 400;
 }
 
 .CheckoutConfirm-subTotal {
@@ -1177,14 +1177,14 @@ i.resize {
 	margin-left: 10px;
 	margin-bottom: 10px;
 	font-size: 20px;
-	font-weight: 200;
+	font-weight: 400;
 	float: left;
 }
 
 .CheckoutConfirm-contact {
 	margin-right: 10px;
 	font-size: 20px;
-	font-weight: 200;
+	font-weight: 400;
 	float: right;
 	text-align: right;
 }
@@ -1196,7 +1196,7 @@ i.resize {
 	width: 200px;
 	height: 25px;
 	font-size: 18px;
-	font-weight: 100;
+	font-weight: 400;
 	text-align: right;
 }
 
@@ -1276,7 +1276,7 @@ i.resize {
 	padding-right: 20px;
 	color: #fff;
 	background: $active;
-	font-weight: 200;
+	font-weight: 400;
 }
 
 .js-formWarn:before {

@@ -63,7 +63,7 @@
 			</div>
 
 			<div class='js-formField'>
-				<div class='js-formLabel'>State:</div>
+				<div class='js-formLabel'>State / Province:</div>
 				<div class='js-formInput u-width400' :class="(selected == 'state')?'isSelected':''">
 					<select name="state" 
 						v-model="info.state"
