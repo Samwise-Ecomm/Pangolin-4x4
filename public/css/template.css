@@ -741,7 +741,8 @@ hr.inCheckoutCart {
 
 .CheckoutCart-item {
   width: 880px;
-  display: table; }
+  display: inline-table;
+  table-layout: fixed; }
 
 .CheckoutCart-pic {
   padding: 0;
@@ -816,7 +817,8 @@ i.resize {
   border: 1px solid #252525; }
 
 .Subtotal-container {
-  display: table;
+  display: inline-table;
+  table-layout: fixed;
   height: 60px; }
 
 .Subtotal-label {

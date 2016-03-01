@@ -895,7 +895,8 @@ hr.inCheckoutCart {
 
 .CheckoutCart-item {
 	width: $contentWidth - 20px;
-	display: table;
+	display: inline-table;
+	table-layout: fixed;
 }
 
 .CheckoutCart-pic {
@@ -986,7 +987,8 @@ i.resize {
 }
 
 .Subtotal-container {
-	display: table;
+	display: inline-table;
+	table-layout: fixed;
 	height: 60px;
 }
 
