@@ -153,6 +153,7 @@ module.exports = {
 		},
 
 		storeCart(cart) {
+			localStorage.cartExperation = Date.now() + (1000 * 60 * 60 * 24);
 			localStorage.cart = JSON.stringify(cart)
 			this.restoreCart()
 		},
@@ -168,6 +169,13 @@ module.exports = {
 		},
 
 		clearCart() {
+			console.log(localStorage)
+			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
+				delete localStorage.cart
+				delete localStorage.cartExperation
+				return {}
+			}
+
 			if (!localStorage.cart) {
 				return 0
 			}
