@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="/css/store/font-awesome.min.css">
 	<link rel="stylesheet" href="/css/store/lightbox.css">
 
+	<meta name="google-site-verification" content="7PV5WB2FyWGmKvAWHxAtvwstEwTEMm767bFlrgQLGx8" />
 </head>
 <body>
 	<div id="app"></div>
