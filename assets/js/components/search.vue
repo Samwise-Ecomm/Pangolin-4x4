@@ -2,7 +2,7 @@
 	<section id="SideNav-search">
 		<ul v-if="focused">
 			<li v-for="result in results" :class="(selected == $index)?'u-light':''">
-				<a v-link="{ path: '/item/'+result.id }"><small>{{{ result.name }}}</small><br>
+				<a @click='find(result)'><small>{{{ result.name }}}</small><br>
 				<small class="u-thin" v-if="result.type_info.part_number">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>
 			</li>
 		</ul>
@@ -79,6 +79,13 @@ module.exports = {
     	setTimeout(function() { this.focused = false }.bind(this), 1000)
     	
     }
+  },
+
+  methods: {
+  	find (result) {
+  		ga('send', 'event', 'search', 'find', '"'+this.query+'" - '+result.name)
+  		this.$router.go({ path: '/item/'+result.id })
+  	}
   }
 }
 </script>

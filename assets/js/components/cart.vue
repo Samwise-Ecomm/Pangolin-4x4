@@ -128,6 +128,7 @@ module.exports = {
 
 	methods: {
 		addToCart (cartItem, itemId, variantId) {
+			ga('send', 'event', 'cart', 'itemAdded', 'Item #'+itemId+' - "'+cartItem.name+'"; Variant #'+variantId+' - "'+cartItem.variants[variantId].name+'"')
 			var cart = {}
 			if (sessionStorage.cart) {
 				cart = JSON.parse(sessionStorage.cart)

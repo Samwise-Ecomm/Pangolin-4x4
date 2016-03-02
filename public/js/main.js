@@ -14290,6 +14290,7 @@ module.exports = {
 
 	methods: {
 		addToCart: function addToCart(cartItem, itemId, variantId) {
+			ga('send', 'event', 'cart', 'itemAdded', 'Item #' + itemId + ' - "' + cartItem.name + '"; Variant #' + variantId + ' - "' + cartItem.variants[variantId].name + '"');
 			var cart = {};
 			if (sessionStorage.cart) {
 				cart = JSON.parse(sessionStorage.cart);
@@ -14877,9 +14878,16 @@ module.exports = {
 				this.focused = false;
 			}).bind(this), 1000);
 		}
+	},
+
+	methods: {
+		find: function find(result) {
+			ga('send', 'event', 'search', 'find', '"' + this.query + '" - ' + result.name);
+			this.$router.go({ path: '/item/' + result.id });
+		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section id=\"SideNav-search\">\n\t\t<ul v-if=\"focused\">\n\t\t\t<li v-for=\"result in results\" :class=\"(selected == $index)?'u-light':''\">\n\t\t\t\t<a v-link=\"{ path: '/item/'+result.id }\"><small>{{{ result.name }}}</small><br>\n\t\t\t\t<small class=\"u-thin\" v-if=\"result.type_info.part_number\">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>\n\t\t\t</li>\n\t\t</ul>\n\t</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section id=\"SideNav-search\">\n\t\t<ul v-if=\"focused\">\n\t\t\t<li v-for=\"result in results\" :class=\"(selected == $index)?'u-light':''\">\n\t\t\t\t<a @click=\"find(result)\"><small>{{{ result.name }}}</small><br>\n\t\t\t\t<small class=\"u-thin\" v-if=\"result.type_info.part_number\">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>\n\t\t\t</li>\n\t\t</ul>\n\t</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
