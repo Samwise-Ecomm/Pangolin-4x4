@@ -76,8 +76,8 @@ module.exports = {
     },
 
     searchBlurred () {
+    	ga('send', 'event', 'search', 'failed', this.query)
     	setTimeout(function() { this.focused = false }.bind(this), 1000)
-    	
     }
   },
 
