@@ -48,7 +48,7 @@
 		<hr class='u-clear'>
 	</div>
 	<div v-else>
-		<a href="#" @click="go(item.id)">
+		<a @click="go(item.id)">
 			<div class="CatalogGridItem">
 				<img :src="'/img/'+item.images.small[0]+'?u='+item.updated" class='CatalogGridItem-thumb'>
 				<br>

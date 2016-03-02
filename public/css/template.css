@@ -54,6 +54,9 @@ a:hover,
 a:active {
   outline: 0; }
 
+a img {
+  border-style: none; }
+
 input::-ms-clear {
   display: none; }
 

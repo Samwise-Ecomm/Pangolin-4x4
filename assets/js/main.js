@@ -60,6 +60,10 @@ router.beforeEach(function (transition) {
 	transition.next()
 })
 
+router.afterEach(function (transition) {
+	ga('send', 'pageview', transition.to.path)
+})
+
 // Jquery watcher to modify div positioning on scroll
 function resizeWindow() {
 	var minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
