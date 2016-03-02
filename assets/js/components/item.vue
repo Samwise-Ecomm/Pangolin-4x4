@@ -46,21 +46,23 @@
 	</div>
 	<hr class='u-clear'>
 </div>
-<a @click="go(item.id)" v-if="loaded && style == 'grid'">
-	<div class="CatalogGridItem">
-		<img :src="'/img/'+item.images.small[0]+'?u='+item.updated" class='CatalogGridItem-thumb'>
-		<br>
-		<div class="CatalogGridItem-name">
-			<b>{{{ item.name + ', ' + item.type_info.state }}}</b>
-			<div v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>
+<div v-if="loaded && style == 'grid'">
+	<a @click="go(item.id)">
+		<div class="CatalogGridItem">
+			<img :src="'/img/'+item.images.small[0]+'?u='+item.updated" class='CatalogGridItem-thumb'>
+			<br>
+			<div class="CatalogGridItem-name">
+				<b>{{{ item.name + ', ' + item.type_info.state }}}</b>
+				<div v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>
+			</div>
+			<br>
+			<span class="CatalogGridItem-price">
+				<b>{{ item.variants[0].price | currency }}</b>
+				<span v-if="item.variants[0].unit != 'Unit'" class="u-thin"> / {{ item.variants[0].unit }}</span>
+			</span>
 		</div>
-		<br>
-		<span class="CatalogGridItem-price">
-			<b>{{ item.variants[0].price | currency }}</b>
-			<span v-if="item.variants[0].unit != 'Unit'" class="u-thin"> / {{ item.variants[0].unit }}</span>
-		</span>
-	</div>
-</a>
+	</a>
+</div>
 </template>
 
 <script>
