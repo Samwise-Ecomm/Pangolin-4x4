@@ -105,7 +105,7 @@ module.exports = {
 			// check the cart against the server to make sure everything is still in stock
 			this.$http.post('/api/test/cart', { cart: this.returnCartCount() }).then(function(response) {
 				for (var i = 0; i < response.data.length; i++) {
-					var cart = JSON.parse(sessionStorage.cart)
+					var cart = JSON.parse(localStorage.cart)
 					var error = response.data[i]
 					if (error.error == 'count_changed') {
 						// throw an error for the user
@@ -130,7 +130,7 @@ module.exports = {
 				}
 
 				if (response.data.length > 0) {
-					sessionStorage.cart = JSON.stringify(cart)
+					localStorage.cart = JSON.stringify(cart)
 				}
 
 				document.title = "Pangolin 4x4 Checkout"
@@ -162,8 +162,8 @@ module.exports = {
 
 		returnCartCount() {
 			var request = []
-			if (sessionStorage.cart) {
-				var cart = JSON.parse(sessionStorage.cart)
+			if (localStorage.cart) {
+				var cart = JSON.parse(localStorage.cart)
 			} else {
 				var cart = {}
 			}

@@ -14292,8 +14292,8 @@ module.exports = {
 		addToCart: function addToCart(cartItem, itemId, variantId) {
 			ga('send', 'event', 'cart', 'itemAdded', 'Item #' + itemId + ' - "' + cartItem.name + '"; Variant #' + variantId + ' - "' + cartItem.variants[variantId].name + '"');
 			var cart = {};
-			if (sessionStorage.cart) {
-				cart = JSON.parse(sessionStorage.cart);
+			if (localStorage.cart) {
+				cart = JSON.parse(localStorage.cart);
 			}
 
 			if (cart[itemId]) {
@@ -14315,14 +14315,14 @@ module.exports = {
 		},
 
 		storeCart: function storeCart(cart) {
-			sessionStorage.cart = JSON.stringify(cart);
+			localStorage.cart = JSON.stringify(cart);
 			this.restoreCart();
 		},
 
 		restoreCart: function restoreCart() {
-			if (sessionStorage.cart) {
+			if (localStorage.cart) {
 				this.show = true;
-				this.$set('cart', JSON.parse(sessionStorage.cart));
+				this.$set('cart', JSON.parse(localStorage.cart));
 			} else {
 				this.show = false;
 				return {};
@@ -14330,11 +14330,11 @@ module.exports = {
 		},
 
 		clearCart: function clearCart() {
-			if (!sessionStorage.cart) {
+			if (!localStorage.cart) {
 				return 0;
 			}
 
-			var cart = JSON.parse(sessionStorage.cart);
+			var cart = JSON.parse(localStorage.cart);
 			for (var itemId in cart) {
 				for (var variantId in cart[itemId].variants) {
 					if (cart[itemId].variants[variantId].count == 0) {
@@ -14346,9 +14346,9 @@ module.exports = {
 				}
 			}
 			if (_Object$keys(cart).length == 0) {
-				sessionStorage.removeItem('cart');
+				localStorage.removeItem('cart');
 			} else {
-				sessionStorage.cart = JSON.stringify(cart);
+				localStorage.cart = JSON.stringify(cart);
 			}
 		},
 
@@ -14874,6 +14874,7 @@ module.exports = {
 		},
 
 		searchBlurred: function searchBlurred() {
+			ga('send', 'event', 'search', 'failed', this.query);
 			setTimeout((function () {
 				this.focused = false;
 			}).bind(this), 1000);
@@ -14906,8 +14907,8 @@ var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
 
 module.exports = {
 	data: function data() {
-		if (sessionStorage.cart) {
-			var cart = JSON.parse(sessionStorage.cart);
+		if (localStorage.cart) {
+			var cart = JSON.parse(localStorage.cart);
 		} else {
 			var cart = {};
 		}
@@ -14955,8 +14956,7 @@ module.exports = {
 				}
 			}).then(function (response) {
 				if (response.data == 'success') {
-					// WOO, We did it!
-					sessionStorage.removeItem('cart');
+					localStorage.removeItem('cart');
 					var info = require('../store/invoiceInfo.js');
 					info.clear();
 
@@ -15161,7 +15161,7 @@ module.exports = {
 			// check the cart against the server to make sure everything is still in stock
 			this.$http.post('/api/test/cart', { cart: this.returnCartCount() }).then(function (response) {
 				for (var i = 0; i < response.data.length; i++) {
-					var cart = JSON.parse(sessionStorage.cart);
+					var cart = JSON.parse(localStorage.cart);
 					var error = response.data[i];
 					if (error.error == 'count_changed') {
 						// throw an error for the user
@@ -15186,7 +15186,7 @@ module.exports = {
 				}
 
 				if (response.data.length > 0) {
-					sessionStorage.cart = JSON.stringify(cart);
+					localStorage.cart = JSON.stringify(cart);
 				}
 
 				document.title = "Pangolin 4x4 Checkout";
@@ -15218,8 +15218,8 @@ module.exports = {
 
 		returnCartCount: function returnCartCount() {
 			var request = [];
-			if (sessionStorage.cart) {
-				var cart = JSON.parse(sessionStorage.cart);
+			if (localStorage.cart) {
+				var cart = JSON.parse(localStorage.cart);
 			} else {
 				var cart = {};
 			}

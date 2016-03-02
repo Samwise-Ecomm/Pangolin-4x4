@@ -82,8 +82,8 @@
 <script>
 module.exports = {
 	data () {
-		if (sessionStorage.cart) {
-			var cart = JSON.parse(sessionStorage.cart)
+		if (localStorage.cart) {
+			var cart = JSON.parse(localStorage.cart)
 		} else {
 			var cart = {}
 		}
@@ -131,8 +131,7 @@ module.exports = {
 				}
 			}).then(function(response) {
 				if (response.data == 'success') {
-					// WOO, We did it!
-					sessionStorage.removeItem('cart')
+					localStorage.removeItem('cart')
 					var info = require('../store/invoiceInfo.js')
 					info.clear()
 
