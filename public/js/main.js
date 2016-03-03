@@ -15779,6 +15779,7 @@ router.map({
 Vue.http.interceptors.push({
 	response: function response(_response) {
 		if (_response.status == 404) {
+			ga('send', 'event', 'error', '404', window.location.href);
 			window.location.href = "/404";
 		} else if (_response.status == 200) {
 			return _response;
