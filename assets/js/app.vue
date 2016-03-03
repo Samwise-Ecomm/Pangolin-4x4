@@ -1,5 +1,24 @@
 <template>
 	<div class="wrapper" :class="search?'search':'noSearch'">
+		<div id="Social">
+			<ul>
+				<li>
+					<a href="https://www.facebook.com/Pangolin4x4-253570924656290/">
+						<i class="fa fa-2x fa-facebook-square"></i>
+					</a>
+				</li>
+				<li>
+					<a href="https://www.instagram.com/explore/tags/pangolin4x4/">
+						<i class="fa fa-2x fa-instagram"></i>
+					</a>
+				</li>
+				<li>
+					<a href="http://www.roverdose.com/">
+						<i class="fa fa-2x fa-rss-square"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
 		<div id="Head" v-if="loaded">
 			<div id="Head-highlightBar"></div>
 			<div id="Head-titleBar">

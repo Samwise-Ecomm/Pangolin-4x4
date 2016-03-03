@@ -68,6 +68,12 @@ router.afterEach(function (transition) {
 function resizeWindow() {
 	var minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
 	$('#Body-column').css('min-height', minHeight+'px');
+
+	if ($(window).scrollTop() < 147) {
+		$('#Social').css('top', (147 - $(window).scrollTop())+'px')
+	} else if ($('#Social').css('top') != '6px') {
+		$('#Social').css('top', '6px')
+	}
 }
 $(window).scroll(function(){
 	resizeWindow()

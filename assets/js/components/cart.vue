@@ -169,7 +169,6 @@ module.exports = {
 		},
 
 		clearCart() {
-			console.log(localStorage)
 			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
 				delete localStorage.cart
 				delete localStorage.cartExperation

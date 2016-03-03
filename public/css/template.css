@@ -1120,4 +1120,19 @@ li.u-active:hover {
   cursor: pointer;
   color: #dd8131; }
 
+#Social {
+  position: fixed;
+  left: 50%;
+  top: 10px;
+  margin-left: -482px; }
+
+#Social li {
+  line-height: 25px; }
+
+#Social li a {
+  color: black; }
+
+#Social li a:hover {
+  color: #dd8131; }
+
 /*# sourceMappingURL=template.css.map */
