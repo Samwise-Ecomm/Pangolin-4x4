@@ -48,8 +48,50 @@ router.map({
 Vue.http.interceptors.push({
 	response: function(response) {
 		if (response.status == 404) {
-			ga('send', 'event', 'error', '404', window.location.href)
-			window.location.href = "/404"
+			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
+				window.location.href = "/catalog/axles-drive-shafts-and-wheels"
+			} else if (window.location.href.includes("/land-rover-parts-products/accessories")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment"
+			} else if (window.location.href.includes("/land-rover-parts-products/badges-decals-data-plates")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment"
+			} else if (window.location.href.includes("/land-rover-parts-products/body-fittings")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings"
+			} else if (window.location.href.includes("/land-rover-parts-products/body-panels-tops")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings"
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls"
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls"
+			} else if (window.location.href.includes("/land-rover-parts-products/cooling-exhaust-fuel")) {
+				window.location.href = "/catalog/fuel-exhaust-and-emission-systems"
+			} else if (window.location.href.includes("/land-rover-parts-products/dash-instruments-controls")) {
+				window.location.href = "/catalog/instruments-and-controls"
+			} else if (window.location.href.includes("/land-rover-parts-products/electrical")) {
+				window.location.href = "/catalog/electrical-lamps-and-lenses"
+			} else if (window.location.href.includes("/land-rover-parts-products/engine-gearbox-t-case")) {
+				window.location.href = "/catalog/engine"
+			} else if (window.location.href.includes("/land-rover-parts-products/rubber-parts-seals")) {
+				window.location.href = "/land-rover-parts-products"
+			} else if (window.location.href.includes("/land-rover-parts-products/optional-equipment")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment"
+			} else if (window.location.href.includes("/land-rover-parts-products/paint")) {
+				window.location.href = "/catalog/paint"
+			} else if (window.location.href.includes("/land-rover-parts-products/mercedes")) {
+				window.location.href = "/catalog/mercedes-parts"
+			} else if (window.location.href.includes("/land-rover-parts-products/t-shirts-toys-gifts")) {
+				window.location.href = "/catalog/t-shirts-toys-and-gifts"
+			} else if (window.location.href.includes("/land-rover-parts-products/tools")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment"
+			} else if (window.location.href.includes("/land-rover-parts-products/rare-parts")) {
+				window.location.href = "/home/featured-parts"
+			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
+				window.location.href = "/home/recently-added-parts"
+			} else if (window.location.href.includes("/land-rover-parts-products")) {
+				window.location.href = "/land-rover-parts-and-products"
+			} else {
+				ga('send', 'event', 'error', '404', window.location.href)
+				window.location.href = "/404"
+			}
 		} else if (response.status == 200) {
 			return response
 		}

@@ -13,7 +13,7 @@
 				<br><br>
 				{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.
 				<span v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>
-				<span v-if="item.type_info.ss_part_number">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>
+				<span v-if="item.type_info.ss_part_number">Supersedes Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>
 			</p>
 			<div class='CatalogItem-controls'>
 				<select class='CatalogItem-variations js-variantSelector'

@@ -14775,7 +14775,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div class=\"CatalogItem\" v-if=\"style == &quot;rows&quot;\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[0]+'?u='+item.updated\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t</a>\n\t\t<div class=\"CatalogItem-description\">\n\t\t\t<h2><a @click=\"go(item.id)\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t<br>\n\t\t\t<p>\n\t\t\t\t{{{ item.description }}}\n\t\t\t\t<br><br>\n\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t</p>\n\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t</select>\n\t\t\t\t<br><br>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t      \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t    \t</div>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\tOut of Stock\n\t\t\t\t</div>\n\t    \t<a @click=\"go(item.id)\">\n\t    \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t    \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t    \t\t</div>\n\t    \t</a>\n\t    \t<span class=\"CatalogItem-price\">\n\t    \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t    \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t    \t</span>\n\t\t\t</div>\n\t\t</div>\n\t\t<hr class=\"u-clear\">\n\t</div>\n\t<div v-else=\"\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+item.images.small[0]+'?u='+item.updated\" class=\"CatalogGridItem-thumb\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{{ item.name + ', ' + item.type_info.state }}}</b>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ item.variants[0].price | currency }}</b>\n\t\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div class=\"CatalogItem\" v-if=\"style == &quot;rows&quot;\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[0]+'?u='+item.updated\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t</a>\n\t\t<div class=\"CatalogItem-description\">\n\t\t\t<h2><a @click=\"go(item.id)\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t<br>\n\t\t\t<p>\n\t\t\t\t{{{ item.description }}}\n\t\t\t\t<br><br>\n\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Supersedes Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t</p>\n\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t</select>\n\t\t\t\t<br><br>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t      \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t    \t</div>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\tOut of Stock\n\t\t\t\t</div>\n\t    \t<a @click=\"go(item.id)\">\n\t    \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t    \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t    \t\t</div>\n\t    \t</a>\n\t    \t<span class=\"CatalogItem-price\">\n\t    \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t    \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t    \t</span>\n\t\t\t</div>\n\t\t</div>\n\t\t<hr class=\"u-clear\">\n\t</div>\n\t<div v-else=\"\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+item.images.small[0]+'?u='+item.updated\" class=\"CatalogGridItem-thumb\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{{ item.name + ', ' + item.type_info.state }}}</b>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ item.variants[0].price | currency }}</b>\n\t\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15779,8 +15779,50 @@ router.map({
 Vue.http.interceptors.push({
 	response: function response(_response) {
 		if (_response.status == 404) {
-			ga('send', 'event', 'error', '404', window.location.href);
-			window.location.href = "/404";
+			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
+				window.location.href = "/catalog/axles-drive-shafts-and-wheels";
+			} else if (window.location.href.includes("/land-rover-parts-products/accessories")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/badges-decals-data-plates")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/body-fittings")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings";
+			} else if (window.location.href.includes("/land-rover-parts-products/body-panels-tops")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings";
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/cooling-exhaust-fuel")) {
+				window.location.href = "/catalog/fuel-exhaust-and-emission-systems";
+			} else if (window.location.href.includes("/land-rover-parts-products/dash-instruments-controls")) {
+				window.location.href = "/catalog/instruments-and-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/electrical")) {
+				window.location.href = "/catalog/electrical-lamps-and-lenses";
+			} else if (window.location.href.includes("/land-rover-parts-products/engine-gearbox-t-case")) {
+				window.location.href = "/catalog/engine";
+			} else if (window.location.href.includes("/land-rover-parts-products/rubber-parts-seals")) {
+				window.location.href = "/land-rover-parts-products";
+			} else if (window.location.href.includes("/land-rover-parts-products/optional-equipment")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/paint")) {
+				window.location.href = "/catalog/paint";
+			} else if (window.location.href.includes("/land-rover-parts-products/mercedes")) {
+				window.location.href = "/catalog/mercedes-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products/t-shirts-toys-gifts")) {
+				window.location.href = "/catalog/t-shirts-toys-and-gifts";
+			} else if (window.location.href.includes("/land-rover-parts-products/tools")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/rare-parts")) {
+				window.location.href = "/home/featured-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
+				window.location.href = "/home/recently-added-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products")) {
+				window.location.href = "/land-rover-parts-and-products";
+			} else {
+				ga('send', 'event', 'error', '404', window.location.href);
+				window.location.href = "/404";
+			}
 		} else if (_response.status == 200) {
 			return _response;
 		}
