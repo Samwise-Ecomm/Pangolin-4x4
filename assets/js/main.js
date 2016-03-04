@@ -114,8 +114,8 @@ function resizeWindow() {
 
 	if ($(window).scrollTop() < 147) {
 		$('#Social').css('top', (147 - $(window).scrollTop())+'px')
-	} else if ($('#Social').css('top') != '6px') {
-		$('#Social').css('top', '6px')
+	} else if ($('#Social').css('top') != '2px') {
+		$('#Social').css('top', '2px')
 	}
 }
 $(window).scroll(function(){
