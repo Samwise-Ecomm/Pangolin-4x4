@@ -15,7 +15,7 @@
 		<a :href="'/img/'+pic.path+'?u='+item.updated" id='js-currentPicLink' data-lightbox="pic" v-for="pic in item.images.large">
 			<img :src="'/img/'+item.images.medium[$index]+'?u='+item.updated" id='Pictures-current' class="u-activeImg" v-if="pic.selected">
 		</a>
-	  <img :src="'/img/'+pic+'?u='+item.updated" class="u-activeImg Pictures-thumb" 
+	  <img :src="'/img/'+pic+'?u='+item.updated" class="u-activeImg Pictures-thumb"
 	  	:class="($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'"
 	  	v-for="pic in item.images.small"
 	  	@click="selectPic($index)">
@@ -29,7 +29,7 @@
 			<br><br>
 			{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.
 			<span v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>
-			<span v-if="item.type_info.ss_part_number">Superseded by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>
+			<span v-if="item.type_info.ss_part_number">Supersedes by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>
 		</p>
 	</div>
 
@@ -39,7 +39,7 @@
 				{{ item.variants[0].price | currency }}
 				<span v-if="item.variants[0].unit != 'Unit'" class='u-thin'> / {{ item.variants[0].unit }}</span>
 			</b>
-			<div class="Button Button--active inVariations u-floatRight js-addToCart" 
+			<div class="Button Button--active inVariations u-floatRight js-addToCart"
 				v-if="item.variants[0].stock > 0 || item.variants[0].infinite"
 				:variant-id="item.variants[0].id"
 				@click="addToCart(item.variants[0])">
@@ -49,7 +49,7 @@
 				Out of Stock
 			</div>
 		</section>
-		
+
 		<table id='VariationsTable' v-else>
 			<tr v-for="variant in item.variants">
 				<td>{{ variant.name }}</td>
@@ -58,7 +58,7 @@
 					<span v-if="variant.unit != 'Unit'" class='u-thin'> / {{ variant.unit }}</span>
 				</b></td>
 				<td class="VariationsTable-button">
-					<div class="Button Button--active inVariations u-floatRight js-addToCart" 
+					<div class="Button Button--active inVariations u-floatRight js-addToCart"
 						v-if="variant.stock > 0 || variant.infinite"
 						:variant-id="variant.id"
 						@click="addToCart(variant)">
