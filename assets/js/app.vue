@@ -36,9 +36,9 @@
 			<div id="Head-navBar">
 				<div class="u-contentWrapper">
 					<div id="Head-menu" class="u-inverted">
-						<span v-for="link in settings.menus.header">
+						<span v-for="link in menus.header">
 							<a v-link="{ path: link.path }">{{ link.name }}</a>
-							<span v-if="settings.menus.header.length > $index + 1">|</span>
+							<span v-if="menus.header.length > $index + 1">|</span>
 						</span>
 					</div>
 					<div id="Head-searchField" v-if="search">
@@ -62,7 +62,7 @@
 					<search v-ref:search :query.sync="query"></search>
 					<cart v-ref:cart :checkout="false"></cart>
 					<section id="SideNav-catalogs">
-						<span v-for="link in settings.menus.sidebar">
+						<span v-for="link in menus.sidebar">
 							<b v-if="link.label">{{ link.name }}</b>
 							<a v-else v-link="{ path: '/catalog/'+link.slug }">{{ link.name }}</a>
 							<br><br>
@@ -74,9 +74,9 @@
 		<div id="Foot" v-if="loaded">
 			<div id="Foot-blackBar"></div>
 			<div id="Foot-navBar">
-				<span v-for="link in settings.menus.footer">
+				<span v-for="link in menus.footer">
 					<a v-link="{ path: link.path }">{{ link.name }}</a>
-					<span v-if="settings.menus.footer.length > $index + 1">|</span>
+					<span v-if="menus.footer.length > $index + 1">|</span>
 				</span>
 				<br>
 				{{ settings.copyright }}
@@ -91,6 +91,7 @@ module.exports = {
 		return {
 			search: true,
 			settings: {},
+			menus: {},
 			query: '',
 			loaded: false
 		}
@@ -107,13 +108,20 @@ module.exports = {
 
 	methods: {
 		getSettings () {
-			this.$http.get('/api/settings').then(function(response) {
-		  	this.$set('settings', response.data)
-		  	this.loaded = true
-		  	this.$nextTick(function() {
-		  		$(window).scroll()
-		  	})
-	    })
+			this.$http.get('setting/store_info').then(function(response) {
+				this.$set('settings', response.data)
+				this.getMenus()
+			})
+		},
+
+		getMenus () {
+			this.$http.get('store/menus').then(function(response) {
+				this.$set('menus', response.data)
+				this.loaded = true
+				this.$nextTick(() => {
+					$(window).scroll()
+				})
+			})
 		},
 
 		queryChanged (event) {

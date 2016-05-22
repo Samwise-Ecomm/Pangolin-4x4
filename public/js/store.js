@@ -14857,7 +14857,7 @@ module.exports = {
 		return {
 			search: true,
 			settings: {},
-			menus: {},
+			pages: {},
 			query: '',
 			loaded: false
 		};
@@ -14876,13 +14876,13 @@ module.exports = {
 		getSettings: function getSettings() {
 			this.$http.get('setting/store_info').then(function (response) {
 				this.$set('settings', response.data);
-				this.getMenus();
+				this.getPages();
 			});
 		},
 
-		getMenus: function getMenus() {
-			this.$http.get('store/menus').then(function (response) {
-				this.$set('menus', response.data);
+		getPages: function getPages() {
+			this.$http.get('pages').then(function (response) {
+				this.$set('pages', response.data);
 				this.loaded = true;
 				this.$nextTick(function () {
 					$(window).scroll();
@@ -14907,7 +14907,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in menus.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ path: '/catalog/'+link.slug }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in pages.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"pages.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in pages.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ path: '/catalog/'+link.slug }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in pages.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"pages.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15673,140 +15673,6 @@ module.exports = function (input) {
 };
 
 },{}],57:[function(require,module,exports){
-// libraries
-'use strict';
-
-var Vue = require('vue');
-var VueRouter = require('vue-router');
-var VueResource = require('vue-resource');
-Vue.use(VueRouter);
-Vue.use(VueResource);
-
-Vue.http.options.root = '/api';
-
-// Vue-filters
-var nl2br = require('./filters/nl2br.js');
-Vue.filter('nl2br', nl2br);
-
-var App = require('./app.vue');
-var Page = require('./pages/page.vue');
-var Catalog = require('./pages/catalog.vue');
-var Checkout = require('./pages/checkout.vue');
-var Item = require('./pages/item.vue');
-var fileNotFound = require('./pages/404.vue');
-
-// Set up routing and match routes to components
-var router = new VueRouter({
-	history: true
-});
-
-// config Vue global settings
-Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content');
-Vue.config.debug = true;
-// Vue.config.async = false
-
-router.map({
-	'item/:id': {
-		component: Item
-	},
-	'catalog/:id': {
-		component: Catalog
-	},
-	'checkout/:step': {
-		component: Checkout
-	},
-	'404': {
-		component: fileNotFound
-	},
-	'*': {
-		component: Page
-	}
-});
-
-// Set http interceptor for errors returned
-Vue.http.interceptors.push({
-	response: function response(_response) {
-		if (_response.status == 404) {
-			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
-				window.location.href = "/catalog/axles-drive-shafts-and-wheels";
-			} else if (window.location.href.includes("/land-rover-parts-products/accessories")) {
-				window.location.href = "/catalog/accessories-and-optional-equipment";
-			} else if (window.location.href.includes("/land-rover-parts-products/badges-decals-data-plates")) {
-				window.location.href = "/catalog/accessories-and-optional-equipment";
-			} else if (window.location.href.includes("/land-rover-parts-products/body-fittings")) {
-				window.location.href = "/catalog/body-trim-seats-and-fixings";
-			} else if (window.location.href.includes("/land-rover-parts-products/body-panels-tops")) {
-				window.location.href = "/catalog/body-trim-seats-and-fixings";
-			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
-				window.location.href = "/catalog/brakes-and-brake-controls";
-			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
-				window.location.href = "/catalog/brakes-and-brake-controls";
-			} else if (window.location.href.includes("/land-rover-parts-products/cooling-exhaust-fuel")) {
-				window.location.href = "/catalog/fuel-exhaust-and-emission-systems";
-			} else if (window.location.href.includes("/land-rover-parts-products/dash-instruments-controls")) {
-				window.location.href = "/catalog/instruments-and-controls";
-			} else if (window.location.href.includes("/land-rover-parts-products/electrical")) {
-				window.location.href = "/catalog/electrical-lamps-and-lenses";
-			} else if (window.location.href.includes("/land-rover-parts-products/engine-gearbox-t-case")) {
-				window.location.href = "/catalog/engine";
-			} else if (window.location.href.includes("/land-rover-parts-products/rubber-parts-seals")) {
-				window.location.href = "/land-rover-parts-products";
-			} else if (window.location.href.includes("/land-rover-parts-products/optional-equipment")) {
-				window.location.href = "/catalog/accessories-and-optional-equipment";
-			} else if (window.location.href.includes("/land-rover-parts-products/paint")) {
-				window.location.href = "/catalog/paint";
-			} else if (window.location.href.includes("/land-rover-parts-products/mercedes")) {
-				window.location.href = "/catalog/mercedes-parts";
-			} else if (window.location.href.includes("/land-rover-parts-products/t-shirts-toys-gifts")) {
-				window.location.href = "/catalog/t-shirts-toys-and-gifts";
-			} else if (window.location.href.includes("/land-rover-parts-products/tools")) {
-				window.location.href = "/catalog/accessories-and-optional-equipment";
-			} else if (window.location.href.includes("/land-rover-parts-products/rare-parts")) {
-				window.location.href = "/home/featured-parts";
-			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
-				window.location.href = "/home/recently-added-parts";
-			} else if (window.location.href.includes("/land-rover-parts-products")) {
-				window.location.href = "/land-rover-parts-and-products";
-			} else {
-				ga('send', 'event', 'error', '404', window.location.href);
-				window.location.href = "/404";
-			}
-		} else if (_response.status == 200) {
-			return _response;
-		}
-	}
-});
-
-router.beforeEach(function (transition) {
-	transition.to.router.app.search = true;
-	transition.next();
-});
-
-router.afterEach(function (transition) {
-	ga('send', 'pageview', transition.to.path);
-});
-
-// Jquery watcher to modify div positioning on scroll
-function resizeWindow() {
-	var minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
-	$('#Body-column').css('min-height', minHeight + 'px');
-
-	if ($(window).scrollTop() < 147) {
-		$('#Social').css('top', 147 - $(window).scrollTop() + 'px');
-	} else if ($('#Social').css('top') != '2px') {
-		$('#Social').css('top', '2px');
-	}
-}
-$(window).scroll(function () {
-	resizeWindow();
-});
-$(window).resize(function () {
-	resizeWindow();
-});
-
-router.start(App, '#app');
-
-},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/404.vue":58,"./pages/catalog.vue":59,"./pages/checkout.vue":60,"./pages/item.vue":61,"./pages/page.vue":62,"vue":47,"vue-resource":35,"vue-router":46}],58:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15826,7 +15692,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15930,7 +15796,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16068,7 +15934,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":64,"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
+},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":64,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16140,7 +16006,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16167,15 +16033,13 @@ module.exports = {
 
 	methods: {
 		getPage: function getPage() {
-			var _this = this;
-
-			this.$http.get('page' + this.$route.path).then(function (response) {
-				_this.$set('page', response.data);
-				document.title = "Pangolin 4x4: " + _this.page.name;
+			this.$http.get('/api/page' + this.$route.path).then(function (response) {
+				this.$set('page', response.data);
+				document.title = "Pangolin 4x4: " + this.page.name;
 
 				var vue = require('vue');
-				var pageContent = vue.component('page' + _this.page.id, {
-					template: _this.page.content,
+				var pageContent = vue.component('page' + this.page.id, {
+					template: this.page.content,
 					created: function created() {},
 					components: {
 						catalog: require('../components/catalog.vue')
@@ -16187,12 +16051,12 @@ module.exports = {
 				thisPage.$mount().$appendTo('#page');
 				// HACK the correct root into these children
 				for (var i = 0; i < thisPage.$children.length; i++) {
-					thisPage.$children[i].$root = _this.$root;
+					thisPage.$children[i].$root = this.$root;
 				}
-				_this.$children.push(thisPage);
+				this.$children.push(thisPage);
 
-				_this.$parent.search = response.data.search;
-				_this.loaded = true;
+				this.$parent.search = response.data.search;
+				this.loaded = true;
 			});
 		}
 	}
@@ -16209,7 +16073,141 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
+},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
+// libraries
+'use strict';
+
+var Vue = require('vue');
+var VueRouter = require('vue-router');
+var VueResource = require('vue-resource');
+Vue.use(VueRouter);
+Vue.use(VueResource);
+
+Vue.http.options.root = '/api';
+
+// Vue-filters
+var nl2br = require('./filters/nl2br.js');
+Vue.filter('nl2br', nl2br);
+
+var App = require('./app.vue');
+var Page = require('./pages/page.vue');
+var Catalog = require('./pages/catalog.vue');
+var Checkout = require('./pages/checkout.vue');
+var Item = require('./pages/item.vue');
+var fileNotFound = require('./pages/404.vue');
+
+// Set up routing and match routes to components
+var router = new VueRouter({
+	history: true
+});
+
+// config Vue global settings
+Vue.http.headers.common['X-CSRF-TOKEN'] = $('#csrf-token').attr('content');
+Vue.config.debug = true;
+// Vue.config.async = false
+
+router.map({
+	'item/:id': {
+		component: Item
+	},
+	'catalog/:id': {
+		component: Catalog
+	},
+	'checkout/:step': {
+		component: Checkout
+	},
+	'404': {
+		component: fileNotFound
+	},
+	'*': {
+		component: Page
+	}
+});
+
+// Set http interceptor for errors returned
+Vue.http.interceptors.push({
+	response: function response(_response) {
+		if (_response.status == 404) {
+			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
+				window.location.href = "/catalog/axles-drive-shafts-and-wheels";
+			} else if (window.location.href.includes("/land-rover-parts-products/accessories")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/badges-decals-data-plates")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/body-fittings")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings";
+			} else if (window.location.href.includes("/land-rover-parts-products/body-panels-tops")) {
+				window.location.href = "/catalog/body-trim-seats-and-fixings";
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/breaks-clutch")) {
+				window.location.href = "/catalog/brakes-and-brake-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/cooling-exhaust-fuel")) {
+				window.location.href = "/catalog/fuel-exhaust-and-emission-systems";
+			} else if (window.location.href.includes("/land-rover-parts-products/dash-instruments-controls")) {
+				window.location.href = "/catalog/instruments-and-controls";
+			} else if (window.location.href.includes("/land-rover-parts-products/electrical")) {
+				window.location.href = "/catalog/electrical-lamps-and-lenses";
+			} else if (window.location.href.includes("/land-rover-parts-products/engine-gearbox-t-case")) {
+				window.location.href = "/catalog/engine";
+			} else if (window.location.href.includes("/land-rover-parts-products/rubber-parts-seals")) {
+				window.location.href = "/land-rover-parts-products";
+			} else if (window.location.href.includes("/land-rover-parts-products/optional-equipment")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/paint")) {
+				window.location.href = "/catalog/paint";
+			} else if (window.location.href.includes("/land-rover-parts-products/mercedes")) {
+				window.location.href = "/catalog/mercedes-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products/t-shirts-toys-gifts")) {
+				window.location.href = "/catalog/t-shirts-toys-and-gifts";
+			} else if (window.location.href.includes("/land-rover-parts-products/tools")) {
+				window.location.href = "/catalog/accessories-and-optional-equipment";
+			} else if (window.location.href.includes("/land-rover-parts-products/rare-parts")) {
+				window.location.href = "/home/featured-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
+				window.location.href = "/home/recently-added-parts";
+			} else if (window.location.href.includes("/land-rover-parts-products")) {
+				window.location.href = "/land-rover-parts-and-products";
+			} else {
+				ga('send', 'event', 'error', '404', window.location.href);
+				window.location.href = "/404";
+			}
+		} else if (_response.status == 200) {
+			return _response;
+		}
+	}
+});
+
+router.beforeEach(function (transition) {
+	transition.to.router.app.search = true;
+	transition.next();
+});
+
+router.afterEach(function (transition) {
+	ga('send', 'pageview', transition.to.path);
+});
+
+// Jquery watcher to modify div positioning on scroll
+function resizeWindow() {
+	var minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
+	$('#Body-column').css('min-height', minHeight + 'px');
+
+	if ($(window).scrollTop() < 147) {
+		$('#Social').css('top', 147 - $(window).scrollTop() + 'px');
+	} else if ($('#Social').css('top') != '2px') {
+		$('#Social').css('top', '2px');
+	}
+}
+$(window).scroll(function () {
+	resizeWindow();
+});
+$(window).resize(function () {
+	resizeWindow();
+});
+
+router.start(App, '#app');
+
+},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/404.vue":57,"./pages/catalog.vue":58,"./pages/checkout.vue":59,"./pages/item.vue":60,"./pages/page.vue":61,"vue":47,"vue-resource":35,"vue-router":46}],63:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16542,6 +16540,6 @@ module.exports = {
 	}
 };
 
-},{}]},{},[57]);
+},{}]},{},[62]);
 
-//# sourceMappingURL=main.js.map
+//# sourceMappingURL=store.js.map

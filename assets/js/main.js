@@ -5,6 +5,8 @@ var VueResource = 	require('vue-resource')
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
+Vue.http.options.root = '/api';
+
 // Vue-filters
 var nl2br 		= require('./filters/nl2br.js')
 Vue.filter('nl2br', nl2br)
