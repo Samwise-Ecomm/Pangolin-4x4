@@ -38,7 +38,8 @@ module.exports = {
 		return {
 			catalog: {},
 			selected: [],
-			loaded: false
+			loaded: false,
+			id: null
 		}
 	},
 
@@ -73,12 +74,15 @@ module.exports = {
 
 	methods: {
 		getCatalog () {
-			this.$http.get('/api/catalog/'+this.$route.params.id).then(function(response) {
-		  	this.$set('catalog', response.data)
-		  	this.fillTags()
-		  	document.title = "Pangolin 4x4 Catalog: "+this.catalog.name
-		  	this.loaded = true
-	    })
+			this.id = this.$root.catalogSlugToId(this.$route.params.slug)
+
+			this.$http.get('catalog/'+this.id).then(response => {
+				response.data['tags'] = response.data['tags'].split(',')
+				this.$set('catalog', response.data)
+				this.fillTags()
+				document.title = "Pangolin 4x4 Catalog: "+this.catalog.name
+				this.loaded = true
+			})
 		},
 
 		fillTags () {
@@ -119,6 +123,10 @@ module.exports = {
 			} else {
 				return ""
 			}
+		},
+
+		getId(slug) {
+
 		}
 	},
 }

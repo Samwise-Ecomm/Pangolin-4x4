@@ -32,7 +32,8 @@ router.map({
 	'item/:id': {
 		component: Item
 	},
-	'catalog/:id': {
+	'catalog/:slug': {
+		name: 'catalog',
 		component: Catalog
 	},
 	'checkout/:step': {

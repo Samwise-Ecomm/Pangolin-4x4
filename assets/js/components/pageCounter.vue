@@ -14,11 +14,17 @@
 
 <script>
 module.exports = {
-	props: ['page', 'pages'],
+	props: ['givenPage', 'pages'],
+
+	computed: {
+		page () {
+			return this.givenPage + 1
+		}
+	},
 
 	methods: {
 		changePage (page) {
-			this.$dispatch('changePage', page)
+			this.$dispatch('changePage', page - 1)
 		}
 	}
 }

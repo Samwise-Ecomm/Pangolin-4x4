@@ -64,7 +64,7 @@
 					<section id="SideNav-catalogs">
 						<span v-for="link in menus.sidebar">
 							<b v-if="link.label">{{ link.name }}</b>
-							<a v-else v-link="{ path: '/catalog/'+link.slug }">{{ link.name }}</a>
+							<a v-else v-link="{ name: 'catalog', params: { slug: link.slug, id: link.id } }">{{ link.name }}</a>
 							<br><br>
 						</span>
 					</section>
@@ -137,6 +137,16 @@ module.exports = {
 				$('#Head-searchIcon i').addClass('fa-cog fa-spin')
 				this.$refs.search.searching = true
 			}
+		},
+
+		catalogSlugToId (slug) {
+			for (var i = 0; i < this.menus['sidebar'].length; i++) {
+				if (this.menus['sidebar'][i].slug == slug) {
+					return this.menus['sidebar'][i].id
+				}
+			}
+			
+			return null
 		}
 	},
 }

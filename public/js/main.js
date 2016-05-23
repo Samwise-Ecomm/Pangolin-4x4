@@ -14904,10 +14904,20 @@ module.exports = {
 				$('#Head-searchIcon i').addClass('fa-cog fa-spin');
 				this.$refs.search.searching = true;
 			}
+		},
+
+		catalogSlugToId: function catalogSlugToId(slug) {
+			for (var i = 0; i < this.menus['sidebar'].length; i++) {
+				if (this.menus['sidebar'][i].slug == slug) {
+					return this.menus['sidebar'][i].id;
+				}
+			}
+
+			return null;
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in menus.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ path: '/catalog/'+link.slug }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in menus.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ name: 'catalog', params: { slug: link.slug, id: link.id } }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15133,10 +15143,10 @@ module.exports = {
 
 		return {
 			loaded: false,
-			items: [],
+			offers: [],
 			count: 0,
 			pages: 1,
-			page: 1
+			page: 0
 		};
 	},
 
@@ -15178,11 +15188,6 @@ module.exports = {
 			'default': false
 		},
 
-		style: {
-			type: String,
-			'default': 'rows'
-		},
-
 		sort: {
 			type: String,
 			'default': 'name'
@@ -15190,7 +15195,7 @@ module.exports = {
 	},
 
 	components: {
-		item: require('./item.vue'),
+		offer: require('./offer.vue'),
 		pageCounter: require('./pageCounter.vue')
 	},
 
@@ -15203,11 +15208,11 @@ module.exports = {
 
 	events: {
 		changePage: function changePage(page) {
-			if (page < 1) {
-				page = this.pages;
+			if (page < 0) {
+				page = this.pages - 1;
 			}
-			if (page > this.pages) {
-				page = 1;
+			if (page >= this.pages) {
+				page = 0;
 			}
 
 			this.page = page;
@@ -15217,40 +15222,43 @@ module.exports = {
 
 	methods: {
 		getItems: function getItems() {
+			var _this = this;
+
 			if (this.tags.length == 0 && !this.allItems) {
 				this.items = [];
 				this.count = 0;
 				this.pages = 0;
-				this.page = 1;
+				this.page = 0;
 				this.loaded = true;
 				return 1;
 			}
 
 			var request = {
-				tags: this.tags,
-				page: this.page,
-				limit: this.limit
+				_must: JSON.stringify({ tags: this.tags }),
+				_page: this.page,
+				_limit: this.limit
 			};
-			this.$http.post('/api/search/item-tags', request).then(function (response) {
-				for (var i in response.data.items) {
-					response.data.items[i].selected = 0;
+			this.$http.get('offers', request).then(function (response) {
+				console.log(response);
+				for (var i in response.data.body) {
+					response.data.body[i].selected = 0;
 				}
 
-				this.items = response.data.items;
-				this.count = response.data.count;
-				this.pages = response.data.pages;
-				this.page = response.data.page;
-				this.limit = response.data.limit;
-				this.loaded = true;
+				_this.offers = response.data.body;
+				_this.count = response.data.length;
+				_this.pages = response.data.pages;
+				_this.page = response.data._page;
+				_this.limit = response.data._limit;
+				_this.loaded = true;
 
-				this.$nextTick(function () {
+				_this.$nextTick(function () {
 					this.$root.$refs.cart.setAddToCartButtons();
 				});
 			});
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section v-if=\"loaded\">\n\t\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :page.sync=\"page\">\n\t\t</page-counter>\n\t\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'item' }} found.</div>\n\t\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t\t<item v-for=\"item in items\" :item=\"item\" :style=\"style\"></item>\n\n\t\t<br class=\"u-clear\">\n\t\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :page.sync=\"page\">\n\t\t</page-counter>\n\t</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section v-if=\"loaded\">\n\t\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t\t</page-counter>\n\t\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'offer' }} found.</div>\n\t\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t\t<offer v-for=\"offer in offers\" :offer=\"offer\"></offer>\n\n\t\t<br class=\"u-clear\">\n\t\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t\t</page-counter>\n\t</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15262,7 +15270,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./item.vue":52,"./pageCounter.vue":53,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"./offer.vue":52,"./pageCounter.vue":53,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15389,56 +15397,22 @@ module.exports = {
 		};
 	},
 
-	props: {
-		item: {
-			type: Object,
-			'default': {}
-		},
-
-		id: {
-			type: Number,
-			'default': null
-		},
-
-		style: {
-			type: String,
-			'default': 'rows'
+	computed: {
+		partNumbers: function partNumbers() {
+			var numbers = [];
+			for (var i = 0; i < this.offer.items.length; i++) {
+				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
+					numbers.push(this.offer.items[i]['part_number']);
+				}
+			}
 		}
 	},
 
+	props: ['offer', 'id'],
+
 	methods: {
 		go: function go(id) {
-			this.$root.$router.go({ path: '/item/' + id });
-		},
-
-		addToCart: function addToCart(item) {
-			var variantId = item.variants[item.selected].id;
-			var variant = item.variants[item.selected];
-
-			if (!variant.infinite && variant.stock == 0) {
-				return 0;
-			}
-
-			var cartItem = {
-				name: item.name,
-				images: item.images,
-				part_number: item.type_info.part_number,
-				state: item.type_info.state,
-				variants: {}
-			};
-
-			cartItem.variants[variant.id] = {
-				name: variant.name,
-				price: variant.price,
-				unit: variant.unit,
-				stock: variant.stock,
-				infinite: variant.infinite,
-				count: 1
-			};
-
-			this.$root.$refs.cart.addToCart(cartItem, item.id, variant.id);
-
-			return 1;
+			this.$root.$router.go();
 		},
 
 		changedVariant: function changedVariant(item) {
@@ -15455,12 +15429,12 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div class=\"CatalogItem\" v-if=\"style == &quot;rows&quot;\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[0]+'?u='+item.updated\" class=\"CatalogItem-thumb u-activeImg\">\n\t\t</a>\n\t\t<div class=\"CatalogItem-description\">\n\t\t\t<h2><a @click=\"go(item.id)\">{{{ item.name + ', ' + item.type_info.state }}}</a></h2>\n\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t<br>\n\t\t\t<p>\n\t\t\t\t{{{ item.description }}}\n\t\t\t\t<br><br>\n\t\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t\t<span v-if=\"item.type_info.ss_part_number\">Supersedes Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t\t</p>\n\t\t\t<div class=\"CatalogItem-controls\">\n\t\t\t\t<select class=\"CatalogItem-variations js-variantSelector\" v-model=\"item.selected\" :item-id=\"item.id\" @change=\"changedVariant(item)\" v-if=\"item.variants.length > 1\">\n\t\t\t\t\t<option v-for=\"(variantIndex, variant) in item.variants\" :value=\"variantIndex\">{{{ variant.name }}} - {{ variant.price | currency }}</option>\n\t\t\t\t</select>\n\t\t\t\t<br><br>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight js-addToCart\" v-if=\"item.variants[item.selected].infinite || item.variants[item.selected].stock > 0\" :variant-id=\"item.variants[item.selected].id\" :item-id=\"item.id\" @click=\"addToCart(item)\">\n\t      \t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t    \t</div>\n\t\t\t\t<div class=\"Button Button--active inCatalog u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\tOut of Stock\n\t\t\t\t</div>\n\t    \t<a @click=\"go(item.id)\">\n\t    \t\t<div class=\"Button Button--dark inCatalog u-floatRight u-marginRight\">\n\t    \t\t\t<i class=\"fa fa-search\"></i> Inspect Item\n\t    \t\t</div>\n\t    \t</a>\n\t    \t<span class=\"CatalogItem-price\">\n\t    \t\t<b>{{ item.variants[item.selected].price | currency }}</b>\n\t    \t\t<span v-if=\"item.variants[item.selected].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[item.selected].unit }}</span>\n\t    \t</span>\n\t\t\t</div>\n\t\t</div>\n\t\t<hr class=\"u-clear\">\n\t</div>\n\t<div v-else=\"\">\n\t\t<a @click=\"go(item.id)\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+item.images.small[0]+'?u='+item.updated\" class=\"CatalogGridItem-thumb\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{{ item.name + ', ' + item.type_info.state }}}</b>\n\t\t\t\t\t<div v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ item.variants[0].price | currency }}</b>\n\t\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div>\n\t\t<a v-link=\"{ path: `/item/${id}` }\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+offer.pictures[0].source.sm\" class=\"CatalogGridItem-thumb\" v-if=\"offer.pictures.length\">\n\t\t\t\t<img src=\"/img/def.jpg\" class=\"CatalogGridItem-thumb\" v-else=\"\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{ offer.name }}</b>\n\t\t\t\t\t<div v-if=\"partNumbers\">Part #{{ partNumbers.join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ offer.items[0].price / 100 | currency }}</b>\n\t\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
-  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/item.vue"
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/offer.vue"
   if (!module.hot.data) {
     hotAPI.createRecord(id, module.exports)
   } else {
@@ -15471,11 +15445,17 @@ if (module.hot) {(function () {  module.hot.accept()
 'use strict';
 
 module.exports = {
-	props: ['page', 'pages'],
+	props: ['givenPage', 'pages'],
+
+	computed: {
+		page: function page() {
+			return this.givenPage + 1;
+		}
+	},
 
 	methods: {
 		changePage: function changePage(page) {
-			this.$dispatch('changePage', page);
+			this.$dispatch('changePage', page - 1);
 		}
 	}
 };
@@ -15709,7 +15689,8 @@ router.map({
 	'item/:id': {
 		component: Item
 	},
-	'catalog/:id': {
+	'catalog/:slug': {
+		name: 'catalog',
 		component: Catalog
 	},
 	'checkout/:step': {
@@ -15834,7 +15815,8 @@ module.exports = {
 		return {
 			catalog: {},
 			selected: [],
-			loaded: false
+			loaded: false,
+			id: null
 		};
 	},
 
@@ -15869,11 +15851,16 @@ module.exports = {
 
 	methods: {
 		getCatalog: function getCatalog() {
-			this.$http.get('/api/catalog/' + this.$route.params.id).then(function (response) {
-				this.$set('catalog', response.data);
-				this.fillTags();
-				document.title = "Pangolin 4x4 Catalog: " + this.catalog.name;
-				this.loaded = true;
+			var _this = this;
+
+			this.id = this.$root.catalogSlugToId(this.$route.params.slug);
+
+			this.$http.get('catalog/' + this.id).then(function (response) {
+				response.data['tags'] = response.data['tags'].split(',');
+				_this.$set('catalog', response.data);
+				_this.fillTags();
+				document.title = "Pangolin 4x4 Catalog: " + _this.catalog.name;
+				_this.loaded = true;
 			});
 		},
 
@@ -15915,7 +15902,9 @@ module.exports = {
 			} else {
 				return "";
 			}
-		}
+		},
+
+		getId: function getId(slug) {}
 	}
 };
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<catalog :tags.sync=\"selected\" style=\"grid\" limit=\"15\"></catalog>\n\t</div>\n"

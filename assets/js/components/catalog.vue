@@ -3,20 +3,19 @@
 		<page-counter class="u-floatLeft" 
 			v-if="pages > 1 && !hidePages"
 			:pages="pages"
-			:page.sync="page">
+			:given-page.sync="page">
 		</page-counter>
-		<div class="u-floatRight" v-if="!hideCount">{{ count }} {{ count | pluralize 'item' }} found.</div>
+		<div class="u-floatRight" v-if="!hideCount">{{ count }} {{ count | pluralize 'offer' }} found.</div>
 		<br v-if="!hideCount"><br v-if="!hideCount">
 
-		<item v-for="item in items"
-			:item="item"
-			:style="style"></item>
+		<offer v-for="offer in offers"
+			:offer="offer"></offer>
 
 		<br class="u-clear">
 		<page-counter class="u-floatRight" 
 			v-if="pages > 1 && !hidePages"
 			:pages="pages"
-			:page.sync="page">
+			:given-page.sync="page">
 		</page-counter>
 	</section>
 </template>
@@ -28,10 +27,10 @@ module.exports = {
 
 		return {
 			loaded: false,
-			items: [],
+			offers: [],
 			count: 0,
 			pages: 1,
-			page: 1,
+			page: 0,
 		}
 	},
 
@@ -71,11 +70,6 @@ module.exports = {
 			default: false,
 		},
 
-		style: {
-			type: String,
-			default: 'rows',
-		},
-
 		sort: {
 			type: String,
 			default: 'name',
@@ -83,7 +77,7 @@ module.exports = {
 	},
 
 	components: {
-		item: require('./item.vue'),
+		offer: require('./offer.vue'),
 		pageCounter: require('./pageCounter.vue')
 	},
 
@@ -96,11 +90,11 @@ module.exports = {
 
 	events: {
 		changePage (page) {
-			if (page < 1) {
-				page = this.pages
+			if (page < 0) {
+				page = this.pages - 1
 			}
-			if (page > this.pages) {
-				page = 1
+			if (page >= this.pages) {
+				page = 0
 			}
 
 			this.page = page
@@ -114,26 +108,27 @@ module.exports = {
 				this.items = []
 				this.count = 0
 				this.pages = 0
-				this.page = 1
+				this.page = 0
 				this.loaded = true
 				return 1
 			}
 
 			var request = {
-				tags: this.tags,
-				page: this.page,
-				limit: this.limit
+				_must: JSON.stringify({ tags: this.tags }),
+				_page: this.page,
+				_limit: this.limit
 			}
-			this.$http.post('/api/search/item-tags', request).then(function(response) {
-				for (var i in response.data.items) {
-					response.data.items[i].selected = 0
+			this.$http.get('offers', request).then(response => {
+				console.log(response)
+				for (var i in response.data.body) {
+					response.data.body[i].selected = 0
 				}
 
-				this.items = response.data.items
-				this.count = response.data.count
+				this.offers = response.data.body
+				this.count = response.data.length
 				this.pages = response.data.pages
-				this.page = response.data.page
-				this.limit = response.data.limit
+				this.page = response.data._page
+				this.limit = response.data._limit
 				this.loaded = true
 
 				this.$nextTick(function() {
