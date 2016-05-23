@@ -1,35 +1,35 @@
 <template>
-	<div class="row" v-if="loaded">
-		<h1>{{ catalog.name }}</h1>
-		<p>{{ catalog.description }}</p>
+<div class="row" v-if="loaded">
+	<h1>{{ catalog.name }}</h1>
+	<p>{{ catalog.description }}</p>
 
-		<section v-if="catalog.tags.length > 1">
-			<hr>
-			<ul class="u-cols-3">
-				<li v-for="tag in catalog.tags">
-					<label for='{{ tag }}'} class='Checkbox'>
-						<input type='checkbox' id='{{ tag }}' checked @click='toggleTag(tag)'>
-						<i class="fa fa-fw" :class="(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'"></i> {{ tag.substring(trim) }}
-					</label>
-				</li>
-			</ul>
-			<br>
-			<ul class="u-cols-3">
-				<li class="u-active" @click="fillTags">
-					<i class="fa fa-fw fa-plus-square"></i> Select All
-				</li>
-				<li class="u-active" @click="clearTags">
-					<i class="fa fa-fw fa-minus-square"></i> Select None
-				</li>
-			</ul>
-		</section>
-
+	<section v-if="catalog.tags.length > 1">
 		<hr>
-		<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>
-		<hr>
+		<ul class="u-cols-3">
+			<li v-for="tag in catalog.tags">
+				<label for='{{ tag }}'} class='Checkbox'>
+					<input type='checkbox' id='{{ tag }}' checked @click='toggleTag(tag)'>
+					<i class="fa fa-fw" :class="(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'"></i> {{ tag.substring(trim) }}
+				</label>
+			</li>
+		</ul>
+		<br>
+		<ul class="u-cols-3">
+			<li class="u-active" @click="fillTags">
+				<i class="fa fa-fw fa-plus-square"></i> Select All
+			</li>
+			<li class="u-active" @click="clearTags">
+				<i class="fa fa-fw fa-minus-square"></i> Select None
+			</li>
+		</ul>
+	</section>
 
-		<catalog :tags.sync="selected" style="grid" limit="15"></catalog>
-	</div>
+	<hr>
+	<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>
+	<hr>
+
+	<catalog :tags.sync="selected" limit="15"></catalog>
+</div>
 </template>
 
 <script>
@@ -123,10 +123,6 @@ module.exports = {
 			} else {
 				return ""
 			}
-		},
-
-		getId(slug) {
-
 		}
 	},
 }

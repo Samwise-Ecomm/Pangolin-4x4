@@ -1,8 +1,8 @@
 <template>
 <div class="row" v-if="loaded">
 	<div id="Title">
-		<h1>{{{ item.name + ', ' + item.type_info.state }}}</h1>
-		<h4 v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}</h4>
+		<h1>{{ offer.name }}</h1>
+		<h4 v-if="offer.partNumbers">Part #{{ offer.partNumbers.join(', #') }}</h4>
 		<hr>
 
 		<i class="u-center">
@@ -12,61 +12,47 @@
 	</div>
 
 	<div id="Pictures">
-		<a :href="'/img/'+pic.path+'?u='+item.updated" id='js-currentPicLink' data-lightbox="pic" v-for="pic in item.images.large">
-			<img :src="'/img/'+item.images.medium[$index]+'?u='+item.updated" id='Pictures-current' class="u-activeImg" v-if="pic.selected">
+		<!-- Lightbox links and selected picture img -->
+		<a v-for="picture in offer.pictures" :href="`/img/${picture.source.lg}`" id='js-currentPicLink' data-lightbox="pic">
+			<img :src="`/img/${picture.source.md}`" id='Pictures-current' class="u-activeImg" v-if="picture.selected">
 		</a>
-	  <img :src="'/img/'+pic+'?u='+item.updated" class="u-activeImg Pictures-thumb"
-	  	:class="($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'"
-	  	v-for="pic in item.images.small"
-	  	@click="selectPic($index)">
+
+		<!-- Thumbs to set selected picture -->
+		<img v-for="picture in offer.pictures" class="u-activeImg Pictures-thumb"
+			:src="`/img/${picture.source.sm}`"
+			:class="($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'"
+			@click="selectPic($index)">
 	</div>
 
 	<div id="Information">
-		<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>
+		<h5>{{ offer.name }}</h5>
 		<br>
 		<p>
-			{{{ item.description | nl2br }}}
+			{{{ offer.description | nl2br }}}
 			<br><br>
-			{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.
-			<span v-if="item.type_info.part_number">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>
-			<span v-if="item.type_info.ss_part_number">Supersedes by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>
+			<span v-if="offer.partNumbers">Part #{{ offer.partNumbers.join(', #') }}.</span>
+			<span v-if="offer.ssPartNumbers">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>
 		</p>
 	</div>
 
 	<div id="Variations">
-		<section v-if="item.variants.length == 1">
+		<section v-if="offer.items.length == 1">
 			<b class="Variations-price">
-				{{ item.variants[0].price | currency }}
-				<span v-if="item.variants[0].unit != 'Unit'" class='u-thin'> / {{ item.variants[0].unit }}</span>
+				{{ offer.items[0].price / 100 | currency }}
+				<span v-if="offer.items[0].unit != 'Unit'" class='u-thin'> / {{ offer.items[0].unit }}</span>
 			</b>
-			<div class="Button Button--active inVariations u-floatRight js-addToCart"
-				v-if="item.variants[0].stock > 0 || item.variants[0].infinite"
-				:variant-id="item.variants[0].id"
-				@click="addToCart(item.variants[0])">
-				<i class="fa fa-cart-plus"></i> Add to Cart
-			</div>
-			<div class="Button Button--active inVariations u-floatRight isDisabled" v-else>
-				Out of Stock
-			</div>
+			<add-to-cart :item="offer.items[0]" class="inVariations u-floatRight"></add-to-cart>
 		</section>
 
 		<table id='VariationsTable' v-else>
-			<tr v-for="variant in item.variants">
-				<td>{{ variant.name }}</td>
+			<tr v-for="item in offer.items">
+				<td>{{ item.name }}</td>
 				<td class="VariationsTable-price"><b>
-					{{ variant.price | currency }}
-					<span v-if="variant.unit != 'Unit'" class='u-thin'> / {{ variant.unit }}</span>
+					{{ item.price / 100 | currency }}
+					<span v-if="item.unit != 'Unit'" class='u-thin'> / {{ item.unit }}</span>
 				</b></td>
 				<td class="VariationsTable-button">
-					<div class="Button Button--active inVariations u-floatRight js-addToCart"
-						v-if="variant.stock > 0 || variant.infinite"
-						:variant-id="variant.id"
-						@click="addToCart(variant)">
-						<i class="fa fa-cart-plus"></i> Add to Cart
-					</div>
-					<div class="Button Button--active inVariations u-floatRight isDisabled" v-else>
-						Out of Stock
-					</div>
+					<add-to-cart :item="item" class="inVariations u-floatRight"></add-to-cart>
 				</td>
 			</tr>
 		</table>
@@ -74,21 +60,11 @@
 		<hr class="u-clear u-paddingTop">
 	</div>
 
-	<div id="Specs">
-		<div v-if="item.x"> Dimensions: {{ item.x }}"
-			<span v-if="item.y"> x {{ item.y }}"
-				<span v-if="item.z"> x {{ item.z }}"</span>
-			</span>
-		</div>
-		<div v-if="item.weight">{{ item.weight }} lbs.</div>
-		<hr v-if="item.weight || item.x">
-	</div>
-
 	<div id="Applications">
-		<div v-if="item.type_info.other_applications">
+		<div v-if="offer.other_applications">
 			<h2>Other Applications:</h2><br>
 			<ul>
-				<li v-for="application in item.type_info.other_applications.split(',')">{{ application }}</li>
+				<li v-for="application in offer.other_applications.split(',')">{{ application }}</li>
 			</ul>
 		</div>
 	</div>
@@ -99,58 +75,77 @@
 module.exports = {
 	data () {
 		return {
-			item: {},
+			offer: {},
 			loaded: false
+		}
+	},
+
+	components: {
+		addToCart: require('../components/addToCart.vue')
+	},
+
+	computed: {
+		partNumbers () {
+			var numbers = [];
+			for (var i = 0; i < this.offer.items.length; i++) {
+				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
+					numbers.push(this.offer.items[i]['part_number'])
+				}
+			}
 		}
 	},
 
 	route: {
 		data() {
-			this.getItem()
+			this.getOffer()
 		},
 	},
 
 	methods: {
-		getItem () {
-			this.$http.get('/api/item/'+this.$route.params.id).then(function(response) {
-		  	this.$set('item', response.data)
-		  	this.selectPic(0)
-		  	document.title = "Pangolin 4x4: "+this.item.name
+		getOffer () {
+			this.$http.get(`offer/${this.$route.params.id}`).then(response => {
+				this.$set('offer', response.data)
+				for (var i = 0; i < this.offer.pictures.length; i++) {
+					this.$set(`offer.pictures[${i}].selected`, false)
+				}
+				this.selectPic(0)
+				document.title = "Pangolin 4x4: "+this.offer.name
 
-		  	this.loaded = true
-		  	this.$nextTick(function() {
-					this.$parent.$refs.cart.setAddToCartButtons()
-				})
-	    })
+				this.loaded = true
+				// this.$nextTick(function() {
+				// 	this.$parent.$refs.cart.setAddToCartButtons()
+				// })
+			})
 		},
 
 		selectPic(index) {
-			for (var i = 0; i < this.item.images.large.length; i++) {
-	  		this.item.images.large[i].selected = false
-	  	}
-	  	this.item.images.large[index].selected = true
+			for (var i = 0; i < this.offer.pictures.length; i++) {
+				this.offer.pictures[i].selected = false
+			}
+			this.offer.pictures[index].selected = true
+
 		},
 
-		addToCart(variant) {
-			var cartItem = {
-				name: this.item.name,
-				images: this.item.images,
-				part_number: this.item.type_info.part_number,
-				state: this.item.type_info.state,
-				variants: {},
-			}
+		// addToCart(variant) {
+		// 	var cartItem = {
+		// 		name: this.offer.name,
+		// 		pictures: this.offer.pictures,
+		// 		part_number: this.offer.type_info.part_number,
+		// 		state: this.offer.type_info.state,
+		// 		variants: {},
+		// 	}
 
-			cartItem.variants[variant.id] = {
-				name: variant.name,
-				price: variant.price,
-				unit: variant.unit,
-				stock: variant.stock,
-				infinite: variant.infinite,
-				count: 1
-			}
+		// 	cartItem.variants[variant.id] = {
+		// 		name: variant.name,
+		// 		price: variant.price,
+		// 		unit: variant.unit,
+		// 		stock: variant.stock,
+		// 		infinite: variant.infinite,
+		// 		count: 1
+		// 	}
 
-			this.$parent.$refs.cart.addToCart(cartItem, this.item.id, variant.id)
-		}
+		// 	this.$parent.$refs.cart.addToCart(cartItem, this.offer.id, variant.id)
+		// }
 	},
 }
 </script>

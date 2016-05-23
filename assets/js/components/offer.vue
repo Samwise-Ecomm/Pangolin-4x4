@@ -1,7 +1,7 @@
 <template>
 <div v-if="loaded">
 	<div>
-		<a v-link="{ path: `/item/${id}` }">
+		<a v-link="{ path: `/item/${offer.id}` }">
 			<div class="CatalogGridItem">
 				<img :src="'/img/'+offer.pictures[0].source.sm" class='CatalogGridItem-thumb' v-if="offer.pictures.length">
 				<img src="/img/def.jpg" class='CatalogGridItem-thumb' v-else>

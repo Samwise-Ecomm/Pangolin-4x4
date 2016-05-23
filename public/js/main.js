@@ -14929,200 +14929,124 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/cart.vue":49,"./components/search.vue":54,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+},{"./components/cart.vue":50,"./components/search.vue":57,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['item'],
+
+	computed: {
+		count: function count() {
+			if (this.cart.cart[this.item.offer_id] && this.cart.cart[this.item.offer_id].items[this.item.id]) {
+				return this.cart.cart[this.item.offer_id].items[this.item.id].count;
+			} else {
+				return 0;
+			}
+		},
+
+		inStock: function inStock() {
+			return this.item.stock > 0 || this.item.infinite;
+		},
+
+		countMaxed: function countMaxed() {
+			return !this.item.infinite && this.count >= this.item.stock;
+		},
+
+		message: function message() {
+			if (!this.inStock) {
+				return 'Out of Stock';
+			} else if (this.countMaxed) {
+				return 'All in Cart (' + this.count + ')';
+			} else if (this.count > 0) {
+				return this.count + ' in Cart';
+			} else {
+				return 'Add to Cart';
+			}
+		},
+
+		icon: function icon() {
+			return 'fa-cart-plus';
+		},
+
+		cart: function cart() {
+			return this.$root.$refs.cart;
+		}
+	},
+
+	methods: {
+		addItem: function addItem() {
+			this.cart.addItem(this.item);
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"Button Button--active\" :class=\"(!inStock || countMaxed)?'isDisabled':''\" @click=\"addItem\">\n\t<i class=\"fa\" :class=\"icon\"></i> {{ message }}\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/addToCart.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
 
-var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
-
 module.exports = {
 	data: function data() {
 		return {
-			cart: {},
-			show: false
+			cart: {}
 		};
 	},
 
-	props: ['checkout'],
-
-	created: function created() {
-		this.clearCart();
-		this.restoreCart();
-	},
-
-	watch: {
-		cart: function cart() {
-			this.setAddToCartButtons();
-		}
-	},
-
 	computed: {
-		lastObject: function lastObject() {
+		subTotal: function subTotal() {
+			var subTotal = 0;
+			for (var offerId in this.cart) {
+				for (var itemId in this.cart[offerId].items) {
+					var item = this.cart[offerId].items[itemId];
+					subTotal += item.count * item.price;
+				}
+			}
+			return subTotal;
+		},
+
+		lastOfferId: function lastOfferId() {
 			if (this.cart) {
 				return _Object$keys(this.cart)[_Object$keys(this.cart).length - 1];
 			} else {
 				return null;
 			}
-		},
-
-		subTotal: function subTotal() {
-			var subTotal = 0;
-			for (var itemId in this.cart) {
-				for (var variantId in this.cart[itemId].variants) {
-					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price;
-				}
-			}
-
-			return subTotal;
 		}
 	},
 
+	components: {
+		offer: require('./cartOffer.vue')
+	},
+
 	methods: {
-		addToCart: function addToCart(cartItem, itemId, variantId) {
-			ga('send', 'event', 'cart', 'itemAdded', 'Item #' + itemId + ' - "' + cartItem.name + '"; Variant #' + variantId + ' - "' + cartItem.variants[variantId].name + '"');
-			var cart = {};
-			if (localStorage.cart) {
-				cart = JSON.parse(localStorage.cart);
+		addItem: function addItem(item) {
+			if (!this.cart[item.offer_id]) {
+				this.$set('cart[' + item.offer_id + ']', {
+					name: item.offer_name,
+					items: {}
+				});
 			}
 
-			if (cart[itemId]) {
-				if (cart[itemId].variants[variantId]) {
-					cart[itemId].variants[variantId].count += cartItem.variants[variantId].count;
-
-					var variant = cart[itemId].variants[variantId];
-					if (!variant.infinite && variant.count > variant.stock) {
-						cart[itemId].variants[variantId].count = variant.stock;
-					}
-				} else {
-					cart[itemId].variants[variantId] = cartItem.variants[variantId];
-				}
+			if (!this.cart[item.offer_id].items[item.id]) {
+				this.$set('cart[' + item.offer_id + '].items[' + item.id + ']', item);
+				this.$set('cart[' + item.offer_id + '].items[' + item.id + '].count', 1);
 			} else {
-				cart[itemId] = cartItem;
+				this.cart[item.offer_id].items[item.id].count += 1;
 			}
-
-			this.storeCart(cart);
-		},
-
-		storeCart: function storeCart(cart) {
-			localStorage.cartExperation = Date.now() + 1000 * 60 * 60 * 24;
-			localStorage.cart = JSON.stringify(cart);
-			this.restoreCart();
-		},
-
-		restoreCart: function restoreCart() {
-			if (localStorage.cart) {
-				this.show = true;
-				this.$set('cart', JSON.parse(localStorage.cart));
-			} else {
-				this.show = false;
-				return {};
-			}
-		},
-
-		clearCart: function clearCart() {
-			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
-				delete localStorage.cart;
-				delete localStorage.cartExperation;
-				return {};
-			}
-
-			if (!localStorage.cart) {
-				return 0;
-			}
-
-			var cart = JSON.parse(localStorage.cart);
-			for (var itemId in cart) {
-				for (var variantId in cart[itemId].variants) {
-					if (cart[itemId].variants[variantId].count == 0) {
-						delete cart[itemId].variants[variantId];
-					}
-				}
-				if (_Object$keys(cart[itemId].variants).length == 0) {
-					delete cart[itemId];
-				}
-			}
-			if (_Object$keys(cart).length == 0) {
-				localStorage.removeItem('cart');
-			} else {
-				localStorage.cart = JSON.stringify(cart);
-			}
-		},
-
-		changeCount: function changeCount(variant, change) {
-			variant.count = parseInt(variant.count) + change;
-			if (variant.count < 0) {
-				variant.count = 0;
-			}
-			if (!variant.infinite && variant.count > variant.stock) {
-				variant.count = variant.stock;
-			}
-
-			this.storeCart(_Object$assign({}, this.cart));
-		},
-
-		setAddToCartButtons: function setAddToCartButtons() {
-			$('.js-addToCart').removeClass('isDisabled');
-			$('.js-addToCart').addClass('Button--active');
-			$('.js-addToCart').html('<i class="fa fa-cart-plus"></i> Add to Cart');
-
-			for (var itemId in this.cart) {
-				for (var variantId in this.cart[itemId].variants) {
-					var variant = this.cart[itemId].variants[variantId];
-					if (variant.count == 0) {
-						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('isDisabled');
-						$('.js-addToCart[variant-id=' + variantId + ']').addClass('Button--active');
-						$('.js-addToCart[variant-id=' + variantId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart');
-					} else if (!variant.infinite && variant.count >= variant.stock) {
-						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('Button--active');
-						$('.js-addToCart[variant-id=' + variantId + ']').addClass('isDisabled');
-						$('.js-addToCart[variant-id=' + variantId + ']').html('All in Cart (' + variant.count + ')');
-					} else {
-						$('.js-addToCart[variant-id=' + variantId + ']').removeClass('isDisabled');
-						$('.js-addToCart[variant-id=' + variantId + ']').addClass('Button--active');
-						$('.js-addToCart[variant-id=' + variantId + ']').html('<i class="fa fa-cart-plus"></i> ' + variant.count + ' in Cart');
-					}
-				}
-			}
-		},
-
-		returnCount: function returnCount(itemId, variantId) {
-			if (cart[itemId] == undefined) {
-				return 0;
-			}
-
-			if (cart[itemId].variants[variantId] == undefined) {
-				return 0;
-			}
-
-			return cart[itemId].variants[variantId].count;
-		},
-
-		checkKey: function checkKey(event) {
-			if (event.keyCode == 8) {
-				return 0;
-			} else if (event.keyCode < 48 || 57 < event.keyCode) {
-				event.preventDefault();
-			}
-		},
-
-		checkCount: function checkCount(variant) {
-			if (variant.count < 0) {
-				variant.count = 0;
-			} else if (!variant.infinite && variant.count > variant.stock) {
-				variant.count = variant.stock;
-			}
-
-			this.storeCart(_Object$assign({}, this.cart));
-		},
-
-		submitCheckout: function submitCheckout() {
-			this.clearCart();
-			this.$parent.nextStep();
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section>\n\t\t<span v-if=\"checkout\">\n\t\t\t<section v-for=\"(itemId, item) in cart\">\n\t\t\t\t<div class=\"CheckoutCart-item\">\n\t\t\t\t\t<div class=\"CheckoutCart-pic\"><img :src=\"'/img/'+item.images.small[0]\"></div>\n\t\t\t\t\t<div class=\"CheckoutCart-desc\">\n\t\t\t\t\t\t<div class=\"CheckoutCart-title\"><h1>{{ item.name }}</h1></div>\n\t\t\t\t\t\t<div class=\"CheckoutCart-partNum\"><h4 v-if=\"item.part_number\">Part #{{ item.part_number.split(',').join(', #') }}</h4></div>\n\t\t\t\t\t\t<div class=\"CheckoutCart-variant\" v-for=\"variant in item.variants\">\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-varTitle\"><h4 v-if=\"variant.name\">{{{ variant.name }}} -&nbsp;</h4></div>\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-price\">\n\t\t\t\t\t\t\t\t<h4>{{ variant.price | currency }}<span v-if=\"variant.unit != 'Unit'\"> / {{ variant.unit }}</span></h4>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"CheckoutCart-counter\">\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-minus\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(variant, -1)\"></i>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-cnt\">\n\t\t\t\t\t\t\t\t\t<input type=\"text\" maxlength=\"4\" v-model=\"variant.count\" @keydown=\"checkKey\" @input=\"checkCount(variant)\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"CheckoutCart-plus\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.infinite || variant.count < variant.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(variant, 1)\"></i>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<hr class=\"inCheckoutCart\" v-if=\"item != lastItem\">\n\t\t\t\t<b v-else=\"\">\n\t\t\t\t\t<hr class=\"inCheckoutCart\">\n\t\t\t\t</b>\n\t\t\t</section>\n\n\t\t\t<div class=\"Subtotal-container\" data-subtotal=\"<?=$subtotal?>\">\n\t\t\t\t<div class=\"Subtotal-label\"><h4>Subtotal: </h4></div>\n\t\t\t\t<div id=\"Subtotal-total\"><h1>{{ subTotal | currency }}</h1></div>\n\t\t\t</div>\n\n\t\t\t<hr>\n\t\t\t<div>\n\t\t\t\t<a v-link=\"{ path: '/home' }\"><div class=\"Button Button--active u-width200 u-floatLeft\">&lt; Continue Shopping</div></a>\n\t\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\">Next &gt;</div>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-else=\"\">\n\t\t\t<div id=\"Cart\" v-if=\"show\">\n\t\t\t\t<div id=\"Cart-head\">Cart</div>\n\t\t\t\t<div class=\"Cart-item\" v-for=\"(itemId, item) in cart\">\n\t\t\t\t\t<small><b><a v-link=\"{ path: '/item/'+itemId }\">{{ item.name }}</a></b></small><br>\n\t\t\t\t\t<div v-for=\"(variantId, variant) in item.variants\">\n\t\t\t\t\t\t<small class=\"u-thin\">{{{ variant.name }}}</small><br v-if=\"variant.name\">\n\t\t\t\t\t\t<small>{{ variant.price | currency }} <span v-if=\"variant.unit != 'Unit'\">/ {{ variant.unit }}</span></small>\n\t\t\t\t\t\t<span class=\"u-floatRight\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(variant, -1)\"></i>\n\t\t\t\t\t\t\t{{ variant.count }}\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(variant.infinite || variant.count < variant.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(variant, 1)\"></i>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<hr class=\"u-clear\" v-if=\"itemId != lastObject\">\n\t\t\t\t\t<span class=\"u-clear\" v-else=\"\"></span>\n\t\t\t\t</div>\n\t\t\t\t<a v-link=\"{ path: '/checkout/cart' }\">\n\t\t\t\t\t<div id=\"Cart-foot\" class=\"u-active\">\n\t\t\t\t\t\t<b>Subtotal:</b> {{ subTotal | currency }}<b class=\"u-floatRight\">Checkout</b>\n\t\t\t\t\t</div>\n\t\t\t\t</a>\n\t\t\t</div>\n\t\t</span>\n\t</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"cart\">\n\t<div id=\"Cart-head\">Cart</div>\n\t<offer v-for=\"(offerId, offer) in cart\" :offer=\"offer\" :offer-id=\"offerId\" :last-offer-id=\"lastOfferId\">\n\t</offer>\n\t<a v-link=\"{ path: '/checkout/cart' }\">\n\t\t<div id=\"Cart-foot\" class=\"u-active\">\n\t\t\t<b>Subtotal:</b> {{ subTotal / 100 | currency }}<b class=\"u-floatRight\">Checkout</b>\n\t\t</div>\n\t</a>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15134,7 +15058,53 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"babel-runtime/core-js/object/assign":1,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
+},{"./cartOffer.vue":51,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['offer', 'offerId', 'lastOfferId'],
+
+	components: {
+		item: require('./cartOfferItem.vue')
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"Cart-item\">\n\t<small><b><a v-link=\"{ path: `/item/${offer.id}` }\">{{ offer.name }}</a></b></small>\n\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t<hr class=\"u-clear\" v-if=\"offerId != lastOfferId\">\n\t<span class=\"u-clear\" v-else=\"\"></span>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/cartOffer.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"./cartOfferItem.vue":52,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['item'],
+
+	methods: {
+		changeCount: function changeCount(change) {
+			this.item.count += change;
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div>\n\t<small class=\"u-thin\">{{{ item.name }}}</small><br v-if=\"item.name\">\n\t<small>{{ item.price / 100 | currency }} <span v-if=\"item.unit != 'Unit'\"> {{ '\\/' + item.unit }}</span></small>\n\t<span class=\"u-floatRight\">\n\t\t<i class=\"fa fa-fw\" :class=\"(item.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(-1)\"></i>\n\t\t{{ item.count }}\n\t\t<i class=\"fa fa-fw\" :class=\"(item.infinite || item.count < item.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(1)\"></i>\n\t</span>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/cartOfferItem.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15201,7 +15171,7 @@ module.exports = {
 
 	watch: {
 		tags: function tags() {
-			this.page = 1;
+			this.page = 0;
 			this.getItems();
 		}
 	},
@@ -15239,7 +15209,6 @@ module.exports = {
 				_limit: this.limit
 			};
 			this.$http.get('offers', request).then(function (response) {
-				console.log(response);
 				for (var i in response.data.body) {
 					response.data.body[i].selected = 0;
 				}
@@ -15251,14 +15220,14 @@ module.exports = {
 				_this.limit = response.data._limit;
 				_this.loaded = true;
 
-				_this.$nextTick(function () {
-					this.$root.$refs.cart.setAddToCartButtons();
-				});
+				// this.$nextTick(function() {
+				// 	this.$root.$refs.cart.setAddToCartButtons()	
+				// })
 			});
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section v-if=\"loaded\">\n\t\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t\t</page-counter>\n\t\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'offer' }} found.</div>\n\t\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t\t<offer v-for=\"offer in offers\" :offer=\"offer\"></offer>\n\n\t\t<br class=\"u-clear\">\n\t\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t\t</page-counter>\n\t</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section v-if=\"loaded\">\n\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'offer' }} found.</div>\n\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t<offer v-for=\"offer in offers\" :offer=\"offer\"></offer>\n\n\t<br class=\"u-clear\">\n\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15270,7 +15239,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./offer.vue":52,"./pageCounter.vue":53,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"./offer.vue":55,"./pageCounter.vue":56,"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15387,7 +15356,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":63,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+},{"../store/geoInfo.js":66,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15429,7 +15398,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div>\n\t\t<a v-link=\"{ path: `/item/${id}` }\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+offer.pictures[0].source.sm\" class=\"CatalogGridItem-thumb\" v-if=\"offer.pictures.length\">\n\t\t\t\t<img src=\"/img/def.jpg\" class=\"CatalogGridItem-thumb\" v-else=\"\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{ offer.name }}</b>\n\t\t\t\t\t<div v-if=\"partNumbers\">Part #{{ partNumbers.join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ offer.items[0].price / 100 | currency }}</b>\n\t\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div>\n\t\t<a v-link=\"{ path: `/item/${offer.id}` }\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+offer.pictures[0].source.sm\" class=\"CatalogGridItem-thumb\" v-if=\"offer.pictures.length\">\n\t\t\t\t<img src=\"/img/def.jpg\" class=\"CatalogGridItem-thumb\" v-else=\"\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{ offer.name }}</b>\n\t\t\t\t\t<div v-if=\"partNumbers\">Part #{{ partNumbers.join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ offer.items[0].price / 100 | currency }}</b>\n\t\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15441,7 +15410,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15471,7 +15440,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15567,7 +15536,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 'use strict';
 
 var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
@@ -15645,14 +15614,14 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":64,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"../store/invoiceInfo.js":67,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 module.exports = function (input) {
 	return (input + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
 };
 
-},{}],57:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15787,7 +15756,7 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./filters/nl2br.js":56,"./pages/404.vue":58,"./pages/catalog.vue":59,"./pages/checkout.vue":60,"./pages/item.vue":61,"./pages/page.vue":62,"vue":47,"vue-resource":35,"vue-router":46}],58:[function(require,module,exports){
+},{"./app.vue":48,"./filters/nl2br.js":59,"./pages/404.vue":61,"./pages/catalog.vue":62,"./pages/checkout.vue":63,"./pages/item.vue":64,"./pages/page.vue":65,"vue":47,"vue-resource":35,"vue-router":46}],61:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15807,7 +15776,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15902,12 +15871,10 @@ module.exports = {
 			} else {
 				return "";
 			}
-		},
-
-		getId: function getId(slug) {}
+		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<h1>{{ catalog.name }}</h1>\n\t\t<p>{{ catalog.description }}</p>\n\n\t\t<section v-if=\"catalog.tags.length > 1\">\n\t\t\t<hr>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t\t</label>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t\t<br>\n\t\t\t<ul class=\"u-cols-3\">\n\t\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t\t</li>\n\t\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</section>\n\n\t\t<hr>\n\t\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t\t<hr>\n\n\t\t<catalog :tags.sync=\"selected\" style=\"grid\" limit=\"15\"></catalog>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<h1>{{ catalog.name }}</h1>\n\t<p>{{ catalog.description }}</p>\n\n\t<section v-if=\"catalog.tags.length > 1\">\n\t\t<hr>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t</label>\n\t\t\t</li>\n\t\t</ul>\n\t\t<br>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t</li>\n\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t</li>\n\t\t</ul>\n\t</section>\n\n\t<hr>\n\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t<hr>\n\n\t<catalog :tags.sync=\"selected\" limit=\"15\"></catalog>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15919,7 +15886,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16057,67 +16024,87 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":49,"../components/contactInfo.vue":51,"../components/submitCheckout.vue":55,"../store/invoiceInfo.js":64,"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
+},{"../components/cart.vue":50,"../components/contactInfo.vue":54,"../components/submitCheckout.vue":58,"../store/invoiceInfo.js":67,"vue":47,"vue-hot-reload-api":21}],64:[function(require,module,exports){
 'use strict';
 
 module.exports = {
 	data: function data() {
 		return {
-			item: {},
+			offer: {},
 			loaded: false
 		};
 	},
 
+	components: {
+		addToCart: require('../components/addToCart.vue')
+	},
+
+	computed: {
+		partNumbers: function partNumbers() {
+			var numbers = [];
+			for (var i = 0; i < this.offer.items.length; i++) {
+				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
+					numbers.push(this.offer.items[i]['part_number']);
+				}
+			}
+		}
+	},
+
 	route: {
 		data: function data() {
-			this.getItem();
+			this.getOffer();
 		}
 	},
 
 	methods: {
-		getItem: function getItem() {
-			this.$http.get('/api/item/' + this.$route.params.id).then(function (response) {
-				this.$set('item', response.data);
-				this.selectPic(0);
-				document.title = "Pangolin 4x4: " + this.item.name;
+		getOffer: function getOffer() {
+			var _this = this;
 
-				this.loaded = true;
-				this.$nextTick(function () {
-					this.$parent.$refs.cart.setAddToCartButtons();
-				});
+			this.$http.get('offer/' + this.$route.params.id).then(function (response) {
+				_this.$set('offer', response.data);
+				for (var i = 0; i < _this.offer.pictures.length; i++) {
+					_this.$set('offer.pictures[' + i + '].selected', false);
+				}
+				_this.selectPic(0);
+				document.title = "Pangolin 4x4: " + _this.offer.name;
+
+				_this.loaded = true;
+				// this.$nextTick(function() {
+				// 	this.$parent.$refs.cart.setAddToCartButtons()
+				// })
 			});
 		},
 
 		selectPic: function selectPic(index) {
-			for (var i = 0; i < this.item.images.large.length; i++) {
-				this.item.images.large[i].selected = false;
+			for (var i = 0; i < this.offer.pictures.length; i++) {
+				this.offer.pictures[i].selected = false;
 			}
-			this.item.images.large[index].selected = true;
-		},
-
-		addToCart: function addToCart(variant) {
-			var cartItem = {
-				name: this.item.name,
-				images: this.item.images,
-				part_number: this.item.type_info.part_number,
-				state: this.item.type_info.state,
-				variants: {}
-			};
-
-			cartItem.variants[variant.id] = {
-				name: variant.name,
-				price: variant.price,
-				unit: variant.unit,
-				stock: variant.stock,
-				infinite: variant.infinite,
-				count: 1
-			};
-
-			this.$parent.$refs.cart.addToCart(cartItem, this.item.id, variant.id);
+			this.offer.pictures[index].selected = true;
 		}
+
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{{ item.name + ', ' + item.type_info.state }}}</h1>\n\t\t<h4 v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<a :href=\"'/img/'+pic.path+'?u='+item.updated\" id=\"js-currentPicLink\" data-lightbox=\"pic\" v-for=\"pic in item.images.large\">\n\t\t\t<img :src=\"'/img/'+item.images.medium[$index]+'?u='+item.updated\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"pic.selected\">\n\t\t</a>\n\t  <img :src=\"'/img/'+pic+'?u='+item.updated\" class=\"u-activeImg Pictures-thumb\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" v-for=\"pic in item.images.small\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{{ item.name + ', ' + item.type_info.state }}}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ item.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t{{ item.type_info.quality }}, {{ (item.type_info.state == 'NOS')?'New/Old Stock':item.type_info.state }}.\n\t\t\t<span v-if=\"item.type_info.part_number\">Part #{{ item.type_info.part_number.split(',').join(', #') }}.</span>\n\t\t\t<span v-if=\"item.type_info.ss_part_number\">Supersedes by Part #{{ item.type_info.ss_part_number.split(',').join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"item.variants.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ item.variants[0].price | currency }}\n\t\t\t\t<span v-if=\"item.variants[0].unit != 'Unit'\" class=\"u-thin\"> / {{ item.variants[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"item.variants[0].stock > 0 || item.variants[0].infinite\" :variant-id=\"item.variants[0].id\" @click=\"addToCart(item.variants[0])\">\n\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t</div>\n\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\tOut of Stock\n\t\t\t</div>\n\t\t</section>\n\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"variant in item.variants\">\n\t\t\t\t<td>{{ variant.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ variant.price | currency }}\n\t\t\t\t\t<span v-if=\"variant.unit != 'Unit'\" class=\"u-thin\"> / {{ variant.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight js-addToCart\" v-if=\"variant.stock > 0 || variant.infinite\" :variant-id=\"variant.id\" @click=\"addToCart(variant)\">\n\t\t\t\t\t\t<i class=\"fa fa-cart-plus\"></i> Add to Cart\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"Button Button--active inVariations u-floatRight isDisabled\" v-else=\"\">\n\t\t\t\t\t\tOut of Stock\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Specs\">\n\t\t<div v-if=\"item.x\"> Dimensions: {{ item.x }}\"\n\t\t\t<span v-if=\"item.y\"> x {{ item.y }}\"\n\t\t\t\t<span v-if=\"item.z\"> x {{ item.z }}\"</span>\n\t\t\t</span>\n\t\t</div>\n\t\t<div v-if=\"item.weight\">{{ item.weight }} lbs.</div>\n\t\t<hr v-if=\"item.weight || item.x\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"item.type_info.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in item.type_info.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
+// addToCart(variant) {
+// 	var cartItem = {
+// 		name: this.offer.name,
+// 		pictures: this.offer.pictures,
+// 		part_number: this.offer.type_info.part_number,
+// 		state: this.offer.type_info.state,
+// 		variants: {},
+// 	}
+
+// 	cartItem.variants[variant.id] = {
+// 		name: variant.name,
+// 		price: variant.price,
+// 		unit: variant.unit,
+// 		stock: variant.stock,
+// 		infinite: variant.infinite,
+// 		count: 1
+// 	}
+
+// 	this.$parent.$refs.cart.addToCart(cartItem, this.offer.id, variant.id)
+// }
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{ offer.name }}</h1>\n\t\t<h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<!-- Lightbox links and selected picture img -->\n\t\t<a v-for=\"picture in offer.pictures\" :href=\"`/img/${picture.source.lg}`\" id=\"js-currentPicLink\" data-lightbox=\"pic\">\n\t\t\t<img :src=\"`/img/${picture.source.md}`\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"picture.selected\">\n\t\t</a>\n\n\t\t<!-- Thumbs to set selected picture -->\n\t\t<img v-for=\"picture in offer.pictures\" class=\"u-activeImg Pictures-thumb\" :src=\"`/img/${picture.source.sm}`\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{ offer.name }}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ offer.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t<span v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}.</span>\n\t\t\t<span v-if=\"offer.ssPartNumbers\">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"offer.items.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ offer.items[0].price / 100 | currency }}\n\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<add-to-cart :item=\"offer.items[0]\" class=\"inVariations u-floatRight\"></add-to-cart>\n\t\t</section>\n\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"item in offer.items\">\n\t\t\t\t<td>{{ item.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ item.price / 100 | currency }}\n\t\t\t\t\t<span v-if=\"item.unit != 'Unit'\" class=\"u-thin\"> / {{ item.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<add-to-cart :item=\"item\" class=\"inVariations u-floatRight\"></add-to-cart>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"offer.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in offer.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -16129,7 +16116,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
+},{"../components/addToCart.vue":49,"vue":47,"vue-hot-reload-api":21}],65:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16198,7 +16185,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":50,"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],66:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16449,7 +16436,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],64:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16531,6 +16518,6 @@ module.exports = {
 	}
 };
 
-},{}]},{},[57]);
+},{}]},{},[60]);
 
 //# sourceMappingURL=main.js.map

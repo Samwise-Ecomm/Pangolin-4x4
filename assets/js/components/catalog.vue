@@ -1,23 +1,23 @@
 <template>
-	<section v-if="loaded">
-		<page-counter class="u-floatLeft" 
-			v-if="pages > 1 && !hidePages"
-			:pages="pages"
-			:given-page.sync="page">
-		</page-counter>
-		<div class="u-floatRight" v-if="!hideCount">{{ count }} {{ count | pluralize 'offer' }} found.</div>
-		<br v-if="!hideCount"><br v-if="!hideCount">
+<section v-if="loaded">
+	<page-counter class="u-floatLeft" 
+		v-if="pages > 1 && !hidePages"
+		:pages="pages"
+		:given-page.sync="page">
+	</page-counter>
+	<div class="u-floatRight" v-if="!hideCount">{{ count }} {{ count | pluralize 'offer' }} found.</div>
+	<br v-if="!hideCount"><br v-if="!hideCount">
 
-		<offer v-for="offer in offers"
-			:offer="offer"></offer>
+	<offer v-for="offer in offers"
+		:offer="offer"></offer>
 
-		<br class="u-clear">
-		<page-counter class="u-floatRight" 
-			v-if="pages > 1 && !hidePages"
-			:pages="pages"
-			:given-page.sync="page">
-		</page-counter>
-	</section>
+	<br class="u-clear">
+	<page-counter class="u-floatRight" 
+		v-if="pages > 1 && !hidePages"
+		:pages="pages"
+		:given-page.sync="page">
+	</page-counter>
+</section>
 </template>
 
 <script>
@@ -83,7 +83,7 @@ module.exports = {
 
 	watch: {
 		tags () {
-			this.page = 1
+			this.page = 0
 			this.getItems()
 		}
 	},
@@ -119,7 +119,6 @@ module.exports = {
 				_limit: this.limit
 			}
 			this.$http.get('offers', request).then(response => {
-				console.log(response)
 				for (var i in response.data.body) {
 					response.data.body[i].selected = 0
 				}
@@ -131,9 +130,9 @@ module.exports = {
 				this.limit = response.data._limit
 				this.loaded = true
 
-				this.$nextTick(function() {
-		  		this.$root.$refs.cart.setAddToCartButtons()	
-		  	})
+				// this.$nextTick(function() {
+				// 	this.$root.$refs.cart.setAddToCartButtons()	
+				// })
 			})
 		}
 	}
