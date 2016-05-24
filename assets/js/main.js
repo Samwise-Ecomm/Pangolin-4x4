@@ -103,6 +103,9 @@ Vue.http.interceptors.push({
 
 router.beforeEach(function (transition) {
 	transition.to.router.app.search = true
+	if (transition.to.router.app.$refs.cart) {
+		transition.to.router.app.$refs.cart.clearCart()
+	}
 	transition.next()
 })
 

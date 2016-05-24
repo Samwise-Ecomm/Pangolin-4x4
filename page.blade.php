@@ -14,7 +14,7 @@
 <body>
 	<div id="app"></div>
 
-	<script src="/js/ace/ace.js"></script>
+	<script src="/js/store/ace/ace.js"></script>
 	<script src="/js/store/jquery.min.js"></script>
 	<script src="/js/store/pageEditor.js"></script>
 </body>

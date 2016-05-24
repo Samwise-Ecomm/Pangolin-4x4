@@ -11964,7 +11964,7 @@ exports.insert = function (css) {
 }
 
 },{}],29:[function(require,module,exports){
-var __vueify_style__ = require("vueify-insert-css").insert("\n\t.ace_editor, .ace_editor * {\n    font-family: \"Monaco\", \"Menlo\", \"Ubuntu Mono\", \"Droid Sans Mono\", \"Consolas\", monospace !important;\n    font-size: 12px !important;\n    font-weight: 400 !important;\n    letter-spacing: 0 !important;\n\t}\n\t#editor {\n\t\theight: 100%;\n\t}\n")
+var __vueify_style__ = require("vueify-insert-css").insert("\n\t.ace_editor, .ace_editor * {\n\t\tfont-family: \"Monaco\", \"Menlo\", \"Ubuntu Mono\", \"Droid Sans Mono\", \"Consolas\", monospace !important;\n\t\tfont-size: 12px !important;\n\t\tfont-weight: 400 !important;\n\t\tletter-spacing: 0 !important;\n\t}\n\t#editor {\n\t\theight: 100%;\n\t}\n")
 'use strict';
 
 module.exports = {
@@ -11995,11 +11995,13 @@ module.exports = {
 
 	methods: {
 		loadPage: function loadPage() {
+			var _this = this;
+
 			var id = window.location.href.split('/')[window.location.href.split('/').length - 1];
-			this.$http.get('/admin/pages/' + id).then(function (response) {
-				this.$set('page', response.data);
-				this.loaded = true;
-				this.$nextTick(function () {
+			this.$http.get('/api/page/' + id).then(function (response) {
+				_this.$set('page', response.data);
+				_this.loaded = true;
+				_this.$nextTick(function () {
 					this.loadEditor();
 				});
 			});
@@ -12017,12 +12019,12 @@ module.exports = {
 			}
 
 			var request = {
-				id: this.page.id,
 				search: this.page.search,
 				content: content
 			};
 
-			this.$http.post('/admin/page', request).then(function (response) {
+			var id = window.location.href.split('/')[window.location.href.split('/').length - 1];
+			this.$http.patch('/api/page/' + id, request).then(function (response) {
 				$(".js-save").removeClass("fa-cog fa-spin");
 				$(".js-save").addClass("fa-check");
 				setTimeout(function () {
@@ -12080,7 +12082,7 @@ if (module.hot) {(function () {  module.hot.accept()
   if (!hotAPI.compatible) return
   var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/page_editor/app.vue"
   module.hot.dispose(function () {
-    require("vueify-insert-css").cache["\n\t.ace_editor, .ace_editor * {\n    font-family: \"Monaco\", \"Menlo\", \"Ubuntu Mono\", \"Droid Sans Mono\", \"Consolas\", monospace !important;\n    font-size: 12px !important;\n    font-weight: 400 !important;\n    letter-spacing: 0 !important;\n\t}\n\t#editor {\n\t\theight: 100%;\n\t}\n"] = false
+    require("vueify-insert-css").cache["\n\t.ace_editor, .ace_editor * {\n\t\tfont-family: \"Monaco\", \"Menlo\", \"Ubuntu Mono\", \"Droid Sans Mono\", \"Consolas\", monospace !important;\n\t\tfont-size: 12px !important;\n\t\tfont-weight: 400 !important;\n\t\tletter-spacing: 0 !important;\n\t}\n\t#editor {\n\t\theight: 100%;\n\t}\n"] = false
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
@@ -12257,8 +12259,10 @@ module.exports = {
   },
   methods: {
     getFiles: function getFiles() {
-      this.$http.get('/admin/upload').then(function (response) {
-        this.$set('files', response.data);
+      var _this = this;
+
+      this.$http.get('/api/images').then(function (response) {
+        _this.$set('files', response.data);
       });
     }
   }

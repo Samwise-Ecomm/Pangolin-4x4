@@ -6,7 +6,7 @@
 
 <script>
 module.exports = {
-	props: ['item'],
+	props: ['item', 'thumb', 'partNumbers'],
 
 	computed: {
 		count () {
@@ -52,7 +52,7 @@ module.exports = {
 				return
 			}
 
-			this.cart.addItem(this.item)
+			this.cart.addItem(this.item, this.thumb, this.partNumbers)
 		}
 	}
 }

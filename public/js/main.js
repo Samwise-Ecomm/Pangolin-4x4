@@ -14929,11 +14929,54 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/cart.vue":50,"./components/search.vue":57,"./components/statusIcon.vue":58,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+},{"./components/cart.vue":51,"./components/search.vue":60,"./components/statusIcon.vue":61,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
 'use strict';
 
 module.exports = {
 	props: ['item'],
+
+	methods: {
+		changeCount: function changeCount(change) {
+			this.item.count = parseInt(this.item.count) + change;
+			this.$parent.$parent.storeCart();
+		},
+
+		checkKey: function checkKey(event) {
+			if (event.keyCode == 8) {
+				return 0;
+			} else if (event.keyCode < 48 || 57 < event.keyCode) {
+				event.preventDefault();
+			}
+		},
+
+		checkCount: function checkCount() {
+			if (this.item.count < 0) {
+				this.item.count = 0;
+			} else if (!this.item.infinite && this.item.count > this.item.stock) {
+				this.item.count = this.item.stock;
+			}
+
+			this.$parent.$parent.storeCart();
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"CheckoutCart-variant\">\n\t<div class=\"CheckoutCart-varTitle\"><h4 v-if=\"item.name\">{{{ item.name }}} -&nbsp;</h4></div>\n\t<div class=\"CheckoutCart-price\">\n\t\t<h4>{{ item.price / 100 | currency }}<span v-if=\"item.unit != 'Unit'\"> {{ '\\/' + item.unit }}</span></h4>\n\t</div>\n\t<div class=\"CheckoutCart-counter\">\n\t\t<div class=\"CheckoutCart-minus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(-1)\"></i>\n\t\t</div>\n\t\t<div class=\"CheckoutCart-cnt\">\n\t\t\t<input type=\"text\" maxlength=\"4\" v-model=\"item.count\" @keydown=\"checkKey\" @input=\"checkCount(item)\">\n\t\t</div>\n\t\t<div class=\"CheckoutCart-plus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.infinite || item.count < item.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(1)\"></i>\n\t\t</div>\n\t</div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/CheckoutCartOfferItem.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['item', 'thumb', 'partNumbers'],
 
 	computed: {
 		count: function count() {
@@ -14979,7 +15022,7 @@ module.exports = {
 				return;
 			}
 
-			this.cart.addItem(this.item);
+			this.cart.addItem(this.item, this.thumb, this.partNumbers);
 		}
 	}
 };
@@ -14995,7 +15038,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15005,6 +15048,10 @@ module.exports = {
 		return {
 			cart: {}
 		};
+	},
+
+	ready: function ready() {
+		this.restoreCart();
 	},
 
 	computed: {
@@ -15028,7 +15075,7 @@ module.exports = {
 		},
 
 		empty: function empty() {
-			return this.subTotal == 0;
+			return _Object$keys(this.cart).length == 0;
 		}
 	},
 
@@ -15037,10 +15084,12 @@ module.exports = {
 	},
 
 	methods: {
-		addItem: function addItem(item) {
+		addItem: function addItem(item, thumb, partNumbers) {
 			if (!this.cart[item.offer_id]) {
 				this.$set('cart[' + item.offer_id + ']', {
 					name: item.offer_name,
+					thumb: thumb,
+					partNumbers: partNumbers,
 					items: {}
 				});
 			}
@@ -15051,6 +15100,63 @@ module.exports = {
 			} else {
 				this.cart[item.offer_id].items[item.id].count += 1;
 			}
+
+			this.storeCart();
+		},
+
+		storeCart: function storeCart() {
+			localStorage.cartExperation = Date.now() + 1000 * 60 * 60 * 24;
+			localStorage.cart = JSON.stringify(this.cart);
+			localStorage.condensedCart = JSON.stringify(this.condenseCart());
+		},
+
+		condenseCart: function condenseCart() {
+			var condensedCart = {};
+
+			for (var offerId in this.cart) {
+				condensedCart[offerId] = {};
+				var offer = this.cart[offerId];
+
+				for (var itemId in this.cart[offerId].items) {
+					var item = offer.items[itemId];
+					condensedCart[offerId][itemId] = item.count;
+				}
+			}
+
+			return condensedCart;
+		},
+
+		restoreCart: function restoreCart() {
+			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
+				delete localStorage.cart;
+				delete localStorage.cartExperation;
+				delete localStorage.condensedCart;
+			}
+
+			if (localStorage.cart) {
+				this.$set('cart', JSON.parse(localStorage.cart));
+			} else {
+				this.$set('cart', {});
+			}
+		},
+
+		clearCart: function clearCart() {
+			var Vue = require('vue');
+
+			for (var offerId in this.cart) {
+				var offer = this.cart[offerId];
+				for (var itemId in this.cart[offerId].items) {
+					var item = offer.items[itemId];
+					if (item.count == 0) {
+						Vue['delete'](this.cart[offerId].items, itemId);
+					}
+				}
+				if (_Object$keys(offer.items).length == 0) {
+					Vue['delete'](this.cart, offerId);
+				}
+			}
+
+			this.storeCart();
 		}
 	}
 };
@@ -15066,7 +15172,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./cartOffer.vue":51,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"./cartOffer.vue":52,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15076,7 +15182,7 @@ module.exports = {
 		item: require('./cartOfferItem.vue')
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"Cart-item\">\n\t<small><b><a v-link=\"{ path: `/item/${offer.id}` }\">{{ offer.name }}</a></b></small>\n\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t<hr class=\"u-clear\" v-if=\"offerId != lastOfferId\">\n\t<span class=\"u-clear\" v-else=\"\"></span>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"Cart-item\">\n\t<small><b><a v-link=\"{ path: `/item/${offerId}` }\">{{ offer.name }}</a></b></small>\n\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t<hr class=\"u-clear\" v-if=\"offerId != lastOfferId\">\n\t<span class=\"u-clear\" v-else=\"\"></span>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15088,7 +15194,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./cartOfferItem.vue":52,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+},{"./cartOfferItem.vue":53,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15097,6 +15203,7 @@ module.exports = {
 	methods: {
 		changeCount: function changeCount(change) {
 			this.item.count += change;
+			this.$parent.$parent.storeCart();
 		}
 	}
 };
@@ -15112,7 +15219,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15247,7 +15354,144 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./offer.vue":55,"./pageCounter.vue":56,"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
+},{"./offer.vue":58,"./pageCounter.vue":59,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+'use strict';
+
+var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
+
+module.exports = {
+	data: function data() {
+		return {
+			cart: {}
+		};
+	},
+
+	ready: function ready() {
+		this.restoreCart();
+	},
+
+	computed: {
+		subTotal: function subTotal() {
+			var subTotal = 0;
+			for (var offerId in this.cart) {
+				for (var itemId in this.cart[offerId].items) {
+					var item = this.cart[offerId].items[itemId];
+					subTotal += item.count * item.price;
+				}
+			}
+			return subTotal;
+		},
+
+		lastOfferId: function lastOfferId() {
+			if (this.cart) {
+				return _Object$keys(this.cart)[_Object$keys(this.cart).length - 1];
+			} else {
+				return null;
+			}
+		}
+	},
+
+	components: {
+		offer: require('./checkoutCartOffer.vue')
+	},
+
+	methods: {
+		storeCart: function storeCart() {
+			localStorage.cartExperation = Date.now() + 1000 * 60 * 60 * 24;
+			localStorage.cart = JSON.stringify(this.cart);
+			localStorage.condensedCart = JSON.stringify(this.condenseCart());
+		},
+
+		condenseCart: function condenseCart() {
+			var condensedCart = {};
+
+			for (var offerId in this.cart) {
+				condensedCart[offerId] = {};
+				var offer = this.cart[offerId];
+
+				for (var itemId in this.cart[offerId].items) {
+					var item = offer.items[itemId];
+					condensedCart[offerId][itemId] = item.count;
+				}
+			}
+
+			return condensedCart;
+		},
+
+		restoreCart: function restoreCart() {
+			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
+				delete localStorage.cart;
+				delete localStorage.cartExperation;
+				delete localStorage.condensedCart;
+			}
+
+			if (localStorage.cart) {
+				this.$set('cart', JSON.parse(localStorage.cart));
+			} else {
+				this.$set('cart', {});
+			}
+		},
+
+		clearCart: function clearCart() {
+			var Vue = require('vue');
+
+			for (var offerId in this.cart) {
+				var offer = this.cart[offerId];
+				for (var itemId in this.cart[offerId].items) {
+					var item = offer.items[itemId];
+					if (item.count == 0) {
+						Vue['delete'](this.cart[offerId].items, itemId);
+					}
+				}
+				if (_Object$keys(offer.items).length == 0) {
+					Vue['delete'](this.cart, offerId);
+				}
+			}
+
+			this.storeCart();
+		},
+
+		submitCheckout: function submitCheckout() {
+			this.clearCart();
+			this.$parent.nextStep();
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section>\n\t<span>\n\t\t<offer :offer=\"offer\" :offer-id=\"offerId\" :last-offer-id=\"lastOfferId\" v-for=\"(offerId, offer) in cart\"></offer>\n\n\t\t<div class=\"Subtotal-container\" data-subtotal=\"<?=$subtotal?>\">\n\t\t\t<div class=\"Subtotal-label\"><h4>Subtotal: </h4></div>\n\t\t\t<div id=\"Subtotal-total\"><h1>{{ subTotal / 100 | currency }}</h1></div>\n\t\t</div>\n\n\t\t<hr>\n\t\t<div>\n\t\t\t<a v-link=\"{ path: '/home' }\"><div class=\"Button Button--active u-width200 u-floatLeft\">&lt; Continue Shopping</div></a>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\">Next &gt;</div>\n\t\t</div>\n\t</span>\n</section>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/checkoutCart.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"./checkoutCartOffer.vue":56,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['offer', 'offerId', 'lastOfferId'],
+
+	components: {
+		item: require('./CheckoutCartOfferItem.vue')
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section>\n\t<div class=\"CheckoutCart-item\">\n\t\t<div class=\"CheckoutCart-pic\"><img :src=\"`/img/${offer.thumb}`\"></div>\n\t\t<div class=\"CheckoutCart-desc\">\n\t\t\t<div class=\"CheckoutCart-title\"><h1>{{ offer.name }}</h1></div>\n\t\t\t<div class=\"CheckoutCart-partNum\"><h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4></div>\n\t\t\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t\t</div>\n\t</div>\n\n\t<hr class=\"inCheckoutCart\" v-if=\"item != lastItem\">\n\t<b v-else=\"\">\n\t\t<hr class=\"inCheckoutCart\">\n\t</b>\n</section>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/checkoutCartOffer.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"./CheckoutCartOfferItem.vue":49,"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15277,7 +15521,7 @@ module.exports = {
 			var valid = true;
 
 			this.warn = [];
-			var requiredFields = ['first_name', 'last_name', 'zip', 'city', 'street_address_first'];
+			var requiredFields = ['first_name', 'last_name', 'zip', 'city', 'street'];
 			requiredFields.forEach((function (field) {
 				if (this.info[field] == "") {
 					this.warn.push(field);
@@ -15352,7 +15596,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2 v-if=\"shipping\">Shipping Information:</h2>\n\t\t<h2 v-else=\"\">Billing Information:</h2>\n\t\t<hr>\n\n\t\t<div v-if=\"!shipping\" @click=\"info.seperate_billing = !info.seperate_billing\">\n\t\t\t<i>Note: Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount.</i><br>\n\t\t\t<br>\n\t\t\t<span class=\"u-active\">\n\t\t\t\t<i class=\"fa fa-fw\" :class=\"info.seperate_billing?'fa-check-square':'fa-square'\"></i> Seperate Shipping &amp; Billing Address?\n\t\t\t</span>\n\t\t\t<hr>\n\t\t</div>\n\n\t\t<span v-if=\"shipping || !shipping &amp;&amp; info.seperate_billing\">\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">First Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'first_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"firstName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.first_name\" @input=\"checkField('first_name')\" @focus=\"selected = 'first_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('first_name') == -1)?'':'isShown'\">First name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Last Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'last_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"lastName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.last_name\" @input=\"checkField('last_name')\" @focus=\"selected = 'last_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('last_name') == -1)?'':'isShown'\">Last name is required</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Company:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'company')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"company\" maxlength=\"64\" v-model=\"info.company\" @focus=\"selected = 'company'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">Country:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'country')?'isSelected':''\">\n\t\t\t\t\t<select name=\"country\" v-model=\"info.country\" @focus=\"selected = 'country'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"country\" v-for=\"country in returnCountries()\">{{ country }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">State / Province:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'state')?'isSelected':''\">\n\t\t\t\t\t<select name=\"state\" v-model=\"info.state\" @focus=\"selected = 'state'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"state\" v-for=\"state in returnStates(info.country)\">{{ state }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Zip:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'zip')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"zip\" maxlength=\"32\" placeholder=\"Required\" v-model=\"info.zip\" @input=\"checkField('zip')\" @focus=\"selected = 'zip'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('zip') == -1)?'':'isShown'\">Zip code is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">City:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'city')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"city\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.city\" @input=\"checkField('city')\" @focus=\"selected = 'city'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('city') == -1)?'':'isShown'\">City name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Street Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street_address_first')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetFirst\" maxlength=\"128\" placeholder=\"Required\" v-model=\"info.street_address_first\" @input=\"checkField('street_address_first')\" @focus=\"selected = 'street_address_first'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('street_address_first') == -1)?'':'isShown'\">Street address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\"></div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street_address_second')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetSecond\" maxlength=\"128\" v-model=\"info.street_address_second\" @focus=\"selected = 'street_address_second'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Apt / Suite / Bld #:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'apt')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"apt\" maxlength=\"32\" v-model=\"info.apt\" @focus=\"selected = 'apt'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shipping\">\n\t\t\t<hr>\n\t\t\t<h2>Contact Information:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Phone:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'phone')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"phone\" maxlength=\"64\" v-model=\"info.phone\" @focus=\"selected = 'phone'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">E-Mail Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"eMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.email\" @input=\"checkField('email')\" @focus=\"selected = 'email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('email') == -1)?'':'isShown'\">A valid E-Mail address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Confirm E-Mail:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'confirm_email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"cMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.confirm_email\" @input=\"checkField('confirm_email')\" @focus=\"selected = 'confirm_email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('confirm_email') == -1)?'':'isShown'\">Confirmation E-Mail must be identical to E-Mail.</div>\n\t\t\t</div>\n\n\t\t\t<hr>\n\t\t\t<h2>Notes:</h2>\n\t\t\t<hr>\n\n\t\t\t<textarea class=\"js-formTextArea\" name=\"notes\" maxlength=\"1024\" placeholder=\"Notes...\" v-model=\"info.notes\"></textarea>\n\t\t</span>\n\n\t\t<hr>\n\t\t<div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Prev</div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submit\">Next &gt;</div>\n\t\t</div>\n\n\t\t<pre>\t\t\t{{ yah | json }}\n\t\t</pre>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2 v-if=\"shipping\">Shipping Information:</h2>\n\t\t<h2 v-else=\"\">Billing Information:</h2>\n\t\t<hr>\n\n\t\t<div v-if=\"!shipping\" @click=\"info.seperate_billing = !info.seperate_billing\">\n\t\t\t<i>Note: Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount.</i><br>\n\t\t\t<br>\n\t\t\t<span class=\"u-active\">\n\t\t\t\t<i class=\"fa fa-fw\" :class=\"info.seperate_billing?'fa-check-square':'fa-square'\"></i> Seperate Shipping &amp; Billing Address?\n\t\t\t</span>\n\t\t\t<hr v-if=\"info.seperate_billing\">\n\t\t</div>\n\n\t\t<span v-if=\"shipping || !shipping &amp;&amp; info.seperate_billing\">\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">First Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'first_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"firstName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.first_name\" @input=\"checkField('first_name')\" @focus=\"selected = 'first_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('first_name') == -1)?'':'isShown'\">First name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Last Name:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'last_name')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"lastName\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.last_name\" @input=\"checkField('last_name')\" @focus=\"selected = 'last_name'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('last_name') == -1)?'':'isShown'\">Last name is required</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Company:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'company')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"company\" maxlength=\"64\" v-model=\"info.company\" @focus=\"selected = 'company'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">Country:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'country')?'isSelected':''\">\n\t\t\t\t\t<select name=\"country\" v-model=\"info.country\" @focus=\"selected = 'country'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"country\" v-for=\"country in returnCountries()\">{{ country }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t\t<div class=\"js-formLabel\">State / Province:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'state')?'isSelected':''\">\n\t\t\t\t\t<select name=\"state\" v-model=\"info.state\" @focus=\"selected = 'state'\" @blur=\"selected = ''\">\n\t\t\t\t\t\t<option :value=\"state\" v-for=\"state in returnStates(info.country)\">{{ state }}</option>\n\t\t\t\t\t</select>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Zip:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'zip')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"zip\" maxlength=\"32\" placeholder=\"Required\" v-model=\"info.zip\" @input=\"checkField('zip')\" @focus=\"selected = 'zip'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('zip') == -1)?'':'isShown'\">Zip code is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">City:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'city')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"city\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.city\" @input=\"checkField('city')\" @focus=\"selected = 'city'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('city') == -1)?'':'isShown'\">City name is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Street Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetFirst\" maxlength=\"128\" placeholder=\"Required\" v-model=\"info.street\" @input=\"checkField('street')\" @focus=\"selected = 'street'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('street') == -1)?'':'isShown'\">Street address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\"></div>\n\t\t\t\t<div class=\"js-formInput u-width400\" :class=\"(selected == 'street_second')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"streetSecond\" maxlength=\"128\" v-model=\"info.street_second\" @focus=\"selected = 'street_second'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Apt / Suite / Bld #:</div>\n\t\t\t\t<div class=\"js-formInput u-width100\" :class=\"(selected == 'apt')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"apt\" maxlength=\"32\" v-model=\"info.apt\" @focus=\"selected = 'apt'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shipping\">\n\t\t\t<hr>\n\t\t\t<h2>Contact Information:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Phone:</div>\n\t\t\t\t<div class=\"js-formInput u-width200\" :class=\"(selected == 'phone')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"phone\" maxlength=\"64\" v-model=\"info.phone\" @focus=\"selected = 'phone'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">E-Mail Address:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"eMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.email\" @input=\"checkField('email')\" @focus=\"selected = 'email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('email') == -1)?'':'isShown'\">A valid E-Mail address is required.</div>\n\t\t\t</div>\n\n\t\t\t<div class=\"js-formField\">\n\t\t\t    <div class=\"js-formLabel\">Confirm E-Mail:</div>\n\t\t\t\t<div class=\"js-formInput u-width300\" :class=\"(selected == 'confirm_email')?'isSelected':''\">\n\t\t\t\t\t<input type=\"text\" name=\"cMail\" maxlength=\"64\" placeholder=\"Required\" v-model=\"info.confirm_email\" @input=\"checkField('confirm_email')\" @focus=\"selected = 'confirm_email'\" @blur=\"selected = ''\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"js-formWarn\" :class=\"(warn.indexOf('confirm_email') == -1)?'':'isShown'\">Confirmation E-Mail must be identical to E-Mail.</div>\n\t\t\t</div>\n\n\t\t\t<hr>\n\t\t\t<h2>Notes:</h2>\n\t\t\t<hr>\n\n\t\t\t<textarea class=\"js-formTextArea\" name=\"notes\" maxlength=\"1024\" placeholder=\"Notes...\" v-model=\"info.notes\"></textarea>\n\t\t</span>\n\n\t\t<hr>\n\t\t<div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Prev</div>\n\t\t\t<div class=\"Button Button--active u-width200 u-floatRight\" @click=\"submit\">Next &gt;</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15364,7 +15608,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":67,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"../store/geoInfo.js":70,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15418,7 +15662,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15448,7 +15692,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15545,7 +15789,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],61:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15595,7 +15839,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
 'use strict';
 
 var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
@@ -15617,9 +15861,10 @@ module.exports = {
 	computed: {
 		subTotal: function subTotal() {
 			var subTotal = 0;
-			for (var itemId in this.cart) {
-				for (var variantId in this.cart[itemId].variants) {
-					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price;
+			for (var offerId in this.cart) {
+				for (var itemId in this.cart[offerId].items) {
+					var item = this.cart[offerId].items[itemId];
+					subTotal += item.count * item.price;
 				}
 			}
 
@@ -15631,37 +15876,38 @@ module.exports = {
 
 	methods: {
 		submitCheckout: function submitCheckout() {
+			var _this = this;
+
 			this.processing = true;
-			var request = _Object$assign({}, this.shippingInfo);
+			var shipping = _Object$assign({}, this.shippingInfo);
 			var billing = _Object$assign({}, this.billingInfo);
-			for (var field in billing) {
-				if (field != 'seperate_billing') {
-					request['billing_' + field] = billing[field];
-				} else {
-					request[field] = billing[field];
-				}
-			}
-			request['cart'] = this.$parent.returnCartCount();
 
-			this.$http.post('/api/submit/invoice', request)['catch'](function (response) {
-				if (response.status == 422) {
-					for (var errorField in response.data) {
-						this.$parent.errors.push(response.data[errorField]);
-					}
-				}
-			}).then(function (response) {
-				if (response.data == 'success') {
-					localStorage.removeItem('cart');
-					var info = require('../store/invoiceInfo.js');
-					info.clear();
+			var request = {
+				email: shipping.email,
+				confirm_email: shipping.confirm_email,
+				phone: shipping.phone,
+				phone_preferred: shipping.phone_preferred,
+				notes: shipping.notes,
+				seperate_billing: billing.seperate_billing,
+				billing_address: billing,
+				shipping_address: shipping,
+				cart: JSON.parse(localStorage.condensedCart)
+			};
 
-					this.$router.go({ path: '/checkout/success' });
-				}
+			this.$http.post('invoice', request).then(function (response) {
+				delete localStorage.cart;
+				delete localStorage.cartExperation;
+				delete localStorage.condensedCart;
+
+				var info = require('../store/invoiceInfo.js');
+				info.clear();
+
+				_this.$router.go({ path: '/checkout/success' });
 			});
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2>Order Confirmation:</h2>\n\t\t<hr>\n\n\t\t<div class=\"CheckoutConfirm-item\" v-for=\"item in cart\">\n\t\t\t<div class=\"CheckoutConfirm-title\">{{{ item.name }}}</div>\n\t\t\t<div class=\"CheckoutConfirm-itemNum\" v-if=\"item.part_number\">Part #{{ item.part_number.split(',').join(', #') }}</div>\n\n\t\t\t<span v-for=\"variant in item.variants\">\n\t\t\t\t<div class=\"CheckoutConfirm-price\">{{ variant.price | currency }} * {{ variant.count }}</div>\n\t\t\t\t<div class=\"CheckoutConfirm-variant u-thin\" v-if=\"variant.name\">{{{ variant.name }}} -&nbsp;</div>\n\t\t\t</span>\n\n\t\t\t<hr>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-subContainer\">\n\t\t\t<div class=\"Button Button--active Button--thin u-width200 u-floatLeft\" v-link=\"{ path: '/checkout/cart' }\">&lt; Edit Cart</div>\n\t\t\t<div class=\"CheckoutConfirm-subTotal\">{{ subTotal | currency }}</div>\n\t\t\t<div class=\"CheckoutConfirm-subTitle\">Subtotal:&nbsp;</div>\n\t\t</div>\n\n\t\t<hr class=\"u-clear\">\n\n\t\t<h2 v-if=\"billingInfo.seperate_billing\">Shipping Confirmation:</h2>\n\t\t<h2 v-else=\"\">Shipping &amp; Billing Confirmation:</h2>\n\n\t\t<hr>\n\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t<b>{{ shippingInfo.first_name + \" \" + shippingInfo.last_name }}\n\t\t\t<span v-if=\"shippingInfo.company\"> of {{ shippingInfo.company }}</span></b><br>\n\t\t\t{{ shippingInfo.street_address_first }}<br>\n\t\t\t<span v-if=\"shippingInfo.street_address_second\">{{ shippingInfo.street_address_second }}<br></span>\n\t\t\t{{ shippingInfo.city + \" \" + shippingInfo.state + \", \" + shippingInfo.zip }}<br>\n\t\t\t{{ shippingInfo.country }}<br>\n\t\t\t<span v-if=\"shippingInfo.apt\">Apt/Suite/Bld # {{ shippingInfo.apt }}</span>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-contact\">\n\t\t\t<b>{{ shippingInfo.email }}</b>\n\t\t\t<div v-if=\"shippingInfo.phone\">{{ shippingInfo.phone }}</div>\n\t\t</div>\n\n\t\t<br class=\"u-clear\">\n\t\t<div class=\"Button Button--active Button--thin u-width200\" v-link=\"{ path: '/checkout/shipping' }\">&lt; Edit Shipping</div>\n\n\t\t<span v-if=\"billingInfo.seperate_billing\">\n\t\t\t<hr>\n\t\t\t<h2>Billing Confirmation:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t\t<b>{{ billingInfo.first_name + \" \" + billingInfo.last_name }}\n\t\t\t\t<span v-if=\"billingInfo.company\"> of {{ billingInfo.company }}</span></b><br>\n\t\t\t\t{{ billingInfo.street_address_first }}<br>\n\t\t\t\t<span v-if=\"billingInfo.street_address_second\">{{ billingInfo.street_address_second }}<br></span>\n\t\t\t\t{{ billingInfo.city + \" \" + billingInfo.state + \", \" + billingInfo.zip }}<br>\n\t\t\t\t{{ billingInfo.country }}<br>\n\t\t\t\t<span v-if=\"billingInfo.apt\">Apt/Suite/Bld # {{ billingInfo.apt }}</span>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shippingInfo.notes\">\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t<h3>Notes:</h3>\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t{{ shippingInfo.notes }}<br><br>\n\t\t</span>\n\t\t<span v-else=\"\">\n\t\t\t<hr class=\"u-clear\"><br>\t\n\t\t</span>\n\n\t\t<div>\n\t\t\t<div id=\"prev\" class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Edit Billing</div>\n\t\t\t<div class=\"Button Button--dark u-width200 u-floatRight\" v-if=\"processing\"><i class=\"fa fa-cog fa-spin\"></i> Submitting</div>\n\t\t\t<div id=\"submit\" class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\" v-else=\"\"><i class=\"fa fa-paper-plane\"></i> Submit</div>\n\t\t</div>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div>\n\t\t<h2>Order Confirmation:</h2>\n\t\t<hr>\n\n\t\t<div class=\"CheckoutConfirm-item\" v-for=\"offer in cart\">\n\t\t\t<div class=\"CheckoutConfirm-title\">{{{ offer.name }}}</div>\n\t\t\t<!-- <div class='CheckoutConfirm-itemNum' v-if=\"item.part_number\">Part #{{ item.part_number.split(',').join(', #') }}</div> -->\n\n\t\t\t<span v-for=\"item in offer.items\">\n\t\t\t\t<div class=\"CheckoutConfirm-price\">{{ item.price / 100 | currency }} * {{ item.count }}</div>\n\t\t\t\t<div class=\"CheckoutConfirm-variant u-thin\" v-if=\"item.name\">{{{ item.name }}} -&nbsp;</div>\n\t\t\t</span>\n\n\t\t\t<hr>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-subContainer\">\n\t\t\t<div class=\"Button Button--active Button--thin u-width200 u-floatLeft\" v-link=\"{ path: '/checkout/cart' }\">&lt; Edit Cart</div>\n\t\t\t<div class=\"CheckoutConfirm-subTotal\">{{ subTotal / 100 | currency }}</div>\n\t\t\t<div class=\"CheckoutConfirm-subTitle\">Subtotal:&nbsp;</div>\n\t\t</div>\n\n\t\t<hr class=\"u-clear\">\n\n\t\t<h2 v-if=\"billingInfo.seperate_billing\">Shipping Confirmation:</h2>\n\t\t<h2 v-else=\"\">Shipping &amp; Billing Confirmation:</h2>\n\n\t\t<hr>\n\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t<b>{{ shippingInfo.first_name + \" \" + shippingInfo.last_name }}\n\t\t\t<span v-if=\"shippingInfo.company\"> of {{ shippingInfo.company }}</span></b><br>\n\t\t\t{{ shippingInfo.street_address_first }}<br>\n\t\t\t<span v-if=\"shippingInfo.street_address_second\">{{ shippingInfo.street_address_second }}<br></span>\n\t\t\t{{ shippingInfo.city + \" \" + shippingInfo.state + \", \" + shippingInfo.zip }}<br>\n\t\t\t{{ shippingInfo.country }}<br>\n\t\t\t<span v-if=\"shippingInfo.apt\">Apt/Suite/Bld # {{ shippingInfo.apt }}</span>\n\t\t</div>\n\n\t\t<div class=\"CheckoutConfirm-contact\">\n\t\t\t<b>{{ shippingInfo.email }}</b>\n\t\t\t<div v-if=\"shippingInfo.phone\">{{ shippingInfo.phone }}</div>\n\t\t</div>\n\n\t\t<br class=\"u-clear\">\n\t\t<div class=\"Button Button--active Button--thin u-width200\" v-link=\"{ path: '/checkout/shipping' }\">&lt; Edit Shipping</div>\n\n\t\t<span v-if=\"billingInfo.seperate_billing\">\n\t\t\t<hr>\n\t\t\t<h2>Billing Confirmation:</h2>\n\t\t\t<hr>\n\n\t\t\t<div class=\"CheckoutConfirm-shippingAddress\">\n\t\t\t\t<b>{{ billingInfo.first_name + \" \" + billingInfo.last_name }}\n\t\t\t\t<span v-if=\"billingInfo.company\"> of {{ billingInfo.company }}</span></b><br>\n\t\t\t\t{{ billingInfo.street_address_first }}<br>\n\t\t\t\t<span v-if=\"billingInfo.street_address_second\">{{ billingInfo.street_address_second }}<br></span>\n\t\t\t\t{{ billingInfo.city + \" \" + billingInfo.state + \", \" + billingInfo.zip }}<br>\n\t\t\t\t{{ billingInfo.country }}<br>\n\t\t\t\t<span v-if=\"billingInfo.apt\">Apt/Suite/Bld # {{ billingInfo.apt }}</span>\n\t\t\t</div>\n\t\t</span>\n\n\t\t<span v-if=\"shippingInfo.notes\">\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t<h3>Notes:</h3>\n\t\t\t<hr class=\"u-clear u-width300\">\n\t\t\t{{ shippingInfo.notes }}<br><br>\n\t\t</span>\n\t\t<span v-else=\"\">\n\t\t\t<hr class=\"u-clear\"><br>\t\n\t\t</span>\n\n\t\t<div>\n\t\t\t<div id=\"prev\" class=\"Button Button--active u-width200 u-floatLeft\" @click=\"$parent.prevStep\">&lt; Edit Billing</div>\n\t\t\t<div class=\"Button Button--dark u-width200 u-floatRight\" v-if=\"processing\"><i class=\"fa fa-cog fa-spin\"></i> Submitting</div>\n\t\t\t<div id=\"submit\" class=\"Button Button--active u-width200 u-floatRight\" @click=\"submitCheckout\" v-else=\"\"><i class=\"fa fa-paper-plane\"></i> Submit</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15673,14 +15919,14 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":68,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
+},{"../store/invoiceInfo.js":71,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
 'use strict';
 
 module.exports = function (input) {
 	return (input + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
 };
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15788,6 +16034,9 @@ Vue.http.interceptors.push({
 
 router.beforeEach(function (transition) {
 	transition.to.router.app.search = true;
+	if (transition.to.router.app.$refs.cart) {
+		transition.to.router.app.$refs.cart.clearCart();
+	}
 	transition.next();
 });
 
@@ -15815,7 +16064,7 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./filters/nl2br.js":60,"./pages/404.vue":62,"./pages/catalog.vue":63,"./pages/checkout.vue":64,"./pages/item.vue":65,"./pages/page.vue":66,"vue":47,"vue-resource":35,"vue-router":46}],62:[function(require,module,exports){
+},{"./app.vue":48,"./filters/nl2br.js":63,"./pages/404.vue":65,"./pages/catalog.vue":66,"./pages/checkout.vue":67,"./pages/item.vue":68,"./pages/page.vue":69,"vue":47,"vue-resource":35,"vue-router":46}],65:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15835,7 +16084,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],66:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15945,7 +16194,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],64:[function(require,module,exports){
+},{"../components/catalog.vue":54,"vue":47,"vue-hot-reload-api":21}],67:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15963,7 +16212,7 @@ module.exports = {
 	},
 
 	components: {
-		cart: require('../components/cart.vue'),
+		checkoutCart: require('../components/checkoutCart.vue'),
 		contactInfo: require('../components/contactInfo.vue'),
 		submitCheckout: require('../components/submitCheckout.vue')
 	},
@@ -15991,43 +16240,8 @@ module.exports = {
 			}
 
 			this.$parent.search = false;
-			this.loaded = false;
-			this.errors = [];
-
-			// check the cart against the server to make sure everything is still in stock
-			this.$http.post('/api/test/cart', { cart: this.returnCartCount() }).then(function (response) {
-				for (var i = 0; i < response.data.length; i++) {
-					var cart = JSON.parse(localStorage.cart);
-					var error = response.data[i];
-					if (error.error == 'count_changed') {
-						// throw an error for the user
-						var item = cart[error.item_id];
-						if (item.variants[error.variant_id].name) {
-							var variantName = ' (' + item.variants[error.variant_id].name + ')';
-						} else {
-							var variantName = '';
-						}
-
-						if (error.count == 0) {
-							this.errors.push('"' + item.name + variantName + '" has been sold out and because of this it has been removed from your cart, we apologize for the inconveniance. ');
-						} else {
-							this.errors.push('The stock on "' + item.name + variantName + '" has been reduced, most likely due to a purchase since you added it to your cart. The amount in your cart has been reduced to ' + error.count + ' to reflect this change. We are sorry for the inconveniance.');
-						}
-
-						cart[error.item_id].variants[error.variant_id].count = error.count;
-						cart[error.item_id].variants[error.variant_id].stock = error.count;
-					} else if (error.error == "stock_changed") {
-						cart[error.item_id].variants[error.variant_id].stock = error['stock'];
-					}
-				}
-
-				if (response.data.length > 0) {
-					localStorage.cart = JSON.stringify(cart);
-				}
-
-				document.title = "Pangolin 4x4 Checkout";
-				this.loaded = true;
-			});
+			document.title = "Pangolin 4x4 Checkout";
+			this.loaded = true;
 		}
 	},
 
@@ -16050,28 +16264,10 @@ module.exports = {
 			} else if (this.step == 3) {
 				this.$router.go({ path: '/checkout/billing' });
 			}
-		},
-
-		returnCartCount: function returnCartCount() {
-			var request = [];
-			if (localStorage.cart) {
-				var cart = JSON.parse(localStorage.cart);
-			} else {
-				var cart = {};
-			}
-
-			for (var itemId in cart) {
-				for (var variantId in cart[itemId].variants) {
-					var variant = cart[itemId].variants[variantId];
-					request.push({ variant_id: variantId, count: variant.count, stock: variant.stock });
-				}
-			}
-
-			return request;
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<form id=\"form\" method=\"post\">\n\t\t\t<input type=\"hidden\" name=\"stage\" id=\"js-stage\" value=\"<?=$stage?>\">\n\n\t\t\t<ol id=\"Checkout-progressBar\" data-steps=\"4\">\n\t\t\t\t<li :class=\"(step == 0)?'ProgressBar-current':(step > 0)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-shopping-cart\"></i> Cart Confirmation\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 1)?'ProgressBar-current':(step > 1)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-truck\"></i> Shipping Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 2)?'ProgressBar-current':(step > 2)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-credit-card\"></i> Billing Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 3)?'ProgressBar-current':(step > 3)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-pencil-square-o\"></i> Submit Order\n\t\t\t\t</li>\n\t\t\t</ol>\n\n\t\t\t<div v-if=\"errors.length > 0\" class=\"Checkout-errorList\">\n\t\t\t\t<span v-for=\"error in errors\"> - {{ error }}<br></span>\n\t\t\t</div>\n\t\t\t<hr>\n\n\t\t\t<cart v-if=\"step == 0\" :checkout=\"true\">\n\t\t\t</cart>\n\t\t\t<contact-info v-if=\"step == 1\" :shipping=\"true\" :info.sync=\"shippingInfo\">\n\t\t\t</contact-info>\n\t\t\t<contact-info v-if=\"step == 2\" :shipping=\"false\" :info.sync=\"billingInfo\">\n\t\t\t</contact-info>\n\t\t\t<submit-checkout v-if=\"step == 3\" :shipping-info=\"shippingInfo\" :billing-info=\"billingInfo\">\n\t\t\t</submit-checkout>\n\t\t\t<div v-if=\"step == 4\">\n\t\t\t\t<h1>Thank you for your order!</h1>\n\t\t\t\t<h4>We will calculate shipping and send the full bill to you as soon as possible.</h4>\n\t\t\t\t<hr>\n\t\t\t\t<p>If you have any questions call us at <span class=\"u-highlight\">(541) 606-0095</span>&nbsp;\n\t\t\t\tor Email us at <span class=\"u-highlight\">Info@Pangolin4x4.com</span>.</p>\n\t\t\t\t<br>\n\t\t\t\t<div class=\"Button Button--active Button--thin u-width400\" v-link=\"{ path: '/home' }\">Return Home</div>\n\t\t\t</div>\n\t\t</form>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"row\" v-if=\"loaded\">\n\t\t<form id=\"form\" method=\"post\">\n\t\t\t<input type=\"hidden\" name=\"stage\" id=\"js-stage\" value=\"<?=$stage?>\">\n\n\t\t\t<ol id=\"Checkout-progressBar\" data-steps=\"4\">\n\t\t\t\t<li :class=\"(step == 0)?'ProgressBar-current':(step > 0)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-shopping-cart\"></i> Cart Confirmation\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 1)?'ProgressBar-current':(step > 1)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-truck\"></i> Shipping Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 2)?'ProgressBar-current':(step > 2)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-credit-card\"></i> Billing Info\n\t\t\t\t</li>\n\t\t\t\t<li :class=\"(step == 3)?'ProgressBar-current':(step > 3)?'ProgressBar-done':'ProgressBar-todo'\">\n\t\t\t\t\t<i class=\"fa fa-pencil-square-o\"></i> Submit Order\n\t\t\t\t</li>\n\t\t\t</ol>\n\n\t\t\t<div v-if=\"errors.length > 0\" class=\"Checkout-errorList\">\n\t\t\t\t<span v-for=\"error in errors\"> - {{ error }}<br></span>\n\t\t\t</div>\n\t\t\t<hr>\n\n\t\t\t<checkout-cart v-if=\"step == 0\" :checkout=\"true\">\n\t\t\t</checkout-cart>\n\t\t\t<contact-info v-if=\"step == 1\" :shipping=\"true\" :info.sync=\"shippingInfo\">\n\t\t\t</contact-info>\n\t\t\t<contact-info v-if=\"step == 2\" :shipping=\"false\" :info.sync=\"billingInfo\">\n\t\t\t</contact-info>\n\t\t\t<submit-checkout v-if=\"step == 3\" :shipping-info=\"shippingInfo\" :billing-info=\"billingInfo\">\n\t\t\t</submit-checkout>\n\t\t\t<div v-if=\"step == 4\">\n\t\t\t\t<h1>Thank you for your order!</h1>\n\t\t\t\t<h4>We will calculate shipping and send the full bill to you as soon as possible.</h4>\n\t\t\t\t<hr>\n\t\t\t\t<p>If you have any questions call us at <span class=\"u-highlight\">(541) 606-0095</span>&nbsp;\n\t\t\t\tor Email us at <span class=\"u-highlight\">Info@Pangolin4x4.com</span>.</p>\n\t\t\t\t<br>\n\t\t\t\t<div class=\"Button Button--active Button--thin u-width400\" v-link=\"{ path: '/home' }\">Return Home</div>\n\t\t\t</div>\n\t\t</form>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -16083,7 +16279,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":50,"../components/contactInfo.vue":54,"../components/submitCheckout.vue":59,"../store/invoiceInfo.js":68,"vue":47,"vue-hot-reload-api":21}],65:[function(require,module,exports){
+},{"../components/checkoutCart.vue":55,"../components/contactInfo.vue":57,"../components/submitCheckout.vue":62,"../store/invoiceInfo.js":71,"vue":47,"vue-hot-reload-api":21}],68:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16104,6 +16300,15 @@ module.exports = {
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
 					numbers.push(this.offer.items[i]['part_number']);
+				}
+			}
+		},
+
+		ssPartNumbers: function ssPartNumbers() {
+			var numbers = [];
+			for (var i = 0; i < this.offer.items.length; i++) {
+				if (this.offer.items[i]['ss_part_number'] && !numbers.includes(this.offer.items[i]['ss_part_number'])) {
+					numbers.push(this.offer.items[i]['ss_part_number']);
 				}
 			}
 		}
@@ -16128,9 +16333,6 @@ module.exports = {
 				document.title = "Pangolin 4x4: " + _this.offer.name;
 
 				_this.loaded = true;
-				// this.$nextTick(function() {
-				// 	this.$parent.$refs.cart.setAddToCartButtons()
-				// })
 			});
 		},
 
@@ -16140,30 +16342,9 @@ module.exports = {
 			}
 			this.offer.pictures[index].selected = true;
 		}
-
 	}
 };
-// addToCart(variant) {
-// 	var cartItem = {
-// 		name: this.offer.name,
-// 		pictures: this.offer.pictures,
-// 		part_number: this.offer.type_info.part_number,
-// 		state: this.offer.type_info.state,
-// 		variants: {},
-// 	}
-
-// 	cartItem.variants[variant.id] = {
-// 		name: variant.name,
-// 		price: variant.price,
-// 		unit: variant.unit,
-// 		stock: variant.stock,
-// 		infinite: variant.infinite,
-// 		count: 1
-// 	}
-
-// 	this.$parent.$refs.cart.addToCart(cartItem, this.offer.id, variant.id)
-// }
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{ offer.name }}</h1>\n\t\t<h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<!-- Lightbox links and selected picture img -->\n\t\t<a v-for=\"picture in offer.pictures\" :href=\"`/img/${picture.source.lg}`\" id=\"js-currentPicLink\" data-lightbox=\"pic\">\n\t\t\t<img :src=\"`/img/${picture.source.md}`\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"picture.selected\">\n\t\t</a>\n\n\t\t<!-- Thumbs to set selected picture -->\n\t\t<img v-for=\"picture in offer.pictures\" class=\"u-activeImg Pictures-thumb\" :src=\"`/img/${picture.source.sm}`\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{ offer.name }}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ offer.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t<span v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}.</span>\n\t\t\t<span v-if=\"offer.ssPartNumbers\">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"offer.items.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ offer.items[0].price / 100 | currency }}\n\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<add-to-cart :item=\"offer.items[0]\" class=\"inVariations u-floatRight\"></add-to-cart>\n\t\t</section>\n\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"item in offer.items\">\n\t\t\t\t<td>{{ item.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ item.price / 100 | currency }}\n\t\t\t\t\t<span v-if=\"item.unit != 'Unit'\" class=\"u-thin\"> / {{ item.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<add-to-cart :item=\"item\" class=\"inVariations u-floatRight\"></add-to-cart>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"offer.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in offer.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{ offer.name }}</h1>\n\t\t<h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<!-- Lightbox links and selected picture img -->\n\t\t<a v-for=\"picture in offer.pictures\" :href=\"`/img/${picture.source.lg}`\" id=\"js-currentPicLink\" data-lightbox=\"pic\">\n\t\t\t<img :src=\"`/img/${picture.source.md}`\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"picture.selected\">\n\t\t</a>\n\n\t\t<!-- Thumbs to set selected picture -->\n\t\t<img v-for=\"picture in offer.pictures\" class=\"u-activeImg Pictures-thumb\" :src=\"`/img/${picture.source.sm}`\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{ offer.name }}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ offer.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t<span v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}.</span>\n\t\t\t<span v-if=\"offer.ssPartNumbers\">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"offer.items.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ offer.items[0].price / 100 | currency }}\n\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<add-to-cart class=\"inVariations u-floatRight\" :item=\"offer.items[0]\" :thumb=\"offer.pictures[0].source.sm\" :part-numbers=\"partNumbers\">\n\t\t\t</add-to-cart>\n\t\t</section>\n\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"item in offer.items\">\n\t\t\t\t<td>{{ item.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ item.price / 100 | currency }}\n\t\t\t\t\t<span v-if=\"item.unit != 'Unit'\" class=\"u-thin\"> / {{ item.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<add-to-cart class=\"inVariations u-floatRight\" :item=\"item\" :thumb=\"offer.pictures[0].source.sm\" :part-numbers=\"partNumbers\">\n\t\t\t\t\t</add-to-cart>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"offer.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in offer.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -16175,7 +16356,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/addToCart.vue":49,"vue":47,"vue-hot-reload-api":21}],66:[function(require,module,exports){
+},{"../components/addToCart.vue":50,"vue":47,"vue-hot-reload-api":21}],69:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16244,7 +16425,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],67:[function(require,module,exports){
+},{"../components/catalog.vue":54,"vue":47,"vue-hot-reload-api":21}],70:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16495,7 +16676,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],68:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16507,8 +16688,8 @@ module.exports = {
 		state: "Oregon",
 		zip: "",
 		city: "",
-		street_address_first: "",
-		street_address_second: "",
+		street: "",
+		street_second: "",
 		apt: "",
 		email: "",
 		confirm_email: "",
@@ -16525,8 +16706,8 @@ module.exports = {
 		state: "Oregon",
 		zip: "",
 		city: "",
-		street_address_first: "",
-		street_address_second: "",
+		street: "",
+		street_second: "",
 		apt: ""
 	},
 
@@ -16548,8 +16729,8 @@ module.exports = {
 			state: "Oregon",
 			zip: "",
 			city: "",
-			street_address_first: "",
-			street_address_second: "",
+			street: "",
+			street_second: "",
 			apt: "",
 			email: "",
 			confirm_email: "",
@@ -16567,7 +16748,7 @@ module.exports = {
 			state: "Oregon",
 			zip: "",
 			city: "",
-			street_address_first: "",
+			street: "",
 			street_address_second: "",
 			apt: ""
 		};
@@ -16577,6 +16758,6 @@ module.exports = {
 	}
 };
 
-},{}]},{},[61]);
+},{}]},{},[64]);
 
 //# sourceMappingURL=main.js.map

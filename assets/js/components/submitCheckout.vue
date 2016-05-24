@@ -3,13 +3,13 @@
 		<h2>Order Confirmation:</h2>
 		<hr>
 
-		<div class='CheckoutConfirm-item' v-for="item in cart">
-			<div class='CheckoutConfirm-title'>{{{ item.name }}}</div>
-			<div class='CheckoutConfirm-itemNum' v-if="item.part_number">Part #{{ item.part_number.split(',').join(', #') }}</div>
+		<div class='CheckoutConfirm-item' v-for="offer in cart">
+			<div class='CheckoutConfirm-title'>{{{ offer.name }}}</div>
+			<!-- <div class='CheckoutConfirm-itemNum' v-if="item.part_number">Part #{{ item.part_number.split(',').join(', #') }}</div> -->
 
-			<span v-for="variant in item.variants">
-				<div class='CheckoutConfirm-price'>{{ variant.price | currency }} * {{ variant.count }}</div>
-				<div class='CheckoutConfirm-variant u-thin' v-if="variant.name">{{{ variant.name }}} -&nbsp;</div>
+			<span v-for="item in offer.items">
+				<div class='CheckoutConfirm-price'>{{ item.price / 100 | currency }} * {{ item.count }}</div>
+				<div class='CheckoutConfirm-variant u-thin' v-if="item.name">{{{ item.name }}} -&nbsp;</div>
 			</span>
 
 			<hr>
@@ -17,7 +17,7 @@
 
 		<div class='CheckoutConfirm-subContainer'>
 			<div class='Button Button--active Button--thin u-width200 u-floatLeft'  v-link="{ path: '/checkout/cart' }">< Edit Cart</div>
-			<div class='CheckoutConfirm-subTotal'>{{ subTotal | currency }}</div>
+			<div class='CheckoutConfirm-subTotal'>{{ subTotal / 100 | currency }}</div>
 			<div class='CheckoutConfirm-subTitle'>Subtotal:&nbsp;</div>
 		</div>
 
@@ -97,9 +97,10 @@ module.exports = {
 	computed: {
 		subTotal () {
 			var subTotal = 0
-			for (var itemId in this.cart) {
-				for (var variantId in this.cart[itemId].variants) {
-					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price
+			for (var offerId in this.cart) {
+				for (var itemId in this.cart[offerId].items) {
+					var item = this.cart[offerId].items[itemId]
+					subTotal += item.count * item.price
 				}
 			}
 
@@ -112,31 +113,30 @@ module.exports = {
 	methods: {
 		submitCheckout () {
 			this.processing = true
-			var request = Object.assign({}, this.shippingInfo)
+			var shipping = Object.assign({}, this.shippingInfo)
 			var billing = Object.assign({}, this.billingInfo)
-			for (var field in billing) {
-				if (field != 'seperate_billing') {
-					request['billing_'+field] = billing[field]	
-				} else {
-					request[field] = billing[field]
-				}
+
+			var request = {
+				email: shipping.email,
+				confirm_email: shipping.confirm_email,
+				phone: shipping.phone,
+				phone_preferred: shipping.phone_preferred,
+				notes: shipping.notes,
+				seperate_billing: billing.seperate_billing,
+				billing_address: billing,
+				shipping_address: shipping,
+				cart: JSON.parse(localStorage.condensedCart)
 			}
-			request['cart'] = this.$parent.returnCartCount()
+			
+			this.$http.post('invoice', request).then(response => {
+				delete localStorage.cart
+				delete localStorage.cartExperation
+				delete localStorage.condensedCart
+				
+				var info = require('../store/invoiceInfo.js')
+				info.clear()
 
-			this.$http.post('/api/submit/invoice', request).catch(function(response) {
-				if (response.status == 422) {
-					for (var errorField in response.data) {
-						this.$parent.errors.push(response.data[errorField])
-					}
-				}
-			}).then(function(response) {
-				if (response.data == 'success') {
-					localStorage.removeItem('cart')
-					var info = require('../store/invoiceInfo.js')
-					info.clear()
-
-					this.$router.go({ path: '/checkout/success' })
-				}
+				this.$router.go({ path: '/checkout/success' })
 			})
 		}
 	},

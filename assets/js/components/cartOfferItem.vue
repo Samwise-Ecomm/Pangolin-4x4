@@ -21,6 +21,7 @@ module.exports = {
 	methods: {
 		changeCount(change) {
 			this.item.count += change
+			this.$parent.$parent.storeCart()
 		}
 	}
 }

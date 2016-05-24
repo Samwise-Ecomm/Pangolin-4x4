@@ -77,10 +77,10 @@
 
 <style>
 	.ace_editor, .ace_editor * {
-    font-family: "Monaco", "Menlo", "Ubuntu Mono", "Droid Sans Mono", "Consolas", monospace !important;
-    font-size: 12px !important;
-    font-weight: 400 !important;
-    letter-spacing: 0 !important;
+		font-family: "Monaco", "Menlo", "Ubuntu Mono", "Droid Sans Mono", "Consolas", monospace !important;
+		font-size: 12px !important;
+		font-weight: 400 !important;
+		letter-spacing: 0 !important;
 	}
 	#editor {
 		height: 100%;
@@ -97,11 +97,11 @@ module.exports = {
 		return {
 			page: {},
 			loaded: false,
-  		search: true,
-  		coding: true,
-  		content: "",
-  		showUpload: false,
-  	}
+			search: true,
+			coding: true,
+			content: "",
+			showUpload: false,
+		}
 	},
 
 	components: {
@@ -117,7 +117,7 @@ module.exports = {
 	methods: {
 		loadPage () {
 			var id = window.location.href.split('/')[window.location.href.split('/').length - 1]
-			this.$http.get('/admin/pages/'+id).then(function(response) {
+			this.$http.get(`/api/page/${id}`).then(response => {
 				this.$set('page', response.data)
 				this.loaded = true
 				this.$nextTick(function() {
@@ -138,12 +138,12 @@ module.exports = {
 			}
 			
 			var request = {
-				id: this.page.id,
 				search: this.page.search,
 				content: content
 			}
 
-			this.$http.post('/admin/page', request).then(function(response) {
+			var id = window.location.href.split('/')[window.location.href.split('/').length - 1]
+			this.$http.patch(`/api/page/${id}`, request).then(response => {
 				$(".js-save").removeClass("fa-cog fa-spin")
 				$(".js-save").addClass("fa-check")
 				setTimeout( function() {
@@ -169,21 +169,21 @@ module.exports = {
 
 			if (this.coding) {
 				this.$nextTick(function() {
-  				this.loadEditor()
-  			});
+					this.loadEditor()
+				});
 			}
 		},
 
 		loadEditor () {
 			var editor = ace.edit("editor");
-	    editor.setTheme("ace/theme/monokai");
-	    editor.getSession().setMode("ace/mode/html");
-	    editor.$blockScrolling = Infinity;
-	    if (this.page.content) {
-	    	editor.setValue(this.page.content);
-	    }
-	    editor.selection.moveCursorFileStart();
-	    this.resizeWindow()
+			editor.setTheme("ace/theme/monokai");
+			editor.getSession().setMode("ace/mode/html");
+			editor.$blockScrolling = Infinity;
+			if (this.page.content) {
+				editor.setValue(this.page.content);
+			}
+			editor.selection.moveCursorFileStart();
+			this.resizeWindow()
 		},
 
 		resizeWindow () {

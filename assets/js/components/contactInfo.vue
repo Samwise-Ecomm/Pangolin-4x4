@@ -11,7 +11,7 @@
 			<span class="u-active">
 				<i class="fa fa-fw" :class="info.seperate_billing?'fa-check-square':'fa-square'"></i> Seperate Shipping & Billing Address?
 			</span>
-			<hr>
+			<hr v-if="info.seperate_billing">
 		</div>
 
 		<span v-if="shipping || !shipping && info.seperate_billing">
@@ -100,22 +100,22 @@
 
 			<div class='js-formField'>
 			    <div class='js-formLabel'>Street Address:</div>
-				<div class='js-formInput u-width400' :class="(selected == 'street_address_first')?'isSelected':''">
+				<div class='js-formInput u-width400' :class="(selected == 'street')?'isSelected':''">
 					<input type='text' name='streetFirst' maxlength='128' placeholder="Required"
-						v-model='info.street_address_first' 
-						@input="checkField('street_address_first')"
-						@focus="selected = 'street_address_first'"
+						v-model='info.street' 
+						@input="checkField('street')"
+						@focus="selected = 'street'"
 						@blur="selected = ''">
 				</div>
-				<div class='js-formWarn' :class="(warn.indexOf('street_address_first') == -1)?'':'isShown'">Street address is required.</div>
+				<div class='js-formWarn' :class="(warn.indexOf('street') == -1)?'':'isShown'">Street address is required.</div>
 			</div>
 
 			<div class='js-formField'>
 			    <div class='js-formLabel'></div>
-				<div class='js-formInput u-width400' :class="(selected == 'street_address_second')?'isSelected':''">
+				<div class='js-formInput u-width400' :class="(selected == 'street_second')?'isSelected':''">
 					<input type='text' name='streetSecond' maxlength='128' 
-						v-model='info.street_address_second'
-						@focus="selected = 'street_address_second'"
+						v-model='info.street_second'
+						@focus="selected = 'street_second'"
 						@blur="selected = ''">
 				</div>
 			</div>
@@ -182,10 +182,6 @@
 			<div class='Button Button--active u-width200 u-floatLeft' @click="$parent.prevStep">< Prev</div>
 			<div class='Button Button--active u-width200 u-floatRight' @click="submit">Next ></div>
 		</div>
-
-		<pre>
-			{{ yah | json }}
-		</pre>
 	</div>
 </template>
 
@@ -215,7 +211,7 @@ module.exports = {
 			var valid = true
 
 			this.warn = []
-			var requiredFields = ['first_name','last_name','zip','city','street_address_first']
+			var requiredFields = ['first_name','last_name','zip','city','street']
 			requiredFields.forEach(function(field) {
 				if (this.info[field] == "") {
 					this.warn.push(field)

@@ -41,7 +41,11 @@
 				{{ offer.items[0].price / 100 | currency }}
 				<span v-if="offer.items[0].unit != 'Unit'" class='u-thin'> / {{ offer.items[0].unit }}</span>
 			</b>
-			<add-to-cart :item="offer.items[0]" class="inVariations u-floatRight"></add-to-cart>
+			<add-to-cart class="inVariations u-floatRight"
+				:item="offer.items[0]"
+				:thumb="offer.pictures[0].source.sm" 
+				:part-numbers="partNumbers">
+			</add-to-cart>
 		</section>
 
 		<table id='VariationsTable' v-else>
@@ -52,7 +56,11 @@
 					<span v-if="item.unit != 'Unit'" class='u-thin'> / {{ item.unit }}</span>
 				</b></td>
 				<td class="VariationsTable-button">
-					<add-to-cart :item="item" class="inVariations u-floatRight"></add-to-cart>
+					<add-to-cart class="inVariations u-floatRight"
+						:item="item"
+						:thumb="offer.pictures[0].source.sm" 
+						:part-numbers="partNumbers">
+					</add-to-cart>
 				</td>
 			</tr>
 		</table>
@@ -92,6 +100,15 @@ module.exports = {
 					numbers.push(this.offer.items[i]['part_number'])
 				}
 			}
+		},
+
+		ssPartNumbers () {
+			var numbers = [];
+			for (var i = 0; i < this.offer.items.length; i++) {
+				if (this.offer.items[i]['ss_part_number'] && !numbers.includes(this.offer.items[i]['ss_part_number'])) {
+					numbers.push(this.offer.items[i]['ss_part_number'])
+				}
+			}
 		}
 	},
 
@@ -112,9 +129,6 @@ module.exports = {
 				document.title = "Pangolin 4x4: "+this.offer.name
 
 				this.loaded = true
-				// this.$nextTick(function() {
-				// 	this.$parent.$refs.cart.setAddToCartButtons()
-				// })
 			})
 		},
 
@@ -124,28 +138,7 @@ module.exports = {
 			}
 			this.offer.pictures[index].selected = true
 
-		},
-
-		// addToCart(variant) {
-		// 	var cartItem = {
-		// 		name: this.offer.name,
-		// 		pictures: this.offer.pictures,
-		// 		part_number: this.offer.type_info.part_number,
-		// 		state: this.offer.type_info.state,
-		// 		variants: {},
-		// 	}
-
-		// 	cartItem.variants[variant.id] = {
-		// 		name: variant.name,
-		// 		price: variant.price,
-		// 		unit: variant.unit,
-		// 		stock: variant.stock,
-		// 		infinite: variant.infinite,
-		// 		count: 1
-		// 	}
-
-		// 	this.$parent.$refs.cart.addToCart(cartItem, this.offer.id, variant.id)
-		// }
+		}
 	},
 }
 </script>

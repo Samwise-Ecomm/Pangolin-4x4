@@ -62,7 +62,7 @@ module.exports = {
   },
   methods: {
   	getFiles () {
-  		this.$http.get('/admin/upload').then(function(response) {
+  		this.$http.get('/api/images').then(response => {
   			this.$set('files',response.data)
   		})
   	},

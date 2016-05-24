@@ -23,10 +23,10 @@
 			</div>
 			<hr>
 
-			<cart 
+			<checkout-cart 
 				v-if="step == 0" 
 				:checkout="true">
-			</cart>
+			</checkout-cart>
 			<contact-info 
 				v-if="step == 1" 
 				:shipping="true"
@@ -71,7 +71,7 @@ module.exports = {
 	},
 
 	components: {
-		cart: require('../components/cart.vue'),
+		checkoutCart: require('../components/checkoutCart.vue'),
 		contactInfo: require('../components/contactInfo.vue'),
 		submitCheckout: require('../components/submitCheckout.vue'),
 	},
@@ -99,43 +99,8 @@ module.exports = {
 			}
 
 			this.$parent.search = false
-			this.loaded = false
-			this.errors = []
-
-			// check the cart against the server to make sure everything is still in stock
-			this.$http.post('/api/test/cart', { cart: this.returnCartCount() }).then(function(response) {
-				for (var i = 0; i < response.data.length; i++) {
-					var cart = JSON.parse(localStorage.cart)
-					var error = response.data[i]
-					if (error.error == 'count_changed') {
-						// throw an error for the user
-						var item = cart[error.item_id]
-						if (item.variants[error.variant_id].name) {
-							var variantName = ' (' + item.variants[error.variant_id].name + ')'
-						} else {
-							var variantName = ''
-						}
-
-						if (error.count == 0) {
-							this.errors.push('"' + item.name + variantName +'" has been sold out and because of this it has been removed from your cart, we apologize for the inconveniance. ')
-						} else {
-							this.errors.push('The stock on "' + item.name + variantName +'" has been reduced, most likely due to a purchase since you added it to your cart. The amount in your cart has been reduced to ' + error.count + ' to reflect this change. We are sorry for the inconveniance.')
-						}
-						
-						cart[error.item_id].variants[error.variant_id].count = error.count
-						cart[error.item_id].variants[error.variant_id].stock = error.count
-					} else if (error.error == "stock_changed") {
-						cart[error.item_id].variants[error.variant_id].stock = error['stock']
-					}
-				}
-
-				if (response.data.length > 0) {
-					localStorage.cart = JSON.stringify(cart)
-				}
-
-				document.title = "Pangolin 4x4 Checkout"
-				this.loaded = true
-			})
+			document.title = "Pangolin 4x4 Checkout"
+			this.loaded = true
 		},
 	},
 
@@ -158,24 +123,6 @@ module.exports = {
 			} else if (this.step == 3) {
 				this.$router.go({ path: '/checkout/billing' })
 			}
-		},
-
-		returnCartCount() {
-			var request = []
-			if (localStorage.cart) {
-				var cart = JSON.parse(localStorage.cart)
-			} else {
-				var cart = {}
-			}
-			
-			for (var itemId in cart) {
-				for (var variantId in cart[itemId].variants) {
-					var variant = cart[itemId].variants[variantId]
-					request.push({ variant_id: variantId, count: variant.count, stock: variant.stock })
-				}
-			}
-
-			return request
 		}
 	},
 }
