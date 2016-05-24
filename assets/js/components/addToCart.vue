@@ -48,6 +48,10 @@ module.exports = {
 
 	methods: {
 		addItem () {
+			if (!this.inStock || this.countMaxed) {
+				return
+			}
+
 			this.cart.addItem(this.item)
 		}
 	}

@@ -3,7 +3,7 @@
 		<ul v-if="focused">
 			<li v-for="result in results" :class="(selected == $index)?'u-light':''">
 				<a @click='find(result)'><small>{{{ result.name }}}</small><br>
-				<small class="u-thin" v-if="result.type_info.part_number">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>
+				<!-- <small class="u-thin" v-if="result.part_numbers">Part #{{ result.part_numbers.split(',').join(', #') }}</small></a> -->
 			</li>
 		</ul>
 	</section>
@@ -20,34 +20,33 @@ module.exports = {
 		}
 	},
 
+	computed: {
+		icon () {
+			return this.$root.$refs.searchIcon
+		}
+	},
+
 	props: ['query'],
 
 	watch: {
 		query () {
 			if (this.query.length > 2) {
-				this.$http.post('/api/search/items', { query: this.query }).then(function(response) {
-					$('#Head-searchIcon i').removeClass('fa-cog fa-spin')
-					if (response.data.length > 0) {
-						// TODO: log succesful query
-						$('#Head-searchIcon i').addClass('fa-check')
-						this.searching = false
-					} else {
-						$('#Head-searchIcon i').addClass('fa-times')
-						this.searching = false
-					}
-					
-					this.$set('results', response.data)
+				this.$http.get('offers', { _query: this.query }).then(response => {
+					this.$set('results', response.data.body)
 					this.selected = 0
+					this.searching = false
 
-					setTimeout(function() {
-						$('#Head-searchIcon i').removeClass('fa-check fa-times')
-						$('#Head-searchIcon i').addClass('fa-search')
-					}, 1000);
+					if (this.results.length > 0) {
+						this.icon.check()
+					} else {
+						this.icon.fail()
+					}
+				}, () => {
+					this.icon.fail()
 				})
 			} else { // length is less than 3
 				this.results = []
-				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-cog fa-spin')
-				$('#Head-searchIcon i').addClass('fa-search')
+				this.icon.reset()
 			}
 		}
 	},
@@ -66,7 +65,7 @@ module.exports = {
       	}
       } else if (data.key == 'Enter') {
       	if (!this.searching) {
-      		this.$router.go({ path: '/item/'+this.results[this.selected].id })	
+      		this.find(this.results[this.selected])
       	}
       }
     },
@@ -84,7 +83,7 @@ module.exports = {
   methods: {
   	find (result) {
   		ga('send', 'event', 'search', 'find', '"'+this.query+'" - '+result.name)
-  		this.$router.go({ path: '/item/'+result.id })
+  		this.$router.go({ path: `/item/${result.id}` })
   	}
   }
 }

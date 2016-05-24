@@ -51,35 +51,6 @@
 				<div class='Button Button--active u-width200 u-floatRight' @click="submitCheckout">Next ></div>
 			</div>
 		</span>
-
-		<span v-else>
-			<div id="Cart" v-if="show">
-				<div id='Cart-head'>Cart</div>
-				<div class='Cart-item' v-for="(itemId, item) in cart">
-					<small><b><a v-link="{ path: '/item/'+itemId }">{{ item.name }}</a></b></small><br>
-					<div v-for="(variantId, variant) in item.variants">
-						<small class="u-thin">{{{ variant.name }}}</small><br v-if="variant.name">
-						<small>{{ variant.price | currency }} <span v-if="variant.unit != 'Unit'">/ {{ variant.unit }}</span></small>
-						<span class="u-floatRight">
-							<i class="fa fa-fw" 
-								:class="(variant.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'"
-								@click="changeCount(variant, -1)"></i>
-							{{ variant.count }}
-							<i class="fa fa-fw" 
-								:class="(variant.infinite || variant.count < variant.stock)?'fa-plus-square u-active':'fa-plus-square-o'"
-								@click="changeCount(variant, 1)"></i>
-						</span>
-					</div>
-					<hr class="u-clear" v-if="itemId != lastObject">
-					<span class="u-clear" v-else></span>
-				</div>
-				<a v-link="{ path: '/checkout/cart' }">
-					<div id='Cart-foot' class='u-active'>
-						<b>Subtotal:</b> {{ subTotal | currency }}<b class='u-floatRight'>Checkout</b>
-					</div>
-				</a>
-			</div>
-		</span>
 	</section>
 </template>
 

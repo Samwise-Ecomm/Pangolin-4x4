@@ -14868,6 +14868,7 @@ module.exports = {
 	},
 
 	components: {
+		statusIcon: require('./components/statusIcon.vue'),
 		search: require('./components/search.vue'),
 		cart: require('./components/cart.vue')
 	},
@@ -14900,8 +14901,7 @@ module.exports = {
 				this.$broadcast('searchEvent', { key: event.keyIdentifier });
 			}
 			if (event.keyCode == 8 || 46 < event.keyCode && event.keyCode < 91 || event.keyCode > 145) {
-				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-search');
-				$('#Head-searchIcon i').addClass('fa-cog fa-spin');
+				this.$refs.searchIcon.working();
 				this.$refs.search.searching = true;
 			}
 		},
@@ -14917,7 +14917,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><i class=\"fa fa-search\"></i></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\" :checkout=\"false\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in menus.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ name: 'catalog', params: { slug: link.slug, id: link.id } }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<div class=\"wrapper\" :class=\"search?'search':'noSearch'\">\n\t\t<div id=\"Social\">\n\t\t\t<ul>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.facebook.com/Pangolin4x4-253570924656290/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-facebook-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"https://www.instagram.com/explore/tags/pangolin4x4/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-instagram\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t\t<li>\n\t\t\t\t\t<a href=\"http://www.roverdose.com/\">\n\t\t\t\t\t\t<i class=\"fa fa-2x fa-rss-square\"></i>\n\t\t\t\t\t</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div id=\"Head\" v-if=\"loaded\">\n\t\t\t<div id=\"Head-highlightBar\"></div>\n\t\t\t<div id=\"Head-titleBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<a v-link=\"{ path: '/home' }\">\n\t\t\t\t\t\t<img id=\"Head-logo\" src=\"/img/store/webLogo.svg\" onerror=\"this.src='/img/store/webLogo.png;this.onerror=null;'\">\n\t\t\t\t\t</a>\n\t\t\t\t\t<div id=\"Head-contact\">\n\t\t\t\t\t\tFor questions and ordering<br>\n\t\t\t\t\t\tCall us at <span class=\"u-light\">{{ settings.phone }}</span><br>\n\t\t\t\t\t\tOr email us at <span class=\"u-light\">{{ settings.email }}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div id=\"Head-navBar\">\n\t\t\t\t<div class=\"u-contentWrapper\">\n\t\t\t\t\t<div id=\"Head-menu\" class=\"u-inverted\">\n\t\t\t\t\t\t<span v-for=\"link in menus.header\">\n\t\t\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<span v-if=\"menus.header.length > $index + 1\">|</span>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div id=\"Head-searchField\" v-if=\"search\">\n\t\t\t\t\t\t<span id=\"Head-searchIcon\"><status-icon icon=\"fa-search\" v-ref:search-icon=\"\"></status-icon></span>\n\t\t\t\t\t\t<input type=\"text\" name=\"search\" id=\"Head-searchInput\" placeholder=\"Search our inventory...\" autocomplete=\"off\" v-model=\"query\" debounce=\"500\" @keyup=\"queryChanged\" @focus=\"$broadcast('searchFocus')\" @blur=\"$broadcast('searchBlurred')\">\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Body\" v-if=\"loaded\">\n\t\t\t<div id=\"Body-column\" class=\"u-contentWrapper\">\n\t\t\t\t<div id=\"Body-content\">\n\t\t\t\t\t<router-view></router-view>\n\t\t\t\t</div>\n\t\t\t\t<div id=\"SideNav\" v-if=\"search\">\n\t\t\t\t\t<search v-ref:search=\"\" :query.sync=\"query\"></search>\n\t\t\t\t\t<cart v-ref:cart=\"\"></cart>\n\t\t\t\t\t<section id=\"SideNav-catalogs\">\n\t\t\t\t\t\t<span v-for=\"link in menus.sidebar\">\n\t\t\t\t\t\t\t<b v-if=\"link.label\">{{ link.name }}</b>\n\t\t\t\t\t\t\t<a v-else=\"\" v-link=\"{ name: 'catalog', params: { slug: link.slug, id: link.id } }\">{{ link.name }}</a>\n\t\t\t\t\t\t\t<br><br>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</section>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div id=\"Foot\" v-if=\"loaded\">\n\t\t\t<div id=\"Foot-blackBar\"></div>\n\t\t\t<div id=\"Foot-navBar\">\n\t\t\t\t<span v-for=\"link in menus.footer\">\n\t\t\t\t\t<a v-link=\"{ path: link.path }\">{{ link.name }}</a>\n\t\t\t\t\t<span v-if=\"menus.footer.length > $index + 1\">|</span>\n\t\t\t\t</span>\n\t\t\t\t<br>\n\t\t\t\t{{ settings.copyright }}\n\t\t\t</div>\n\t\t</div>\n\t</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -14929,7 +14929,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/cart.vue":50,"./components/search.vue":57,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
+},{"./components/cart.vue":50,"./components/search.vue":57,"./components/statusIcon.vue":58,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14975,6 +14975,10 @@ module.exports = {
 
 	methods: {
 		addItem: function addItem() {
+			if (!this.inStock || this.countMaxed) {
+				return;
+			}
+
 			this.cart.addItem(this.item);
 		}
 	}
@@ -15021,6 +15025,10 @@ module.exports = {
 			} else {
 				return null;
 			}
+		},
+
+		empty: function empty() {
+			return this.subTotal == 0;
 		}
 	},
 
@@ -15046,7 +15054,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"cart\">\n\t<div id=\"Cart-head\">Cart</div>\n\t<offer v-for=\"(offerId, offer) in cart\" :offer=\"offer\" :offer-id=\"offerId\" :last-offer-id=\"lastOfferId\">\n\t</offer>\n\t<a v-link=\"{ path: '/checkout/cart' }\">\n\t\t<div id=\"Cart-foot\" class=\"u-active\">\n\t\t\t<b>Subtotal:</b> {{ subTotal / 100 | currency }}<b class=\"u-floatRight\">Checkout</b>\n\t\t</div>\n\t</a>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div id=\"cart\" v-if=\"!empty\">\n\t<div id=\"Cart-head\">Cart</div>\n\t<offer v-for=\"(offerId, offer) in cart\" :offer=\"offer\" :offer-id=\"offerId\" :last-offer-id=\"lastOfferId\">\n\t</offer>\n\t<a v-link=\"{ path: '/checkout/cart' }\">\n\t\t<div id=\"Cart-foot\" class=\"u-active\">\n\t\t\t<b>Subtotal:</b> {{ subTotal / 100 | currency }}<b class=\"u-floatRight\">Checkout</b>\n\t\t</div>\n\t</a>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15356,7 +15364,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/geoInfo.js":66,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"../store/geoInfo.js":67,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15453,35 +15461,36 @@ module.exports = {
 		};
 	},
 
+	computed: {
+		icon: function icon() {
+			return this.$root.$refs.searchIcon;
+		}
+	},
+
 	props: ['query'],
 
 	watch: {
 		query: function query() {
+			var _this = this;
+
 			if (this.query.length > 2) {
-				this.$http.post('/api/search/items', { query: this.query }).then(function (response) {
-					$('#Head-searchIcon i').removeClass('fa-cog fa-spin');
-					if (response.data.length > 0) {
-						// TODO: log succesful query
-						$('#Head-searchIcon i').addClass('fa-check');
-						this.searching = false;
+				this.$http.get('offers', { _query: this.query }).then(function (response) {
+					_this.$set('results', response.data.body);
+					_this.selected = 0;
+					_this.searching = false;
+
+					if (_this.results.length > 0) {
+						_this.icon.check();
 					} else {
-						$('#Head-searchIcon i').addClass('fa-times');
-						this.searching = false;
+						_this.icon.fail();
 					}
-
-					this.$set('results', response.data);
-					this.selected = 0;
-
-					setTimeout(function () {
-						$('#Head-searchIcon i').removeClass('fa-check fa-times');
-						$('#Head-searchIcon i').addClass('fa-search');
-					}, 1000);
+				}, function () {
+					_this.icon.fail();
 				});
 			} else {
 				// length is less than 3
 				this.results = [];
-				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-cog fa-spin');
-				$('#Head-searchIcon i').addClass('fa-search');
+				this.icon.reset();
 			}
 		}
 	},
@@ -15500,7 +15509,7 @@ module.exports = {
 				}
 			} else if (data.key == 'Enter') {
 				if (!this.searching) {
-					this.$router.go({ path: '/item/' + this.results[this.selected].id });
+					this.find(this.results[this.selected]);
 				}
 			}
 		},
@@ -15524,7 +15533,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section id=\"SideNav-search\">\n\t\t<ul v-if=\"focused\">\n\t\t\t<li v-for=\"result in results\" :class=\"(selected == $index)?'u-light':''\">\n\t\t\t\t<a @click=\"find(result)\"><small>{{{ result.name }}}</small><br>\n\t\t\t\t<small class=\"u-thin\" v-if=\"result.type_info.part_number\">Part #{{ result.type_info.part_number.split(',').join(', #') }}</small></a>\n\t\t\t</li>\n\t\t</ul>\n\t</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<section id=\"SideNav-search\">\n\t\t<ul v-if=\"focused\">\n\t\t\t<li v-for=\"result in results\" :class=\"(selected == $index)?'u-light':''\">\n\t\t\t\t<a @click=\"find(result)\"><small>{{{ result.name }}}</small><br>\n\t\t\t\t<!-- <small class=\"u-thin\" v-if=\"result.part_numbers\">Part #{{ result.part_numbers.split(',').join(', #') }}</small></a> -->\n\t\t\t</a></li><a @click=\"find(result)\">\n\t\t</a></ul><a @click=\"find(result)\">\n\t</a></section><a @click=\"find(result)\">\n</a>"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -15537,6 +15546,56 @@ if (module.hot) {(function () {  module.hot.accept()
   }
 })()}
 },{"vue":47,"vue-hot-reload-api":21}],58:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	data: function data() {
+		return {
+			activeIcons: [this.icon]
+		};
+	},
+
+	props: ['icon'],
+
+	methods: {
+		working: function working() {
+			this.activeIcons = ['fa-cog', 'fa-spin'];
+		},
+
+		reset: function reset() {
+			this.activeIcons = [this.icon];
+		},
+
+		check: function check() {
+			this.activeIcons = ['fa-check'];
+
+			setTimeout((function () {
+				this.activeIcons = [this.icon];
+			}).bind(this), 1000);
+		},
+
+		fail: function fail() {
+			this.activeIcons = ['fa-times'];
+
+			setTimeout((function () {
+				this.activeIcons = [this.icon];
+			}).bind(this), 1000);
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n\t<i class=\"fa\" :class=\"activeIcons.join(' ')\"></i>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/statusIcon.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
 'use strict';
 
 var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
@@ -15614,14 +15673,14 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../store/invoiceInfo.js":67,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],59:[function(require,module,exports){
+},{"../store/invoiceInfo.js":68,"babel-runtime/core-js/object/assign":1,"vue":47,"vue-hot-reload-api":21}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = function (input) {
 	return (input + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 // libraries
 'use strict';
 
@@ -15756,7 +15815,7 @@ $(window).resize(function () {
 
 router.start(App, '#app');
 
-},{"./app.vue":48,"./filters/nl2br.js":59,"./pages/404.vue":61,"./pages/catalog.vue":62,"./pages/checkout.vue":63,"./pages/item.vue":64,"./pages/page.vue":65,"vue":47,"vue-resource":35,"vue-router":46}],61:[function(require,module,exports){
+},{"./app.vue":48,"./filters/nl2br.js":60,"./pages/404.vue":62,"./pages/catalog.vue":63,"./pages/checkout.vue":64,"./pages/item.vue":65,"./pages/page.vue":66,"vue":47,"vue-resource":35,"vue-router":46}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -15776,7 +15835,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],62:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15886,7 +15945,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],63:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],64:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16024,7 +16083,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/cart.vue":50,"../components/contactInfo.vue":54,"../components/submitCheckout.vue":58,"../store/invoiceInfo.js":67,"vue":47,"vue-hot-reload-api":21}],64:[function(require,module,exports){
+},{"../components/cart.vue":50,"../components/contactInfo.vue":54,"../components/submitCheckout.vue":59,"../store/invoiceInfo.js":68,"vue":47,"vue-hot-reload-api":21}],65:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16116,7 +16175,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/addToCart.vue":49,"vue":47,"vue-hot-reload-api":21}],65:[function(require,module,exports){
+},{"../components/addToCart.vue":49,"vue":47,"vue-hot-reload-api":21}],66:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16185,7 +16244,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],66:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],67:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16436,7 +16495,7 @@ module.exports = {
   "Isle of Man": []
 };
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -16518,6 +16577,6 @@ module.exports = {
 	}
 };
 
-},{}]},{},[60]);
+},{}]},{},[61]);
 
 //# sourceMappingURL=main.js.map

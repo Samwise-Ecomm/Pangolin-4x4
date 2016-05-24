@@ -42,7 +42,7 @@
 						</span>
 					</div>
 					<div id="Head-searchField" v-if="search">
-						<span id="Head-searchIcon"><i class="fa fa-search"></i></span>
+						<span id="Head-searchIcon"><status-icon icon="fa-search" v-ref:search-icon></status-icon></span>
 						<input type="text" name="search" id="Head-searchInput" placeholder="Search our inventory..." autocomplete="off"
 							v-model="query" 
 							debounce="500"
@@ -60,7 +60,7 @@
 				</div>
 				<div id="SideNav" v-if="search">
 					<search v-ref:search :query.sync="query"></search>
-					<cart v-ref:cart :checkout="false"></cart>
+					<cart v-ref:cart></cart>
 					<section id="SideNav-catalogs">
 						<span v-for="link in menus.sidebar">
 							<b v-if="link.label">{{ link.name }}</b>
@@ -102,6 +102,7 @@ module.exports = {
 	},
 
 	components: {
+		statusIcon: require('./components/statusIcon.vue'),
 		search: require('./components/search.vue'),
 		cart: require('./components/cart.vue'),
 	},
@@ -133,8 +134,7 @@ module.exports = {
 				this.$broadcast('searchEvent', { key: event.keyIdentifier })
 			}
 			if (event.keyCode == 8 || (46 < event.keyCode && event.keyCode < 91) || event.keyCode > 145) {
-				$('#Head-searchIcon i').removeClass('fa-check fa-times fa-search')
-				$('#Head-searchIcon i').addClass('fa-cog fa-spin')
+				this.$refs.searchIcon.working()
 				this.$refs.search.searching = true
 			}
 		},

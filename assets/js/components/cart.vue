@@ -1,5 +1,5 @@
 <template>
-<div id="cart">
+<div id="cart" v-if="!empty">
 	<div id="Cart-head">Cart</div>
 	<offer v-for="(offerId, offer) in cart"
 		:offer="offer" 
@@ -41,6 +41,10 @@ module.exports = {
 				return null
 			}
 		},
+
+		empty () {
+			return (this.subTotal == 0)
+		}
 	},
 
 	components: {
