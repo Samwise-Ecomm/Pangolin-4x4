@@ -1,14 +1,14 @@
 <template>
 <div v-if="loaded">
 	<div>
-		<a v-link="{ path: `/item/${offer.id}` }">
+		<a @click="go" class="u-active">
 			<div class="CatalogGridItem">
 				<img :src="'/img/'+offer.pictures[0].source.sm" class='CatalogGridItem-thumb' v-if="offer.pictures.length">
 				<img src="/img/def.jpg" class='CatalogGridItem-thumb' v-else>
 				<br>
 				<div class="CatalogGridItem-name">
 					<b>{{ offer.name }}</b>
-					<div v-if="partNumbers">Part #{{ partNumbers.join(', #') }}</div>
+					<div v-if="partNumbers.length > 0">Part #{{ partNumbers.join(', #') }}</div>
 				</div>
 				<br>
 				<span class="CatalogGridItem-price">
@@ -31,12 +31,14 @@ module.exports = {
 
 	computed: {
 		partNumbers () {
-			var numbers = [];
+			var numbers = []
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers.push(this.offer.items[i]['part_number'])
+					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','))
 				}
 			}
+
+			return numbers
 		}
 	},
 
@@ -44,7 +46,7 @@ module.exports = {
 
 	methods: {
 		go (id) {
-			this.$root.$router.go()
+			this.$root.$router.go({ path: `/item/${this.offer.id}` })
 		},
 
 		changedVariant(item) {

@@ -105,19 +105,25 @@ module.exports = {
 	methods: {
 		getItems () {
 			if (this.tags.length == 0 && !this.allItems) {
-				this.items = []
-				this.count = 0
-				this.pages = 0
-				this.page = 0
-				this.loaded = true
+				this.$set('offers', [])
+				this.$set('count', 0)
+				this.$set('pages', 0)
+				this.$set('page', 0)
+				this.$set('loaded', true)
 				return 1
 			}
 
 			var request = {
-				_must: JSON.stringify({ tags: this.tags }),
+				_must_not: JSON.stringify({ in_stock: false }),
+				_sort: JSON.stringify({ id: 'desc' }),
 				_page: this.page,
 				_limit: this.limit
 			}
+
+			if (this.tags.length) {
+				request['_must'] = JSON.stringify({ tag_array: this.tags })
+			}
+			
 			this.$http.get('offers', request).then(response => {
 				for (var i in response.data.body) {
 					response.data.body[i].selected = 0

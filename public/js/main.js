@@ -15310,19 +15310,25 @@ module.exports = {
 			var _this = this;
 
 			if (this.tags.length == 0 && !this.allItems) {
-				this.items = [];
-				this.count = 0;
-				this.pages = 0;
-				this.page = 0;
-				this.loaded = true;
+				this.$set('offers', []);
+				this.$set('count', 0);
+				this.$set('pages', 0);
+				this.$set('page', 0);
+				this.$set('loaded', true);
 				return 1;
 			}
 
 			var request = {
-				_must: JSON.stringify({ tags: this.tags }),
+				_must_not: JSON.stringify({ in_stock: false }),
+				_sort: JSON.stringify({ id: 'desc' }),
 				_page: this.page,
 				_limit: this.limit
 			};
+
+			if (this.tags.length) {
+				request['_must'] = JSON.stringify({ tag_array: this.tags });
+			}
+
 			this.$http.get('offers', request).then(function (response) {
 				for (var i in response.data.body) {
 					response.data.body[i].selected = 0;
@@ -15623,9 +15629,11 @@ module.exports = {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers.push(this.offer.items[i]['part_number']);
+					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','));
 				}
 			}
+
+			return numbers;
 		}
 	},
 
@@ -15633,7 +15641,7 @@ module.exports = {
 
 	methods: {
 		go: function go(id) {
-			this.$root.$router.go();
+			this.$root.$router.go({ path: '/item/' + this.offer.id });
 		},
 
 		changedVariant: function changedVariant(item) {
@@ -15650,7 +15658,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div>\n\t\t<a v-link=\"{ path: `/item/${offer.id}` }\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+offer.pictures[0].source.sm\" class=\"CatalogGridItem-thumb\" v-if=\"offer.pictures.length\">\n\t\t\t\t<img src=\"/img/def.jpg\" class=\"CatalogGridItem-thumb\" v-else=\"\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{ offer.name }}</b>\n\t\t\t\t\t<div v-if=\"partNumbers\">Part #{{ partNumbers.join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ offer.items[0].price / 100 | currency }}</b>\n\t\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div v-if=\"loaded\">\n\t<div>\n\t\t<a @click=\"go\" class=\"u-active\">\n\t\t\t<div class=\"CatalogGridItem\">\n\t\t\t\t<img :src=\"'/img/'+offer.pictures[0].source.sm\" class=\"CatalogGridItem-thumb\" v-if=\"offer.pictures.length\">\n\t\t\t\t<img src=\"/img/def.jpg\" class=\"CatalogGridItem-thumb\" v-else=\"\">\n\t\t\t\t<br>\n\t\t\t\t<div class=\"CatalogGridItem-name\">\n\t\t\t\t\t<b>{{ offer.name }}</b>\n\t\t\t\t\t<div v-if=\"partNumbers.length > 0\">Part #{{ partNumbers.join(', #') }}</div>\n\t\t\t\t</div>\n\t\t\t\t<br>\n\t\t\t\t<span class=\"CatalogGridItem-price\">\n\t\t\t\t\t<b>{{ offer.items[0].price / 100 | currency }}</b>\n\t\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t\t</span>\n\t\t\t</div>\n\t\t</a>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -16299,18 +16307,22 @@ module.exports = {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers.push(this.offer.items[i]['part_number']);
+					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','));
 				}
 			}
+
+			return numbers;
 		},
 
 		ssPartNumbers: function ssPartNumbers() {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['ss_part_number'] && !numbers.includes(this.offer.items[i]['ss_part_number'])) {
-					numbers.push(this.offer.items[i]['ss_part_number']);
+					numbers = numbers.concat(this.offer.items[i]['ss_part_number'].split(','));
 				}
 			}
+
+			return numbers;
 		}
 	},
 
@@ -16337,6 +16349,10 @@ module.exports = {
 		},
 
 		selectPic: function selectPic(index) {
+			if (this.offer.pictures.length == 0) {
+				return;
+			}
+
 			for (var i = 0; i < this.offer.pictures.length; i++) {
 				this.offer.pictures[i].selected = false;
 			}
@@ -16344,7 +16360,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{ offer.name }}</h1>\n\t\t<h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\">\n\t\t<!-- Lightbox links and selected picture img -->\n\t\t<a v-for=\"picture in offer.pictures\" :href=\"`/img/${picture.source.lg}`\" id=\"js-currentPicLink\" data-lightbox=\"pic\">\n\t\t\t<img :src=\"`/img/${picture.source.md}`\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"picture.selected\">\n\t\t</a>\n\n\t\t<!-- Thumbs to set selected picture -->\n\t\t<img v-for=\"picture in offer.pictures\" class=\"u-activeImg Pictures-thumb\" :src=\"`/img/${picture.source.sm}`\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{ offer.name }}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ offer.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t<span v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}.</span>\n\t\t\t<span v-if=\"offer.ssPartNumbers\">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<section v-if=\"offer.items.length == 1\">\n\t\t\t<b class=\"Variations-price\">\n\t\t\t\t{{ offer.items[0].price / 100 | currency }}\n\t\t\t\t<span v-if=\"offer.items[0].unit != 'Unit'\" class=\"u-thin\"> / {{ offer.items[0].unit }}</span>\n\t\t\t</b>\n\t\t\t<add-to-cart class=\"inVariations u-floatRight\" :item=\"offer.items[0]\" :thumb=\"offer.pictures[0].source.sm\" :part-numbers=\"partNumbers\">\n\t\t\t</add-to-cart>\n\t\t</section>\n\n\t\t<table id=\"VariationsTable\" v-else=\"\">\n\t\t\t<tbody><tr v-for=\"item in offer.items\">\n\t\t\t\t<td>{{ item.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ item.price / 100 | currency }}\n\t\t\t\t\t<span v-if=\"item.unit != 'Unit'\" class=\"u-thin\"> / {{ item.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<add-to-cart class=\"inVariations u-floatRight\" :item=\"item\" :thumb=\"offer.pictures[0].source.sm\" :part-numbers=\"partNumbers\">\n\t\t\t\t\t</add-to-cart>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"offer.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in offer.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<div id=\"Title\">\n\t\t<h1>{{ offer.name }}</h1>\n\t\t<h4 v-if=\"partNumbers.length > 0\">Part #{{ partNumbers.join(', #') }}</h4>\n\t\t<hr>\n\n\t\t<i class=\"u-center\">\n\t\t\tNote: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!\n\t\t</i>\n\t\t<hr>\n\t</div>\n\n\t<div id=\"Pictures\" v-if=\"offer.pictures.length > 0\">\n\t\t<!-- Lightbox links and selected picture img -->\n\t\t<a v-for=\"picture in offer.pictures\" :href=\"`/img/${picture.source.lg}`\" id=\"js-currentPicLink\" data-lightbox=\"pic\">\n\t\t\t<img :src=\"`/img/${picture.source.md}`\" id=\"Pictures-current\" class=\"u-activeImg\" v-if=\"picture.selected\">\n\t\t</a>\n\n\t\t<!-- Thumbs to set selected picture -->\n\t\t<img v-for=\"picture in offer.pictures\" class=\"u-activeImg Pictures-thumb\" :src=\"`/img/${picture.source.sm}`\" :class=\"($index % 3 == 0)?'isLeft':($index % 3 == 1)?'':'isRight'\" @click=\"selectPic($index)\">\n\t</div>\n\n\t<div id=\"Pictures\" v-else=\"\">\n\t\t<a id=\"js-currentPicLink\" href=\"/img/inventory/def.jpg\" data-lightbox=\"pic\">\n\t\t\t<img src=\"/img/inventory/def.jpg\" id=\"Pictures-current\" class=\"u-activeImg\">\n\t\t</a>\n\t</div>\n\n\t<div id=\"Information\">\n\t\t<h5>{{ offer.name }}</h5>\n\t\t<br>\n\t\t<p>\n\t\t\t{{{ offer.description | nl2br }}}\n\t\t\t<br><br>\n\t\t\t<span v-if=\"partNumbers.length > 0\">Part #{{ partNumbers.join(', #') }}.</span>\n\t\t\t<span v-if=\"ssPartNumbers.length > 0\">Supersedes by Part #{{ ssPartNumbers.join(', #') }}.</span>\n\t\t</p>\n\t</div>\n\n\t<div id=\"Variations\">\n\t\t<table id=\"VariationsTable\">\n\t\t\t<tbody><tr v-for=\"item in offer.items\">\n\t\t\t\t<td>{{ item.name }}</td>\n\t\t\t\t<td class=\"VariationsTable-price\"><b>\n\t\t\t\t\t{{ item.price / 100 | currency }}\n\t\t\t\t\t<span v-if=\"item.unit != 'Unit'\" class=\"u-thin\"> / {{ item.unit }}</span>\n\t\t\t\t</b></td>\n\t\t\t\t<td class=\"VariationsTable-button\">\n\t\t\t\t\t<add-to-cart class=\"inVariations u-floatRight\" :item=\"item\" :thumb=\"(offer.pictures.length > 0)?offer.pictures[0].source.sm:'/img/inventory/def.jpg'\" :part-numbers=\"partNumbers\">\n\t\t\t\t\t</add-to-cart>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody></table>\n\n\t\t<hr class=\"u-clear u-paddingTop\">\n\t</div>\n\n\t<div id=\"Applications\">\n\t\t<div v-if=\"offer.other_applications\">\n\t\t\t<h2>Other Applications:</h2><br>\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"application in offer.other_applications.split(',')\">{{ application }}</li>\n\t\t\t</ul>\n\t\t</div>\n\t</div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

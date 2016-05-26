@@ -2,7 +2,7 @@
 <div class="row" v-if="loaded">
 	<div id="Title">
 		<h1>{{ offer.name }}</h1>
-		<h4 v-if="offer.partNumbers">Part #{{ offer.partNumbers.join(', #') }}</h4>
+		<h4 v-if="partNumbers.length > 0">Part #{{ partNumbers.join(', #') }}</h4>
 		<hr>
 
 		<i class="u-center">
@@ -11,7 +11,7 @@
 		<hr>
 	</div>
 
-	<div id="Pictures">
+	<div id="Pictures" v-if="offer.pictures.length > 0">
 		<!-- Lightbox links and selected picture img -->
 		<a v-for="picture in offer.pictures" :href="`/img/${picture.source.lg}`" id='js-currentPicLink' data-lightbox="pic">
 			<img :src="`/img/${picture.source.md}`" id='Pictures-current' class="u-activeImg" v-if="picture.selected">
@@ -24,31 +24,25 @@
 			@click="selectPic($index)">
 	</div>
 
+	<div id="Pictures" v-else>
+		<a id="js-currentPicLink" href="/img/inventory/def.jpg" data-lightbox="pic">
+			<img src="/img/inventory/def.jpg" id="Pictures-current" class="u-activeImg">
+		</a>
+	</div>
+
 	<div id="Information">
 		<h5>{{ offer.name }}</h5>
 		<br>
 		<p>
 			{{{ offer.description | nl2br }}}
 			<br><br>
-			<span v-if="offer.partNumbers">Part #{{ offer.partNumbers.join(', #') }}.</span>
-			<span v-if="offer.ssPartNumbers">Supersedes by Part #{{ offer.ssPartNumbers.join(', #') }}.</span>
+			<span v-if="partNumbers.length > 0">Part #{{ partNumbers.join(', #') }}.</span>
+			<span v-if="ssPartNumbers.length > 0">Supersedes by Part #{{ ssPartNumbers.join(', #') }}.</span>
 		</p>
 	</div>
 
 	<div id="Variations">
-		<section v-if="offer.items.length == 1">
-			<b class="Variations-price">
-				{{ offer.items[0].price / 100 | currency }}
-				<span v-if="offer.items[0].unit != 'Unit'" class='u-thin'> / {{ offer.items[0].unit }}</span>
-			</b>
-			<add-to-cart class="inVariations u-floatRight"
-				:item="offer.items[0]"
-				:thumb="offer.pictures[0].source.sm" 
-				:part-numbers="partNumbers">
-			</add-to-cart>
-		</section>
-
-		<table id='VariationsTable' v-else>
+		<table id='VariationsTable'>
 			<tr v-for="item in offer.items">
 				<td>{{ item.name }}</td>
 				<td class="VariationsTable-price"><b>
@@ -58,7 +52,7 @@
 				<td class="VariationsTable-button">
 					<add-to-cart class="inVariations u-floatRight"
 						:item="item"
-						:thumb="offer.pictures[0].source.sm" 
+						:thumb="(offer.pictures.length > 0)?offer.pictures[0].source.sm:'/img/inventory/def.jpg'" 
 						:part-numbers="partNumbers">
 					</add-to-cart>
 				</td>
@@ -94,21 +88,25 @@ module.exports = {
 
 	computed: {
 		partNumbers () {
-			var numbers = [];
+			var numbers = []
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers.push(this.offer.items[i]['part_number'])
+					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','))
 				}
 			}
+
+			return numbers
 		},
 
 		ssPartNumbers () {
-			var numbers = [];
+			var numbers = []
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['ss_part_number'] && !numbers.includes(this.offer.items[i]['ss_part_number'])) {
-					numbers.push(this.offer.items[i]['ss_part_number'])
+					numbers = numbers.concat(this.offer.items[i]['ss_part_number'].split(','))
 				}
 			}
+
+			return numbers
 		}
 	},
 
@@ -133,6 +131,10 @@ module.exports = {
 		},
 
 		selectPic(index) {
+			if (this.offer.pictures.length == 0) {
+				return
+			}
+
 			for (var i = 0; i < this.offer.pictures.length; i++) {
 				this.offer.pictures[i].selected = false
 			}
