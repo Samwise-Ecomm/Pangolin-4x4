@@ -11983,6 +11983,15 @@ module.exports = {
 		};
 	},
 
+	created: function created() {
+		if (localStorage.samwellToken) {
+			var Vue = require('vue');
+			Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.samwellToken;
+		} else {
+			window.location = "/admin";
+		}
+	},
+
 	components: {
 		upload: require('./components/upload.vue')
 	},
