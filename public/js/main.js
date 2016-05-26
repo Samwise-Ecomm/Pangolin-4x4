@@ -15629,7 +15629,13 @@ module.exports = {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','));
+					var item_numbers = this.offer.items[i]['part_number'].split(',');
+					for (var j = 0; j < item_numbers.length; j++) {
+						item_numbers[j] = item_numbers[j].trim();
+						if (!numbers.includes(item_numbers[j])) {
+							numbers.push(item_numbers[j]);
+						}
+					}
 				}
 			}
 
@@ -16307,18 +16313,30 @@ module.exports = {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					numbers = numbers.concat(this.offer.items[i]['part_number'].split(','));
+					var item_numbers = this.offer.items[i]['part_number'].split(',');
+					for (var j = 0; j < item_numbers.length; j++) {
+						item_numbers[j] = item_numbers[j].trim();
+						if (!numbers.includes(item_numbers[j])) {
+							numbers.push(item_numbers[j]);
+						}
+					}
 				}
 			}
 
 			return numbers;
 		},
 
-		ssPartNumbers: function ssPartNumbers() {
+		partNumbers: function partNumbers() {
 			var numbers = [];
 			for (var i = 0; i < this.offer.items.length; i++) {
 				if (this.offer.items[i]['ss_part_number'] && !numbers.includes(this.offer.items[i]['ss_part_number'])) {
-					numbers = numbers.concat(this.offer.items[i]['ss_part_number'].split(','));
+					var item_numbers = this.offer.items[i]['ss_part_number'].split(',');
+					for (var j = 0; j < item_numbers.length; j++) {
+						item_numbers[j] = item_numbers[j].trim();
+						if (!numbers.includes(item_numbers[j])) {
+							numbers.push(item_numbers[j]);
+						}
+					}
 				}
 			}
 
