@@ -4,7 +4,7 @@
 		<div class='CheckoutCart-pic'><img :src="`/img/${offer.thumb}`"></div>
 		<div class='CheckoutCart-desc'>
 			<div class='CheckoutCart-title'><h1>{{ offer.name }}</h1></div>
-			<div class='CheckoutCart-partNum'><h4 v-if="offer.partNumbers">Part #{{ offer.partNumbers.join(', #') }}</h4></div>
+			<div class='CheckoutCart-partNum'></div>
 			<item :item="item" v-for="item in offer.items"></item>
 		</div>
 	</div>

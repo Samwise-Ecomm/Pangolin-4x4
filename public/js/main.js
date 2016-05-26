@@ -15485,7 +15485,7 @@ module.exports = {
 		item: require('./CheckoutCartOfferItem.vue')
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section>\n\t<div class=\"CheckoutCart-item\">\n\t\t<div class=\"CheckoutCart-pic\"><img :src=\"`/img/${offer.thumb}`\"></div>\n\t\t<div class=\"CheckoutCart-desc\">\n\t\t\t<div class=\"CheckoutCart-title\"><h1>{{ offer.name }}</h1></div>\n\t\t\t<div class=\"CheckoutCart-partNum\"><h4 v-if=\"offer.partNumbers\">Part #{{ offer.partNumbers.join(', #') }}</h4></div>\n\t\t\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t\t</div>\n\t</div>\n\n\t<hr class=\"inCheckoutCart\" v-if=\"item != lastItem\">\n\t<b v-else=\"\">\n\t\t<hr class=\"inCheckoutCart\">\n\t</b>\n</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section>\n\t<div class=\"CheckoutCart-item\">\n\t\t<div class=\"CheckoutCart-pic\"><img :src=\"`/img/${offer.thumb}`\"></div>\n\t\t<div class=\"CheckoutCart-desc\">\n\t\t\t<div class=\"CheckoutCart-title\"><h1>{{ offer.name }}</h1></div>\n\t\t\t<div class=\"CheckoutCart-partNum\"></div>\n\t\t\t<item :item=\"item\" v-for=\"item in offer.items\"></item>\n\t\t</div>\n\t</div>\n\n\t<hr class=\"inCheckoutCart\" v-if=\"item != lastItem\">\n\t<b v-else=\"\">\n\t\t<hr class=\"inCheckoutCart\">\n\t</b>\n</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
