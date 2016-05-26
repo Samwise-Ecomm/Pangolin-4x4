@@ -37,7 +37,7 @@
 			{{{ offer.description | nl2br }}}
 			<br><br>
 			<span v-if="partNumbers.length > 0">Part #{{ partNumbers.join(', #') }}.</span>
-			<span v-if="ssPartNumbers.length > 0">Supersedes by Part #{{ ssPartNumbers.join(', #') }}.</span>
+			<span v-if="ssPartNumbers.length > 0">Supersedes Part #{{ ssPartNumbers.join(', #') }}.</span>
 		</p>
 	</div>
 
