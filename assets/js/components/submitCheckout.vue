@@ -30,8 +30,8 @@
 		<div class='CheckoutConfirm-shippingAddress'>
 			<b>{{ shippingInfo.first_name + " " + shippingInfo.last_name }}
 			<span v-if="shippingInfo.company"> of {{ shippingInfo.company }}</span></b><br>
-			{{ shippingInfo.street_address_first }}<br>
-			<span v-if="shippingInfo.street_address_second">{{ shippingInfo.street_address_second }}<br></span>
+			{{ shippingInfo.street }}<br>
+			<span v-if="shippingInfo.street_second">{{ shippingInfo.street_second }}<br></span>
 			{{ shippingInfo.city + " " + shippingInfo.state + ", " + shippingInfo.zip }}<br>
 			{{ shippingInfo.country }}<br>
 			<span v-if="shippingInfo.apt">Apt/Suite/Bld # {{ shippingInfo.apt }}</span>
@@ -53,8 +53,8 @@
 			<div class='CheckoutConfirm-shippingAddress'>
 				<b>{{ billingInfo.first_name + " " + billingInfo.last_name }}
 				<span v-if="billingInfo.company"> of {{ billingInfo.company }}</span></b><br>
-				{{ billingInfo.street_address_first }}<br>
-				<span v-if="billingInfo.street_address_second">{{ billingInfo.street_address_second }}<br></span>
+				{{ billingInfo.street }}<br>
+				<span v-if="billingInfo.street_second">{{ billingInfo.street_second }}<br></span>
 				{{ billingInfo.city + " " + billingInfo.state + ", " + billingInfo.zip }}<br>
 				{{ billingInfo.country }}<br>
 				<span v-if="billingInfo.apt">Apt/Suite/Bld # {{ billingInfo.apt }}</span>
@@ -68,7 +68,7 @@
 			{{ shippingInfo.notes }}<br><br>
 		</span>
 		<span v-else>
-			<hr class='u-clear'><br>	
+			<hr class='u-clear'><br>
 		</span>
 
 		<div>
@@ -127,12 +127,12 @@ module.exports = {
 				shipping_address: shipping,
 				cart: JSON.parse(localStorage.condensedCart)
 			}
-			
+
 			this.$http.post('invoice', request).then(response => {
 				delete localStorage.cart
 				delete localStorage.cartExperation
 				delete localStorage.condensedCart
-				
+
 				var info = require('../store/invoiceInfo.js')
 				info.clear()
 

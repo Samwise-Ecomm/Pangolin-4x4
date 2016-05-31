@@ -52,7 +52,7 @@
 				<td class="VariationsTable-button">
 					<add-to-cart class="inVariations u-floatRight"
 						:item="item"
-						:thumb="(offer.pictures.length > 0)?offer.pictures[0].source.sm:'/img/inventory/def.jpg'" 
+						:thumb="(offer.pictures.length > 0)?offer.pictures[0].source.sm:'/img/inventory/def.jpg'"
 						:part-numbers="partNumbers">
 					</add-to-cart>
 				</td>
@@ -119,7 +119,7 @@ module.exports = {
 
 				for (var j = 0; j < item_numbers.length; j++) {
 					item_numbers[j] = item_numbers[j].trim()
-					
+
 					if (!numbers.includes(item_numbers[j])) {
 						numbers.push(item_numbers[j])
 					}
@@ -138,7 +138,7 @@ module.exports = {
 
 	methods: {
 		getOffer () {
-			this.$http.get(`offer/${this.$route.params.id}`).then(response => {
+			this.$http.get(`/public-api/offer/${this.$route.params.id}`).then(response => {
 				this.$set('offer', response.data)
 				for (var i = 0; i < this.offer.pictures.length; i++) {
 					this.$set(`offer.pictures[${i}].selected`, false)
