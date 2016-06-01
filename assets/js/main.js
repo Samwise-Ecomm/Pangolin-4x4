@@ -1,22 +1,22 @@
 // libraries
-var Vue = 					require('vue')
-var VueRouter = 		require('vue-router')
-var VueResource = 	require('vue-resource')
+var Vue          = require('vue')
+var VueRouter    = require('vue-router')
+var VueResource  = require('vue-resource')
+var App          = require('./app.vue')
+var Page         = require('./pages/page.vue')
+var Catalog      = require('./pages/catalog.vue')
+var Checkout     = require('./pages/checkout.vue')
+var Item         = require('./pages/item.vue')
+var fileNotFound = require('./pages/404.vue')
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
-Vue.http.options.root = '/api';
+Vue.http.options.root = '/public-api';
 
 // Vue-filters
-var nl2br 		= require('./filters/nl2br.js')
+var nl2br = require('./filters/nl2br.js')
 Vue.filter('nl2br', nl2br)
-
-var App 					=	require('./app.vue')
-var Page 					= require('./pages/page.vue')
-var Catalog 			= require('./pages/catalog.vue')
-var Checkout 			= require('./pages/checkout.vue')
-var Item 					= require('./pages/item.vue')
-var fileNotFound 	= require('./pages/404.vue')
 
 // Set up routing and match routes to components
 var router = new VueRouter({
@@ -102,10 +102,13 @@ Vue.http.interceptors.push({
 })
 
 router.beforeEach(function (transition) {
-	transition.to.router.app.search = true
-	if (transition.to.router.app.$refs.cart) {
-		transition.to.router.app.$refs.cart.clearCart()
+	var app = transition.to.router.app
+
+	app.search = true
+	if (app.$refs.cart) {
+		app.$refs.cart.clearCart()
 	}
+
 	transition.next()
 })
 

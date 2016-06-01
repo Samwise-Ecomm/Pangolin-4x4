@@ -44,7 +44,7 @@
 					<div id="Head-searchField" v-if="search">
 						<span id="Head-searchIcon"><status-icon icon="fa-search" v-ref:search-icon></status-icon></span>
 						<input type="text" name="search" id="Head-searchInput" placeholder="Search our inventory..." autocomplete="off"
-							v-model="query" 
+							v-model="query"
 							debounce="500"
 							@keyup="queryChanged"
 							@focus="$broadcast('searchFocus')"
@@ -109,14 +109,14 @@ module.exports = {
 
 	methods: {
 		getSettings () {
-			this.$http.get('setting/store_info').then(function(response) {
+			this.$http.get('settings').then(function(response) {
 				this.$set('settings', response.data)
 				this.getMenus()
 			})
 		},
 
 		getMenus () {
-			this.$http.get('store/menus').then(function(response) {
+			this.$http.get('menus').then(function(response) {
 				this.$set('menus', response.data)
 				this.loaded = true
 				this.$nextTick(() => {
@@ -145,7 +145,7 @@ module.exports = {
 					return this.menus['sidebar'][i].id
 				}
 			}
-			
+
 			return null
 		}
 	},

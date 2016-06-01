@@ -68,7 +68,7 @@ module.exports = {
 			zip: "",
 			city: "",
 			street: "",
-			street_address_second: "",
+			street_second: "",
 			apt: "",
 		}
 
