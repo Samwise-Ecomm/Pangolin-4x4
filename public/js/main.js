@@ -14935,9 +14935,20 @@ if (module.hot) {(function () {  module.hot.accept()
 module.exports = {
 	props: ['item'],
 
+	watch: {
+		'item.count': function itemCount() {
+			if (this.item.count == '') {
+				this.item.count = 0;
+			}
+		}
+	},
+
 	methods: {
 		changeCount: function changeCount(change) {
 			this.item.count = parseInt(this.item.count) + change;
+			if (this.item.count < 0) {
+				this.item.count = 0;
+			}
 			this.$parent.$parent.storeCart();
 		},
 
@@ -15202,7 +15213,10 @@ module.exports = {
 
 	methods: {
 		changeCount: function changeCount(change) {
-			this.item.count += change;
+			this.item.count = parseInt(this.item.count) + change;
+			if (this.item.count < 0) {
+				this.item.count = 0;
+			}
 			this.$parent.$parent.storeCart();
 		}
 	}

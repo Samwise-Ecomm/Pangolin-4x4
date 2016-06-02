@@ -20,7 +20,10 @@ module.exports = {
 
 	methods: {
 		changeCount(change) {
-			this.item.count += change
+			this.item.count = parseInt(this.item.count) + change
+			if (this.item.count < 0) {
+				this.item.count = 0
+			}
 			this.$parent.$parent.storeCart()
 		}
 	}

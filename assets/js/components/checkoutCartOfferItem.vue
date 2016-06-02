@@ -29,9 +29,20 @@
 module.exports = {
 	props: ['item'],
 
+	watch: {
+		'item.count': function() {
+			if (this.item.count == '') {
+				this.item.count = 0
+			}
+		}
+	},
+
 	methods: {
 		changeCount(change) {
 			this.item.count = parseInt(this.item.count) + change
+			if (this.item.count < 0) {
+				this.item.count = 0
+			}
 			this.$parent.$parent.storeCart()
 		},
 
