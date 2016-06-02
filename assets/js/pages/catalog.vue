@@ -5,6 +5,8 @@
 
 	<section v-if="catalog.tags.length > 1">
 		<hr>
+		<h4>Filter by Application:</h4>
+		<br>
 		<ul class="u-cols-3">
 			<li v-for="tag in catalog.tags">
 				<label for='{{ tag }}'} class='Checkbox'>
@@ -13,7 +15,7 @@
 				</label>
 			</li>
 		</ul>
-		<br>
+		<!-- <br>
 		<ul class="u-cols-3">
 			<li class="u-active" @click="fillTags">
 				<i class="fa fa-fw fa-plus-square"></i> Select All
@@ -21,14 +23,14 @@
 			<li class="u-active" @click="clearTags">
 				<i class="fa fa-fw fa-minus-square"></i> Select None
 			</li>
-		</ul>
+		</ul> -->
 	</section>
 
 	<hr>
 	<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>
 	<hr>
 
-	<catalog :tags.sync="selected" limit="15"></catalog>
+	<catalog :tags.sync="given" limit="15"></catalog>
 </div>
 </template>
 
@@ -49,11 +51,20 @@ module.exports = {
 
 	route: {
 		data () {
+			this.selected = []
 			this.getCatalog()
 		},
 	},
 
 	computed: {
+		given () {
+			if (this.selected.length == 0) {
+				return this.catalog.tags
+			} else {
+				return this.selected
+			}
+		},
+
 		trim () {
 			if (this.catalog.tags.length <= 1) {
 				return 0
@@ -79,7 +90,6 @@ module.exports = {
 			this.$http.get('catalog/'+this.id).then(response => {
 				response.data['tags'] = response.data['tags'].split(',')
 				this.$set('catalog', response.data)
-				this.fillTags()
 				document.title = "Pangolin 4x4 Catalog: "+this.catalog.name
 				this.loaded = true
 			})

@@ -15228,6 +15228,7 @@ module.exports = {
 
 		return {
 			loaded: false,
+			query: '',
 			offers: [],
 			count: 0,
 			pages: 1,
@@ -15273,6 +15274,11 @@ module.exports = {
 			'default': false
 		},
 
+		hideSearch: {
+			type: Boolean,
+			'default': false
+		},
+
 		sort: {
 			type: String,
 			'default': 'name'
@@ -15286,6 +15292,11 @@ module.exports = {
 
 	watch: {
 		tags: function tags() {
+			this.page = 0;
+			this.getItems();
+		},
+
+		query: function query() {
 			this.page = 0;
 			this.getItems();
 		}
@@ -15322,7 +15333,8 @@ module.exports = {
 				_must_not: JSON.stringify({ in_stock: false }),
 				_sort: JSON.stringify({ id: 'desc' }),
 				_page: this.page,
-				_limit: this.limit
+				_limit: this.limit,
+				_query: this.query
 			};
 
 			if (this.tags.length) {
@@ -15342,13 +15354,13 @@ module.exports = {
 				_this.loaded = true;
 
 				// this.$nextTick(function() {
-				// 	this.$root.$refs.cart.setAddToCartButtons()	
+				// 	this.$root.$refs.cart.setAddToCartButtons()
 				// })
 			});
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section v-if=\"loaded\">\n\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'offer' }} found.</div>\n\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t<offer v-for=\"offer in offers\" :offer=\"offer\"></offer>\n\n\t<br class=\"u-clear\">\n\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<section v-if=\"loaded\">\n\t<input type=\"text\" class=\"input\" placeholder=\"Search Within Catalog...\" v-model=\"query\" debounce=\"500\" v-if=\"!hideSearch\">\n\t<br class=\"clear\" v-if=\"!hideSearch\"><br>\n\t<page-counter class=\"u-floatLeft\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n\t<div class=\"u-floatRight\" v-if=\"!hideCount\">{{ count }} {{ count | pluralize 'offer' }} found.</div>\n\t<br v-if=\"!hideCount\"><br v-if=\"!hideCount\">\n\n\t<offer v-for=\"offer in offers\" :offer=\"offer\"></offer>\n\n\t<br class=\"u-clear\">\n\t<page-counter class=\"u-floatRight\" v-if=\"pages > 1 &amp;&amp; !hidePages\" :pages=\"pages\" :given-page.sync=\"page\">\n\t</page-counter>\n</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -16120,11 +16132,20 @@ module.exports = {
 
 	route: {
 		data: function data() {
+			this.selected = [];
 			this.getCatalog();
 		}
 	},
 
 	computed: {
+		given: function given() {
+			if (this.selected.length == 0) {
+				return this.catalog.tags;
+			} else {
+				return this.selected;
+			}
+		},
+
 		trim: function trim() {
 			if (this.catalog.tags.length <= 1) {
 				return 0;
@@ -16152,7 +16173,6 @@ module.exports = {
 			this.$http.get('catalog/' + this.id).then(function (response) {
 				response.data['tags'] = response.data['tags'].split(',');
 				_this.$set('catalog', response.data);
-				_this.fillTags();
 				document.title = "Pangolin 4x4 Catalog: " + _this.catalog.name;
 				_this.loaded = true;
 			});
@@ -16199,7 +16219,7 @@ module.exports = {
 		}
 	}
 };
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<h1>{{ catalog.name }}</h1>\n\t<p>{{ catalog.description }}</p>\n\n\t<section v-if=\"catalog.tags.length > 1\">\n\t\t<hr>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t</label>\n\t\t\t</li>\n\t\t</ul>\n\t\t<br>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t</li>\n\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t</li>\n\t\t</ul>\n\t</section>\n\n\t<hr>\n\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t<hr>\n\n\t<catalog :tags.sync=\"selected\" limit=\"15\"></catalog>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\" v-if=\"loaded\">\n\t<h1>{{ catalog.name }}</h1>\n\t<p>{{ catalog.description }}</p>\n\n\t<section v-if=\"catalog.tags.length > 1\">\n\t\t<hr>\n\t\t<h4>Filter by Application:</h4>\n\t\t<br>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li v-for=\"tag in catalog.tags\">\n\t\t\t\t<label for=\"{{ tag }}\" }=\"\" class=\"Checkbox\">\n\t\t\t\t\t<input type=\"checkbox\" id=\"{{ tag }}\" checked=\"\" @click=\"toggleTag(tag)\">\n\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"(selected.indexOf(tag) != -1)?'fa-check-square':'fa-square'\"></i> {{ tag.substring(trim) }}\n\t\t\t\t</label>\n\t\t\t</li>\n\t\t</ul>\n\t\t<!-- <br>\n\t\t<ul class=\"u-cols-3\">\n\t\t\t<li class=\"u-active\" @click=\"fillTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-plus-square\"></i> Select All\n\t\t\t</li>\n\t\t\t<li class=\"u-active\" @click=\"clearTags\">\n\t\t\t\t<i class=\"fa fa-fw fa-minus-square\"></i> Select None\n\t\t\t</li>\n\t\t</ul> -->\n\t</section>\n\n\t<hr>\n\t<i>Note: Shopping cart does not account for shipping. Once we receive your order, we will send you follow-up invoice that includes the calculated shipping amount. Thank you!</i>\n\t<hr>\n\n\t<catalog :tags.sync=\"given\" limit=\"15\"></catalog>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)

@@ -1,6 +1,11 @@
 <template>
 <section v-if="loaded">
-	<page-counter class="u-floatLeft" 
+	<input type="text" class="input" placeholder="Search Within Catalog..." 
+		v-model="query" 
+		debounce="500"
+		v-if="!hideSearch">
+	<br class="clear" v-if="!hideSearch"><br>
+	<page-counter class="u-floatLeft"
 		v-if="pages > 1 && !hidePages"
 		:pages="pages"
 		:given-page.sync="page">
@@ -12,7 +17,7 @@
 		:offer="offer"></offer>
 
 	<br class="u-clear">
-	<page-counter class="u-floatRight" 
+	<page-counter class="u-floatRight"
 		v-if="pages > 1 && !hidePages"
 		:pages="pages"
 		:given-page.sync="page">
@@ -27,6 +32,7 @@ module.exports = {
 
 		return {
 			loaded: false,
+			query: '',
 			offers: [],
 			count: 0,
 			pages: 1,
@@ -70,6 +76,11 @@ module.exports = {
 			default: false,
 		},
 
+		hideSearch: {
+			type: Boolean,
+			default: false,
+		},
+
 		sort: {
 			type: String,
 			default: 'name',
@@ -83,6 +94,11 @@ module.exports = {
 
 	watch: {
 		tags () {
+			this.page = 0
+			this.getItems()
+		},
+
+		query () {
 			this.page = 0
 			this.getItems()
 		}
@@ -117,13 +133,14 @@ module.exports = {
 				_must_not: JSON.stringify({ in_stock: false }),
 				_sort: JSON.stringify({ id: 'desc' }),
 				_page: this.page,
-				_limit: this.limit
+				_limit: this.limit,
+				_query: this.query
 			}
 
 			if (this.tags.length) {
 				request['_must'] = JSON.stringify({ tag_array: this.tags })
 			}
-			
+
 			this.$http.get('offers', request).then(response => {
 				for (var i in response.data.body) {
 					response.data.body[i].selected = 0
@@ -137,7 +154,7 @@ module.exports = {
 				this.loaded = true
 
 				// this.$nextTick(function() {
-				// 	this.$root.$refs.cart.setAddToCartButtons()	
+				// 	this.$root.$refs.cart.setAddToCartButtons()
 				// })
 			})
 		}

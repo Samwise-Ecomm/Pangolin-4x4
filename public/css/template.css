@@ -227,6 +227,16 @@ div.u-active {
   cursor: pointer;
   border: 1px solid #ce3229; }
 
+.input {
+  height: 27px;
+  padding: 5px;
+  width: 100%;
+  font-size: 15px;
+  outline: none;
+  border-radius: 3px;
+  background: none;
+  border: 1px solid #bebebe; }
+
 .Button {
   color: #f7f7f7;
   box-shadow: 0 -3px 0 rgba(0, 0, 0, 0.2) inset;

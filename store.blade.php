@@ -9,8 +9,6 @@
 	<link rel="stylesheet" href="/css/store/template.css">
 	<link rel="stylesheet" href="/css/store/font-awesome.min.css">
 	<link rel="stylesheet" href="/css/store/lightbox.css">
-
-	<meta name="google-site-verification" content="7PV5WB2FyWGmKvAWHxAtvwstEwTEMm767bFlrgQLGx8" />
 </head>
 <body>
 	<div id="app"></div>
@@ -26,7 +24,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-74582330-1', 'auto');
+  ga('create', '{{ env('GA_KEY') }}', 'auto');
 </script>
 	<script src="/js/store/jquery.min.js"></script>
 	<script src="/js/store/lightbox.min.js"></script>
