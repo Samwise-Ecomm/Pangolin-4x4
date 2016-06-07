@@ -50,6 +50,9 @@ router.map({
 // Set http interceptor for errors returned
 Vue.http.interceptors.push({
 	response: function(response) {
+		if (response.status != 200) {
+			ga('send', 'event', response.status, `${response.request.method} ${response.request.url}`)
+		}
 		if (response.status == 404) {
 			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
 				window.location.href = "/catalog/axles-drive-shafts-and-wheels"
@@ -92,7 +95,7 @@ Vue.http.interceptors.push({
 			} else if (window.location.href.includes("/land-rover-parts-products")) {
 				window.location.href = "/land-rover-parts-and-products"
 			} else {
-				ga('send', 'event', 'error', '404', window.location.href)
+				ga('send', 'event', '404', window.location.href)
 				window.location.href = "/404"
 			}
 		} else if (response.status == 200) {
