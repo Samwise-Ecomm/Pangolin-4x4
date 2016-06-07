@@ -6,18 +6,18 @@
 	</div>
 	<div class='CheckoutCart-counter'>
 		<div class='CheckoutCart-minus'>
-			<i class='fa fa-fw' 
+			<i class='fa fa-fw'
 				:class="(item.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'"
 				@click="changeCount(-1)"></i>
 		</div>
 		<div class='CheckoutCart-cnt'>
-			<input type='text' maxlength=4 
+			<input type='text' maxlength=4
 				v-model="item.count"
 				@keydown="checkKey"
 				@input="checkCount(item)">
 		</div>
 		<div class='CheckoutCart-plus'>
-			<i class='fa fa-fw' 
+			<i class='fa fa-fw'
 				:class="(item.infinite || item.count < item.stock)?'fa-plus-square u-active':'fa-plus-square-o'"
 				@click="changeCount(1)"></i>
 		</div>
@@ -42,6 +42,9 @@ module.exports = {
 			this.item.count = parseInt(this.item.count) + change
 			if (this.item.count < 0) {
 				this.item.count = 0
+			}
+			if (this.item.count > this.item.stock && !this.item.infinite) {
+				this.item.count = this.item.stock
 			}
 			this.$parent.$parent.storeCart()
 		},

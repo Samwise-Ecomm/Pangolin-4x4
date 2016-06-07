@@ -14949,6 +14949,9 @@ module.exports = {
 			if (this.item.count < 0) {
 				this.item.count = 0;
 			}
+			if (this.item.count > this.item.stock && !this.item.infinite) {
+				this.item.count = this.item.stock;
+			}
 			this.$parent.$parent.storeCart();
 		},
 
@@ -15216,6 +15219,9 @@ module.exports = {
 			this.item.count = parseInt(this.item.count) + change;
 			if (this.item.count < 0) {
 				this.item.count = 0;
+			}
+			if (this.item.count > this.item.stock && !this.item.infinite) {
+				this.item.count = this.item.stock;
 			}
 			this.$parent.$parent.storeCart();
 		}
