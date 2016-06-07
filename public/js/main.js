@@ -15032,6 +15032,8 @@ module.exports = {
 
 	methods: {
 		addItem: function addItem() {
+			ga('send', 'event', 'addToCart', this.item.id + ' ' + this.item.full_name);
+
 			if (!this.inStock || this.countMaxed) {
 				return;
 			}
@@ -15765,6 +15767,8 @@ module.exports = {
 
 			if (this.query.length > 2) {
 				this.$http.get('offers', { _query: this.query }).then(function (response) {
+					ga('send', 'event', 'search', 'Q: ' + _this.query);
+
 					_this.$set('results', response.data.body);
 					_this.selected = 0;
 					_this.searching = false;
@@ -15809,7 +15813,6 @@ module.exports = {
 		},
 
 		searchBlurred: function searchBlurred() {
-			ga('send', 'event', 'search', 'failed', this.query);
 			setTimeout((function () {
 				this.focused = false;
 			}).bind(this), 1000);
@@ -15818,7 +15821,7 @@ module.exports = {
 
 	methods: {
 		find: function find(result) {
-			ga('send', 'event', 'search', 'find', '"' + this.query + '" - ' + result.name);
+			ga('send', 'event', 'search', 'Found: ' + result.name);
 			this.$router.go({ path: '/item/' + result.id });
 		}
 	}

@@ -32,6 +32,8 @@ module.exports = {
 		query () {
 			if (this.query.length > 2) {
 				this.$http.get('offers', { _query: this.query }).then(response => {
+					ga('send', 'event', 'search', `Q: ${this.query}`)
+
 					this.$set('results', response.data.body)
 					this.selected = 0
 					this.searching = false
@@ -75,14 +77,13 @@ module.exports = {
     },
 
     searchBlurred () {
-    	ga('send', 'event', 'search', 'failed', this.query)
     	setTimeout(function() { this.focused = false }.bind(this), 1000)
     }
   },
 
   methods: {
   	find (result) {
-  		ga('send', 'event', 'search', 'find', '"'+this.query+'" - '+result.name)
+  		ga('send', 'event', 'search', `Found: ${result.name}`)
   		this.$router.go({ path: `/item/${result.id}` })
   	}
   }

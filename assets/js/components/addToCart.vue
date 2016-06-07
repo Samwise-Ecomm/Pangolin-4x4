@@ -48,6 +48,8 @@ module.exports = {
 
 	methods: {
 		addItem () {
+			ga('send', 'event', 'addToCart', `${this.item.id} ${this.item.full_name}`)
+
 			if (!this.inStock || this.countMaxed) {
 				return
 			}
