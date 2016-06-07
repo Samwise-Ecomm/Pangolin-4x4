@@ -50,7 +50,7 @@ router.map({
 // Set http interceptor for errors returned
 Vue.http.interceptors.push({
 	response: function(response) {
-		if (response.status != 200) {
+		if (response.status != 200 && response.status != 404) {
 			ga('send', 'event', response.status, `${response.request.method} ${response.request.url}`)
 		}
 		if (response.status == 404) {
@@ -92,6 +92,8 @@ Vue.http.interceptors.push({
 				window.location.href = "/home/featured-parts"
 			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
 				window.location.href = "/home/recently-added-parts"
+			} else if (window.location.href.includes("/Welcome")) {
+				window.location.href = "/home"
 			} else if (window.location.href.includes("/land-rover-parts-products")) {
 				window.location.href = "/land-rover-parts-and-products"
 			} else {

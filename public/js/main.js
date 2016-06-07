@@ -15767,6 +15767,7 @@ module.exports = {
 
 			if (this.query.length > 2) {
 				this.$http.get('offers', { _query: this.query }).then(function (response) {
+					console.log(response);
 					ga('send', 'event', 'search', 'Q: ' + _this.query);
 
 					_this.$set('results', response.data.body);
@@ -16030,7 +16031,7 @@ router.map({
 // Set http interceptor for errors returned
 Vue.http.interceptors.push({
 	response: function response(_response) {
-		if (_response.status != 200) {
+		if (_response.status != 200 && _response.status != 404) {
 			ga('send', 'event', _response.status, _response.request.method + ' ' + _response.request.url);
 		}
 		if (_response.status == 404) {
@@ -16072,6 +16073,8 @@ Vue.http.interceptors.push({
 				window.location.href = "/home/featured-parts";
 			} else if (window.location.href.includes("/land-rover-parts-products/recently-added")) {
 				window.location.href = "/home/recently-added-parts";
+			} else if (window.location.href.includes("/Welcome")) {
+				window.location.href = "/home";
 			} else if (window.location.href.includes("/land-rover-parts-products")) {
 				window.location.href = "/land-rover-parts-and-products";
 			} else {

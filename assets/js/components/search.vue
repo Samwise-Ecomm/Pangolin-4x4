@@ -32,6 +32,7 @@ module.exports = {
 		query () {
 			if (this.query.length > 2) {
 				this.$http.get('offers', { _query: this.query }).then(response => {
+					console.log(response)
 					ga('send', 'event', 'search', `Q: ${this.query}`)
 
 					this.$set('results', response.data.body)
