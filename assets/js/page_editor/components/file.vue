@@ -86,7 +86,7 @@ module.exports = {
     	request.append('path', this.file.path)
       this.progress++
 
-    	this.$http.post('/admin/upload', request).then(function(response) {
+    	this.$http.post('/api/image', request).then(function(response) {
     		if (response.data.result == 'error') {
     			this.$dispatch('error', response.data.body)
     		}
@@ -104,7 +104,7 @@ module.exports = {
   			file: path
   		}
 
-  		this.$http.delete('/admin/upload', request).then(function(response) {
+  		this.$http.delete('/api/image', request).then(function(response) {
   			if (response.data.result == 'error') {
     			this.$dispatch('error', response.data.body)
     		}
@@ -121,7 +121,7 @@ module.exports = {
   			name: this.newDirectory
   		}
 
-  		this.$http.post('/admin/upload/directory', request).then(function(response) {
+  		this.$http.post('/api/image/directory', request).then(function(response) {
   			if (response.data.result == 'error') {
     			this.$dispatch('error', response.data.body)
     		}
@@ -136,7 +136,7 @@ module.exports = {
 
   	deleteDirectory () {
   		if (confirm("Are you sure you want to delete '"+this.file.name+"' along with all it's files?")) {
-  			this.$http.delete('/admin/upload/directory', { path: this.file.path }).then(function(response) {
+  			this.$http.delete('/api/image/directory', { path: this.file.path }).then(function(response) {
   				if (response.data.result == 'error') {
 	    			this.$dispatch('error', response.data.body)
 	    		}

@@ -14929,64 +14929,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./components/cart.vue":51,"./components/search.vue":60,"./components/statusIcon.vue":61,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-	props: ['item'],
-
-	watch: {
-		'item.count': function itemCount() {
-			if (this.item.count == '') {
-				this.item.count = 0;
-			}
-		}
-	},
-
-	methods: {
-		changeCount: function changeCount(change) {
-			this.item.count = parseInt(this.item.count) + change;
-			if (this.item.count < 0) {
-				this.item.count = 0;
-			}
-			if (this.item.count > this.item.stock && !this.item.infinite) {
-				this.item.count = this.item.stock;
-			}
-			this.$parent.$parent.storeCart();
-		},
-
-		checkKey: function checkKey(event) {
-			if (event.keyCode == 8) {
-				return 0;
-			} else if (event.keyCode < 48 || 57 < event.keyCode) {
-				event.preventDefault();
-			}
-		},
-
-		checkCount: function checkCount() {
-			if (this.item.count < 0) {
-				this.item.count = 0;
-			} else if (!this.item.infinite && this.item.count > this.item.stock) {
-				this.item.count = this.item.stock;
-			}
-
-			this.$parent.$parent.storeCart();
-		}
-	}
-};
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"CheckoutCart-variant\">\n\t<div class=\"CheckoutCart-varTitle\"><h4 v-if=\"item.name\">{{{ item.name }}} -&nbsp;</h4></div>\n\t<div class=\"CheckoutCart-price\">\n\t\t<h4>{{ item.price / 100 | currency }}<span v-if=\"item.unit != 'Unit'\"> {{ '\\/' + item.unit }}</span></h4>\n\t</div>\n\t<div class=\"CheckoutCart-counter\">\n\t\t<div class=\"CheckoutCart-minus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(-1)\"></i>\n\t\t</div>\n\t\t<div class=\"CheckoutCart-cnt\">\n\t\t\t<input type=\"text\" maxlength=\"4\" v-model=\"item.count\" @keydown=\"checkKey\" @input=\"checkCount(item)\">\n\t\t</div>\n\t\t<div class=\"CheckoutCart-plus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.infinite || item.count < item.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(1)\"></i>\n\t\t</div>\n\t</div>\n</div>\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/CheckoutCartOfferItem.vue"
-  if (!module.hot.data) {
-    hotAPI.createRecord(id, module.exports)
-  } else {
-    hotAPI.update(id, module.exports, module.exports.template)
-  }
-})()}
-},{"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
+},{"./components/cart.vue":50,"./components/search.vue":60,"./components/statusIcon.vue":61,"vue":47,"vue-hot-reload-api":21}],49:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15054,7 +14997,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],50:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15188,7 +15131,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./cartOffer.vue":52,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
+},{"./cartOffer.vue":51,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],51:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15210,7 +15153,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./cartOfferItem.vue":53,"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
+},{"./cartOfferItem.vue":52,"vue":47,"vue-hot-reload-api":21}],52:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15241,7 +15184,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
+},{"vue":47,"vue-hot-reload-api":21}],53:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15394,7 +15337,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./offer.vue":58,"./pageCounter.vue":59,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
+},{"./offer.vue":58,"./pageCounter.vue":59,"vue":47,"vue-hot-reload-api":21}],54:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -15509,7 +15452,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./checkoutCartOffer.vue":56,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+},{"./checkoutCartOffer.vue":55,"babel-runtime/core-js/object/keys":2,"vue":47,"vue-hot-reload-api":21}],55:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15531,7 +15474,64 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"./CheckoutCartOfferItem.vue":49,"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
+},{"./CheckoutCartOfferItem.vue":56,"vue":47,"vue-hot-reload-api":21}],56:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+	props: ['item'],
+
+	watch: {
+		'item.count': function itemCount() {
+			if (this.item.count == '') {
+				this.item.count = 0;
+			}
+		}
+	},
+
+	methods: {
+		changeCount: function changeCount(change) {
+			this.item.count = parseInt(this.item.count) + change;
+			if (this.item.count < 0) {
+				this.item.count = 0;
+			}
+			if (this.item.count > this.item.stock && !this.item.infinite) {
+				this.item.count = this.item.stock;
+			}
+			this.$parent.$parent.storeCart();
+		},
+
+		checkKey: function checkKey(event) {
+			if (event.keyCode == 8) {
+				return 0;
+			} else if (event.keyCode < 48 || 57 < event.keyCode) {
+				event.preventDefault();
+			}
+		},
+
+		checkCount: function checkCount() {
+			if (this.item.count < 0) {
+				this.item.count = 0;
+			} else if (!this.item.infinite && this.item.count > this.item.stock) {
+				this.item.count = this.item.stock;
+			}
+
+			this.$parent.$parent.storeCart();
+		}
+	}
+};
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"CheckoutCart-variant\">\n\t<div class=\"CheckoutCart-varTitle\"><h4 v-if=\"item.name\">{{{ item.name }}} -&nbsp;</h4></div>\n\t<div class=\"CheckoutCart-price\">\n\t\t<h4>{{ item.price / 100 | currency }}<span v-if=\"item.unit != 'Unit'\"> {{ '\\/' + item.unit }}</span></h4>\n\t</div>\n\t<div class=\"CheckoutCart-counter\">\n\t\t<div class=\"CheckoutCart-minus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.count > 0)?'fa-minus-square u-active':'fa-minus-square-o'\" @click=\"changeCount(-1)\"></i>\n\t\t</div>\n\t\t<div class=\"CheckoutCart-cnt\">\n\t\t\t<input type=\"text\" maxlength=\"4\" v-model=\"item.count\" @keydown=\"checkKey\" @input=\"checkCount(item)\">\n\t\t</div>\n\t\t<div class=\"CheckoutCart-plus\">\n\t\t\t<i class=\"fa fa-fw\" :class=\"(item.infinite || item.count < item.stock)?'fa-plus-square u-active':'fa-plus-square-o'\" @click=\"changeCount(1)\"></i>\n\t\t</div>\n\t</div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/Users/TJTorola/Sites/Samwise/storefront/assets/js/components/checkoutCartOfferItem.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, module.exports.template)
+  }
+})()}
+},{"vue":47,"vue-hot-reload-api":21}],57:[function(require,module,exports){
 'use strict';
 
 var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
@@ -16260,7 +16260,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":54,"vue":47,"vue-hot-reload-api":21}],67:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],67:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16345,7 +16345,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/checkoutCart.vue":55,"../components/contactInfo.vue":57,"../components/submitCheckout.vue":62,"../store/invoiceInfo.js":71,"vue":47,"vue-hot-reload-api":21}],68:[function(require,module,exports){
+},{"../components/checkoutCart.vue":54,"../components/contactInfo.vue":57,"../components/submitCheckout.vue":62,"../store/invoiceInfo.js":71,"vue":47,"vue-hot-reload-api":21}],68:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16450,7 +16450,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/addToCart.vue":50,"vue":47,"vue-hot-reload-api":21}],69:[function(require,module,exports){
+},{"../components/addToCart.vue":49,"vue":47,"vue-hot-reload-api":21}],69:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -16519,7 +16519,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, module.exports.template)
   }
 })()}
-},{"../components/catalog.vue":54,"vue":47,"vue-hot-reload-api":21}],70:[function(require,module,exports){
+},{"../components/catalog.vue":53,"vue":47,"vue-hot-reload-api":21}],70:[function(require,module,exports){
 "use strict";
 
 module.exports = {
