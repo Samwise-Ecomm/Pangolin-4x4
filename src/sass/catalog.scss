@@ -1,0 +1,120 @@
+/**
+ * Specific to the catalog template.
+ */
+
+ .CatalogLink {
+	color: black;
+}
+
+.CatalogLink.isCurrent {
+	color: $active;
+}
+
+.CatalogLink:hover {
+	color: $highlight;
+}
+
+/* Catalog Item, styling for each individual item within a catalog */
+
+.CatalogGridItem {
+	font-size: 14px;
+	color: black;
+	padding: 5px;
+	border: 1px solid $light;
+	width: 32%;
+	margin: 4px;
+	float: left;
+}
+
+.noSearch .CatalogGridItem {
+	width: 24%;
+	padding: 7px;
+}
+
+.CatalogGridItem:hover {
+	color: $active;
+	border: 1px solid $active;
+}
+
+.CatalogGridItem-price {
+	color: green;
+	height: 42px;
+	line-height: 30px;
+	font-size: 18px;
+	margin-right: 10px;
+}
+
+.CatalogGridItem-thumb {
+	width: 195px;
+	height: 195px;
+	margin-bottom: 10px;
+}
+
+.CatalogGridItem-name {
+	height: 50px;
+}
+
+.CatalogItem {
+	width: 100%;
+}
+
+.CatalogItem-controls {
+	margin-top: 20px;
+}
+
+.CatalogItem-variations {
+	width: 100%;
+}
+
+.CatalogItem-price {
+	color: green;
+	float: right;
+	height: 42px;
+	line-height: 30px;
+	font-size: 18px;
+	margin-right: 10px;
+}
+
+.CatalogItem-thumb {
+	width: 200px;
+	max-height: 600px;
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.CatalogItem-description p {
+	margin-left: 210px;
+}
+
+.Button.inCatalog {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	padding-bottom: 3px;
+	width: 150px;
+}
+
+.Button.inCatalog:active {
+	height: 27px;
+	padding-bottom: 0px;
+}
+
+.Button.inCatalogHead {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	padding-bottom: 3px;
+	width: 150px;
+	margin-bottom: 10px;
+}
+
+.Button.inCatalogHead:active {
+	height: 27px;
+	padding-bottom: 0px;
+}
+
+.CatalogHr {
+	clear:both;
+	padding-top: 10px;
+}

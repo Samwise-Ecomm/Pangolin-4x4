@@ -1,0 +1,513 @@
+/**
+ * 5.0 Checkout
+ *
+ * Specific to the final checkout pages
+ */
+ #Checkout-progressBar {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#Checkout-progressBar li {
+    display: inline-block;
+    text-align: center;
+    line-height: 3em;
+}
+
+#Checkout-progressBar[data-steps="2"] li { width: 49%; }
+#Checkout-progressBar[data-steps="3"] li { width: 33%; }
+#Checkout-progressBar[data-steps="4"] li { width: 24%; }
+#Checkout-progressBar[data-steps="5"] li { width: 19%; }
+#Checkout-progressBar[data-steps="6"] li { width: 16%; }
+#Checkout-progressBar[data-steps="7"] li { width: 14%; }
+#Checkout-progressBar[data-steps="8"] li { width: 12%; }
+#Checkout-progressBar[data-steps="9"] li { width: 11%; }
+
+.ProgressBar-done {
+    color: $light;
+    border-top: 4px solid $highlight;
+}
+
+.ProgressBar-current {
+    color: black;
+    border-top: 4px solid $highlight;
+}
+
+.ProgressBar-todo {
+    color: $light;
+    border-top: 4px solid $light;
+}
+
+.Checkout-errorList {
+  border: $highlight solid 2px;
+  border-radius: 10px;
+  padding: 10px;
+  background: #FF655C;
+  color: #fff;
+}
+
+/* 6.1 - Checkout Cart */
+
+hr.inCheckoutCart {
+	float: right;
+	width: $contentWidth - 20px - 120px;
+}
+
+.CheckoutCart-item {
+	width: $contentWidth - 20px;
+	display: inline-table;
+	table-layout: fixed;
+}
+
+.CheckoutCart-pic {
+	padding: 0;
+	width: 120px;
+	display: table-cell;
+}
+
+.CheckoutCart-pic img {
+	width: 100px;
+	height: 100px;
+}
+
+.CheckoutCart-desc {
+	vertical-align: top;
+	display: table-cell;
+	width: $contentWidth - 20px - 120px;
+}
+
+.CheckoutCart-title {
+	height: 30px;
+}
+
+.CheckoutCart-partNum {
+	height: 40px;
+}
+
+.CheckoutCart-variant {
+	display: table-row;
+	height: 30px;
+}
+
+.CheckoutCart-varTitle {
+	text-align: right;
+	display: table-cell;
+	vertical-align: top;
+	line-height: 30px;
+	width: $contentWidth - 20px - 120px - 160px - 150px;
+}
+
+.CheckoutCart-price {
+	vertical-align: top;
+	line-height: 30px;
+	display: table-cell;
+	width: 150px;
+}
+
+.CheckoutCart-counter {
+	display: table-row;
+	height: 30px;
+	width:160px;
+}
+
+.CheckoutCart-minus, .CheckoutCart-plus {
+	display: table-cell;
+	width:  30px;
+	font-size: 25px;
+	line-height: 30px;
+	vertical-align: top;
+}
+
+.CheckoutCart-plus {
+	text-align: right;
+}
+
+i.resize {
+	font-size: 28px;
+}
+
+.CheckoutCart-cnt {
+	display: table-cell;
+	width: 80px;
+}
+
+.CheckoutCart-cnt input {
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	font-size: 18px;
+	border-radius: 3px;
+    border: 1px solid $light;
+	background: $lightest;
+}
+
+.CheckoutCart-cnt input:focus {
+	outline: 0;
+	border: 1px solid $darkest;
+}
+
+.Subtotal-container {
+	display: inline-table;
+	table-layout: fixed;
+	height: 60px;
+}
+
+.Subtotal-label {
+	display: table-cell;
+	width: $contentWidth - 20px - 180px;
+	text-align: right;
+	line-height: 60px;
+}
+
+#Subtotal-total {
+	display: table-cell;
+	width: 180px;
+	text-align: center;
+	line-height: 60px;
+}
+
+/* 6.2 - Checkout Contact */
+.select i {
+	cursor: pointer;
+}
+.CheckoutShipping-input i {
+	position: relative;
+	top: 2px;
+	left: 4px;
+}
+.CheckoutShipping-label {
+	float: left;
+	width: 200px;
+	height: 25px;
+	font-size: 18px;
+	font-weight: 400;
+	text-align: right;
+}
+.CheckoutShipping-warning {
+	margin-left: 210px;
+	border: 0;
+	border-radius: 3px;
+	padding: 3px;
+	padding-right: 20px;
+	color: #fff;
+	background: $active;
+	display: none;
+	font-weight: 400;
+}
+.CheckoutShipping-warning:before {
+	content: '';
+	position: relative;
+	width: 0;
+	height: 0;
+	border: 10px solid;
+    border-color: transparent transparent $active transparent;
+    top: -30px;
+    left: 5px;
+    pointer-events: none;
+}
+.CheckoutShipping-radio {
+	height: 25px;
+	line-height: 25px;
+	margin: 10px;
+	margin-left: 210px;
+	font-weight: 400;
+}
+.CheckoutShipping-radio span:hover {
+	color: $active;
+	cursor: pointer;
+}
+.CheckoutShipping-input {
+	height: 25px;
+	margin: 10px;
+	margin-left: 210px;
+	border-radius: 3px;
+	border: 1px solid $light;
+}
+.CheckoutShipping-input input {
+	background: none;
+	border: none;
+	outline: none;
+	padding-left: 4px;
+	width: 100%;
+	height: 100%;
+}
+.CheckoutShipping-input textarea {
+	padding: 4px;
+	border: none;
+	background: none;
+	outline: none;
+	resize: none;
+	width: 100%;
+	height: 100%;
+}
+.CheckoutShipping-input select {
+	background: none;
+	border: none;
+	outline: none;
+	padding-left: 4px;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.CheckoutShipping-input.select:hover {
+	border: 1px solid $active;
+	color: $active;
+}
+
+/* 6.2 - Checkout Billing */
+
+#BillingAddress-toggle {
+    position: absolute;
+    left: -9999px;
+}
+
+#BillingAddress-toggle + label::before {
+	font-family: FontAwesome;
+	padding: 5px;
+	content: "\f096";
+}
+
+#BillingAddress-toggle:checked + label::before {
+	content: "\f046";
+}
+
+/* 6.3 - Checkout Confirmation */
+
+.CheckoutConfirm-item {
+	font-size: 20px;
+	font-weight: 400;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.CheckoutConfirm-title {
+	padding-left: 10px;
+	font-size: 25px;
+}
+
+.CheckoutConfirm-itemNum {
+	padding-left: 10px;
+	font-weight: 400;
+	float: left;
+}
+
+.CheckoutConfirm-variant, .CheckoutConfirm-price {
+	float: right;
+}
+
+.CheckoutConfirm-item hr {
+	margin: 0;
+	clear: both;
+	position: relative;
+	top: 10px;
+}
+
+.CheckoutConfirm-price {
+	width: 150px;
+	padding-right: 10px;
+	clear: right;
+}
+
+.CheckoutConfirm-subContainer {
+	width: 100%;
+	height: 42px;
+	margin-top: 10px;
+}
+
+.CheckoutConfirm-subTitle {
+	text-align: right;
+	font-weight: 400;
+}
+
+.CheckoutConfirm-subTotal {
+	width: 150px;
+}
+
+.CheckoutConfirm-subTotal, .CheckoutConfirm-subTitle {
+	font-size: 24px;
+	float: right;
+	height: 42px;
+	line-height: 42px;
+}
+
+.CheckoutConfirm-shippingAddress {
+	margin-left: 10px;
+	margin-bottom: 10px;
+	font-size: 20px;
+	font-weight: 400;
+	float: left;
+}
+
+.CheckoutConfirm-contact {
+	margin-right: 10px;
+	font-size: 20px;
+	font-weight: 400;
+	float: right;
+	text-align: right;
+}
+
+// forms.js specific formatting
+
+.js-formLabel {
+	float: left;
+	width: 200px;
+	height: 25px;
+	font-size: 18px;
+	font-weight: 400;
+	text-align: right;
+}
+
+.js-formInput {
+	height: 25px;
+	margin: 10px;
+	margin-left: 210px;
+	border-radius: 3px;
+	border: 1px solid $light;
+}
+
+.js-formInput.isSelected {
+	border: 1px solid #000;
+}
+
+.js-formInput:hover {
+	border-color: $active;
+	color: $active;
+}
+
+.js-formInput input {
+	background: none;
+	border: none;
+	outline: none;
+	padding-left: 4px;
+	width: 100%;
+	height: 100%;
+}
+
+.js-formInput select {
+	background: none;
+	border: none;
+	outline: none;
+	padding-left: 4px;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.js-formTextArea {
+	width: 100%;
+	height: 150px;
+	border-radius: 3px;
+	border: 1px solid $light;
+	background: none;
+	outline: none;
+	resize: none;
+	padding: 4px;
+}
+
+.js-formTextArea:hover {
+	border-color: $active;
+}
+
+.js-formInput i {
+	position: relative;
+	top: 2px;
+}
+
+.js-formIcon.fa-check {
+	color: green;
+}
+
+.js-formIcon.fa-times {
+	color: $highlight;
+}
+
+.js-formWarn {
+	display: none;
+	margin-left: 210px;
+	border: 0;
+	border-radius: 3px;
+	padding: 3px;
+	padding-right: 20px;
+	color: #fff;
+	background: $active;
+	font-weight: 400;
+}
+
+.js-formWarn:before {
+	content: '';
+	position: relative;
+	width: 0;
+	height: 0;
+	border: 10px solid;
+  border-color: transparent transparent $active transparent;
+  top: -30px;
+  left: 5px;
+  pointer-events: none;
+}
+
+.js-formWarn.isShown {
+	display: inline-block;
+}
+
+/* NEW STUFF */
+// Vue specific
+a.v-link-active, #SideNav a.v-link-active {
+	color: $highlight;
+}
+
+.u-width400 select {
+  width: 380px !important;
+}
+
+label.Checkbox:hover {
+  cursor: pointer;
+  color: #dd8131;
+}
+
+label.Checkbox input {
+  position: fixed;
+  left: -10000px;
+}
+
+ul.u-cols-3 {
+  -webkit-columns: 3;
+  -moz-columns: 3;
+  columns: 3;
+}
+
+ul.u-cols-2 {
+  -webkit-columns: 2;
+  -moz-columns: 2;
+  columns: 2;
+}
+
+li.u-active:hover {
+  cursor: pointer;
+  color: #dd8131;
+}
+
+#Social {
+	position: fixed;
+  left: 50%;
+  top: 10px;
+  margin-left: -482px;
+}
+
+#Social li {
+	line-height: 25px;
+}
+
+#Social li a {
+	color: black;
+}
+
+#Social li a:hover {
+	color: $active;
+}

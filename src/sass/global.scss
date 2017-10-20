@@ -1,0 +1,297 @@
+/**
+ * Could apply to any part, of any page.
+ */
+
+ *{
+	font-family: 'Roboto', sans-serif;
+}
+
+body {
+	background-color: $light;
+}
+
+.wrapper {
+	width: 100%;
+	display: table;
+}
+
+a {
+	text-decoration: none;
+	color: $active;
+}
+
+a:hover {
+	cursor: pointer;
+	color: $highlight;
+}
+
+ul {
+	list-style-position: inside;
+}
+
+hr {
+	margin: 10px 0;
+    border: 0;
+    border-bottom: 1px solid $light;
+}
+
+b hr {
+	border-bottom: 1px solid $darkest;
+}
+
+h1 {
+	font-weight: 500;
+	font-size: 25px;
+}
+
+h2 {
+	font-weight: 400;
+	font-size: 20px;
+	color: $active;
+}
+
+h3 {
+	font-size: 20px;
+}
+
+h4 {
+	font-size: 20px;
+	font-weight: 400;
+}
+
+h5 {
+	font-size: 17px;
+}
+
+h6 {
+	font-size: 17px;
+	font-weight: 400;
+}
+
+.u-highlight {
+	color: $highlight;
+}
+
+.u-light {
+	color: $active;
+}
+
+.u-thin {
+	font-weight: 400;
+}
+
+.u-contentWrapper {
+	width: $contentWidth;
+	height: 100%;
+	margin: auto;
+}
+
+.u-inverted, .u-inverted a {
+	color: white;
+}
+
+.u-inverted a:hover {
+	color: $active;
+}
+
+.u-hide {
+	display: none;
+}
+
+input.u-hide {
+	display: block;
+	position: fixed;
+	left: -9000px;
+}
+
+.u-floatRight {
+	float: right;
+}
+
+.u-floatLeft {
+	float: left;
+}
+
+.u-marginRight {
+	margin-right: 10px;
+}
+
+.u-inline {
+	display: inline;
+}
+
+.u-center {
+	text-align: center;
+	margin: auto;
+}
+
+.u-clear {
+	clear: both;
+}
+
+.u-paddingTop {
+	padding-top: 10px;
+}
+
+.u-width100 {
+	width: 100px !important;
+}
+
+.u-width200 {
+	width: 200px !important;
+}
+
+.u-width300 {
+	width: 300px !important;
+}
+
+.u-width400 {
+	width: 400px !important;
+}
+
+.u-unselectable, .Button, .fa {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+i.u-active {
+	color: $active;
+}
+
+i.u-active:hover, li.u-active:hover {
+	color: $highlight;
+	cursor: pointer;
+}
+
+span.u-active:hover {
+	color: $highlight;
+	cursor: pointer;
+}
+
+img.u-active {
+	padding: 5px;
+	border: 1px solid $light;
+	background-color: #e0e0e0;
+}
+
+img.u-active:hover {
+	cursor: pointer;
+	border: 1px solid $highlight;
+}
+
+div.u-active {
+	background: $active;
+	color: white;
+}
+
+div.u-active {
+	background: $highlight;
+	cursor: pointer;
+}
+
+.u-activeImg {
+	padding: 5px;
+	border: 1px solid $light;
+	background-color: #e8e8e8;
+}
+
+.u-activeImg:hover {
+	cursor: pointer;
+	border: 1px solid $highlight;
+}
+
+.input {
+	height: 27px;
+	padding: 5px;
+	width: 100%;
+	font-size: 15px;
+	outline: none;
+	border-radius: 3px;
+	background: none;
+	border: 1px solid $light;
+}
+
+.Button {
+	color: $lightest;
+	box-shadow: 0 -3px 0 rgba(0, 0, 0, 0.2) inset;
+	border-radius: 3px;
+	width: auto;
+	padding: 10px;
+	padding-bottom: 13px;
+	text-align: center;
+}
+
+.Button:active {
+	margin-top: 3px;
+	padding-bottom: 10px;
+	box-shadow: 0 0 0 rgba(0, 0, 0, 0.4) inset;
+}
+
+.Button:hover {
+	cursor: pointer;
+}
+
+.Button--active {
+	background: $active;
+}
+
+.Button--active:hover {
+	background: $highlight;
+}
+
+.Button--dark {
+	background: $dark;
+}
+
+.Button--dark:hover {
+	background: $darkest;
+}
+
+.Button--thin {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	padding-bottom: 3px;
+}
+
+.Button--thin:active {
+	height: 27px;
+	padding-bottom: 0px;
+}
+
+.Button.isDisabled, .Button-isDisabled:hover {
+	background: $light !important;
+}
+
+/* 2.1 User implimented css */
+
+.gallery {
+	width: 100%;
+	padding: 2px;
+}
+
+.noSearch .gallery {
+	padding-left: 7px;
+}
+
+.gallery a img {
+	object-fit: cover;
+	margin: 2px;
+	width: 210px;
+	height: 210px;
+	padding: 5px;
+	border: 1px solid $light;
+}
+
+.gallery a img:hover {
+	cursor: pointer;
+	border: 1px solid $highlight;
+}
+
+.gallery a img.isBig {
+	width: 428px;
+}

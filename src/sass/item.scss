@@ -1,0 +1,92 @@
+/**
+ * 5.0 Item
+ *
+ * Specific to the Item Page Template
+ */
+
+ #Pictures {
+	width: 40%;
+	float: left;
+}
+
+#Pictures-current {
+	width: 100%;
+}
+
+.Pictures-thumb {
+	width: 32%;
+	padding: 5px;
+	margin: 1%;
+	float: left;
+}
+
+.Pictures-thumb.isLeft {
+	margin-left: 0;
+}
+
+.Pictures-thumb.isRight {
+	margin-right: 0;
+}
+
+#Information {
+	width: 60%;
+	float: right;
+	padding-left: 10px;
+}
+
+#Variations {
+	clear: both;
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
+.Variations-price {
+	color: green;
+	float: left;
+	height: 42px;
+	line-height: 42px;
+	font-size: 18px;
+}
+
+#VariationsTable {
+	border-collapse: collapse;
+	border: none;
+	width: 100%;
+	clear: both;
+}
+
+#VariationsTable td {
+	padding-left: 5px;
+	padding-right: 5px;
+	border: 1px $light solid;
+	vertical-align: middle;
+	height: 35px;
+}
+
+#VariationsTable tr:nth-child(odd) {
+	background: #CCC
+}
+
+.VariationsTable-price {
+	width: 120px;
+	text-align: right;
+}
+
+.VariationsTable-button {
+	width: 150px;
+	border: none !important;
+	background: $lightest;
+}
+
+.Button.inVariations {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	padding-bottom: 3px;
+	width: 150px;
+}
+
+.Button.inVariations:active {
+	height: 27px;
+	padding-bottom: 0px;
+}
