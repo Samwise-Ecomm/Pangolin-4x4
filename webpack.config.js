@@ -1,13 +1,27 @@
 var path = require('path')
 var webpack = require('webpack')
+var CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const DIST_DIR = path.resolve(__dirname, 'dist');
+const ENTRY_FILE = path.resolve(__dirname, 'src/js/main.js');
+const STATIC_DIR = path.resolve(__dirname, 'src/static');
 
 module.exports = {
-  entry: './src/js/main.js',
+  entry: ENTRY_FILE,
+  context: DIST_DIR,
   output: {
-    path: path.resolve(__dirname, './public/js'),
-    publicPath: '/js',
-    filename: 'store.js'
+    path: DIST_DIR,
+    publicPath: '/',
+    filename: 'p4x4.js'
   },
+  plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: STATIC_DIR,
+        to: DIST_DIR,
+      }
+    ])
+  ],
   module: {
     rules: [
       {
@@ -27,7 +41,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.resolve(__dirname, 'public'),
+    contentBase: DIST_DIR,
     historyApiFallback: true,
     noInfo: true,
     overlay: true
