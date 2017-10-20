@@ -5,7 +5,6 @@
   "main": "src/js/index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "watch": "cross-env NODE_ENV=development webpack --watch --progress --hide-modules",
     "start": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
