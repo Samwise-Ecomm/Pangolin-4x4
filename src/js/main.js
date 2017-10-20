@@ -9,6 +9,8 @@ var Checkout = require('./pages/checkout.vue')
 var Item = require('./pages/item.vue')
 var fileNotFound = require('./pages/404.vue')
 
+require('../sass/index.scss');
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
