@@ -1,12 +1,12 @@
 // libraries
-var Vue          = require('vue')
-var VueRouter    = require('vue-router')
-var VueResource  = require('vue-resource')
-var App          = require('./app.vue')
-var Page         = require('./pages/page.vue')
-var Catalog      = require('./pages/catalog.vue')
-var Checkout     = require('./pages/checkout.vue')
-var Item         = require('./pages/item.vue')
+var Vue = require('vue')
+var VueRouter = require('vue-router')
+var VueResource = require('vue-resource')
+var App = require('./app.vue')
+var Page = require('./pages/page.vue')
+var Catalog = require('./pages/catalog.vue')
+var Checkout = require('./pages/checkout.vue')
+var Item = require('./pages/item.vue')
 var fileNotFound = require('./pages/404.vue')
 
 Vue.use(VueRouter)
@@ -49,10 +49,7 @@ router.map({
 
 // Set http interceptor for errors returned
 Vue.http.interceptors.push({
-	response: function(response) {
-		if (response.status != 200 && response.status != 404) {
-			ga('send', 'event', response.status, `${response.request.method} ${response.request.url}`)
-		}
+	response: function (response) {
 		if (response.status == 404) {
 			if (window.location.href.includes("/land-rover-parts-products/drivetrain-suspension-steering")) {
 				window.location.href = "/catalog/axles-drive-shafts-and-wheels"
@@ -97,7 +94,6 @@ Vue.http.interceptors.push({
 			} else if (window.location.href.includes("/land-rover-parts-products")) {
 				window.location.href = "/land-rover-parts-and-products"
 			} else {
-				ga('send', 'event', '404', window.location.href)
 				window.location.href = "/404"
 			}
 		} else if (response.status == 200) {
@@ -117,25 +113,21 @@ router.beforeEach(function (transition) {
 	transition.next()
 })
 
-router.afterEach(function (transition) {
-	ga('send', 'pageview', transition.to.path)
-})
-
 // Jquery watcher to modify div positioning on scroll
 function resizeWindow() {
 	var minHeight = $(window).height() - $('#Head').height() - $('#Foot').height();
-	$('#Body-column').css('min-height', minHeight+'px');
+	$('#Body-column').css('min-height', minHeight + 'px');
 
 	if ($(window).scrollTop() < 147) {
-		$('#Social').css('top', (147 - $(window).scrollTop())+'px')
+		$('#Social').css('top', (147 - $(window).scrollTop()) + 'px')
 	} else if ($('#Social').css('top') != '2px') {
 		$('#Social').css('top', '2px')
 	}
 }
-$(window).scroll(function(){
+$(window).scroll(function () {
 	resizeWindow()
 })
-$(window).resize(function(){
+$(window).resize(function () {
 	resizeWindow()
 })
 

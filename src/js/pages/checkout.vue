@@ -57,73 +57,73 @@
 
 <script>
 module.exports = {
-	data () {
-		var store = require('../store/invoiceInfo.js')
-		store.load()
+  data() {
+    var store = require("../store/invoiceInfo.js")
+    store.load()
 
-		return {
-			step: 0,
-			loaded: false,
-			shippingInfo: store.shippingInfo,
-			billingInfo: store.billingInfo,
-			errors: [],
-		}
-	},
+    return {
+      step: 0,
+      loaded: false,
+      shippingInfo: store.shippingInfo,
+      billingInfo: store.billingInfo,
+      errors: []
+    }
+  },
 
-	components: {
-		checkoutCart: require('../components/checkoutCart.vue'),
-		contactInfo: require('../components/contactInfo.vue'),
-		submitCheckout: require('../components/submitCheckout.vue'),
-	},
+  components: {
+    checkoutCart: require("../components/checkoutCart.vue"),
+    contactInfo: require("../components/contactInfo.vue"),
+    submitCheckout: require("../components/submitCheckout.vue")
+  },
 
-	route: {
-		data() {
-			switch(this.$route.params.step) {
-				case 'cart':
-					this.step = 0
-					break
-				case 'shipping':
-					this.step = 1
-					break
-				case 'billing':
-					this.step = 2
-					break
-				case 'submit':
-					this.step = 3
-					break
-				case 'success':
-					this.step = 4
-					break
-				default:
-					this.step = 0
-			}
+  route: {
+    data() {
+      switch (this.$route.params.step) {
+        case "cart":
+          this.step = 0
+          break
+        case "shipping":
+          this.step = 1
+          break
+        case "billing":
+          this.step = 2
+          break
+        case "submit":
+          this.step = 3
+          break
+        case "success":
+          this.step = 4
+          break
+        default:
+          this.step = 0
+      }
 
-			this.$parent.search = false
-			document.title = "Pangolin 4x4 Checkout"
-			this.loaded = true
-		},
-	},
+      this.$parent.search = false
+      document.title = "Pangolin 4x4 Checkout"
+      this.loaded = true
+    }
+  },
 
-	methods: {
-		nextStep() {
-			if (this.step == 0) {
-				this.$router.go({ path: '/checkout/shipping' })	
-			} else if (this.step == 1) {
-				this.$router.go({ path: '/checkout/billing' })
-			} else if (this.step == 2) {
-				this.$router.go({ path: '/checkout/submit' })
-			}
-		},
+  methods: {
+    nextStep() {
+      if (this.step == 0) {
+        this.$router.go({ path: "/checkout/shipping" })
+      } else if (this.step == 1) {
+        this.$router.go({ path: "/checkout/billing" })
+      } else if (this.step == 2) {
+        this.$router.go({ path: "/checkout/submit" })
+      }
+    },
 
-		prevStep() {
-			if (this.step == 1) {
-				this.$router.go({ path: '/checkout/cart' })	
-			} else if (this.step == 2) {
-				this.$router.go({ path: '/checkout/shipping' })
-			} else if (this.step == 3) {
-				this.$router.go({ path: '/checkout/billing' })
-			}
-		}
-	},
+    prevStep() {
+      if (this.step == 1) {
+        this.$router.go({ path: "/checkout/cart" })
+      } else if (this.step == 2) {
+        this.$router.go({ path: "/checkout/shipping" })
+      } else if (this.step == 3) {
+        this.$router.go({ path: "/checkout/billing" })
+      }
+    }
+  }
 }
 </script>

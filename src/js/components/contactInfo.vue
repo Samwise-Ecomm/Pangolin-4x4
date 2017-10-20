@@ -179,111 +179,119 @@
 
 		<hr>
 		<div>
-			<div class='Button Button--active u-width200 u-floatLeft' @click="$parent.prevStep">< Prev</div>
-			<div class='Button Button--active u-width200 u-floatRight' @click="submit">Next ></div>
+			<div class='Button Button--active u-width200 u-floatLeft' @click="$parent.prevStep">Prev</div>
+			<div class='Button Button--active u-width200 u-floatRight' @click="submit">Next</div>
 		</div>
 	</div>
 </template>
 
 <script>
 module.exports = {
-	data () {
-		return {
-			warn: [],
-			selected: '',
-		}
-	},
+  data() {
+    return {
+      warn: [],
+      selected: ""
+    }
+  },
 
-	props: ['shipping', 'info'],
+  props: ["shipping", "info"],
 
-	methods: {
-		submit() {
-			if (this.checkFields()) {
-				this.$parent.nextStep()
-			}
-		},
+  methods: {
+    submit() {
+      if (this.checkFields()) {
+        this.$parent.nextStep()
+      }
+    },
 
-		checkFields() {
-			if (!this.shipping && !this.info.seperate_billing) {
-				return true
-			}
+    checkFields() {
+      if (!this.shipping && !this.info.seperate_billing) {
+        return true
+      }
 
-			var valid = true
+      var valid = true
 
-			this.warn = []
-			var requiredFields = ['first_name','last_name','zip','city','street']
-			requiredFields.forEach(function(field) {
-				if (this.info[field] == "") {
-					this.warn.push(field)
-					valid = false
-				}
-			}.bind(this))
+      this.warn = []
+      var requiredFields = ["first_name", "last_name", "zip", "city", "street"]
+      requiredFields.forEach(
+        function(field) {
+          if (this.info[field] == "") {
+            this.warn.push(field)
+            valid = false
+          }
+        }.bind(this)
+      )
 
-			if (this.shipping) {
-				if(!/\S+@\S+\.\S+/.test(this.info.email)) {
-					this.warn.push('email')
-					valid = false
-				} else if (this.info.email != this.info.confirm_email) {
-					this.warn.push('confirm_email')
-					valid = false
-				}
-			}
+      if (this.shipping) {
+        if (!/\S+@\S+\.\S+/.test(this.info.email)) {
+          this.warn.push("email")
+          valid = false
+        } else if (this.info.email != this.info.confirm_email) {
+          this.warn.push("confirm_email")
+          valid = false
+        }
+      }
 
-			if (valid) {
-				if (this.shipping) {
-					sessionStorage.shippingInfo = JSON.stringify(this.info)
-				} else {
-					sessionStorage.billingInfo = JSON.stringify(this.info)
-				}
-			}
-			return valid
-		},
+      if (valid) {
+        if (this.shipping) {
+          sessionStorage.shippingInfo = JSON.stringify(this.info)
+        } else {
+          sessionStorage.billingInfo = JSON.stringify(this.info)
+        }
+      }
+      return valid
+    },
 
-		checkField(field) {
-			if (field == 'email') {
-				if (this.warn.indexOf('email') != -1 && /\S+@\S+\.\S+/.test(this.info.email)) {
-					this.warn.$remove('email')
-					return 1
-				}
-			} else if (field == 'confirm_email') {
-				if (this.warn.indexOf('confirm_email') != -1 && this.info.email == this.info.confirm_email) {
-					this.warn.$remove('confirm_email')
-					return 1
-				}
-			} else {
-				if (this.warn.indexOf(field) != -1 && this.info[field] != "") {
-					this.warn.$remove(field)
-					return 1	
-				}
-			}
+    checkField(field) {
+      if (field == "email") {
+        if (
+          this.warn.indexOf("email") != -1 &&
+          /\S+@\S+\.\S+/.test(this.info.email)
+        ) {
+          this.warn.$remove("email")
+          return 1
+        }
+      } else if (field == "confirm_email") {
+        if (
+          this.warn.indexOf("confirm_email") != -1 &&
+          this.info.email == this.info.confirm_email
+        ) {
+          this.warn.$remove("confirm_email")
+          return 1
+        }
+      } else {
+        if (this.warn.indexOf(field) != -1 && this.info[field] != "") {
+          this.warn.$remove(field)
+          return 1
+        }
+      }
 
-			return 0
-		},
+      return 0
+    },
 
-		returnCountries() {
-			var geoInfo = require('../store/geoInfo.js')
-			return Object.keys(geoInfo)
-		},
+    returnCountries() {
+      var geoInfo = require("../store/geoInfo.js")
+      return Object.keys(geoInfo)
+    },
 
-		returnStates(country) {
-			var geoInfo = require('../store/geoInfo.js')
-			if (geoInfo[country].length == 0) {
-				this.info.state = country
-				return [country]
-			} else {
-				if (country == "United States") {
-					if (geoInfo[country].indexOf(this.info.state) == -1) {
-						this.info.state = "Oregon"	
-					}	
-					return geoInfo[country]
-				} else {
-					if (geoInfo[country].indexOf(this.info.state) == -1) {
-						this.info.state = geoInfo[country][0]
-					}
-					return geoInfo[country]
-				}
-			}
-		},
-	},
+    returnStates(country) {
+      var geoInfo = require("../store/geoInfo.js")
+      if (geoInfo[country].length == 0) {
+        this.info.state = country
+        return [country]
+      } else {
+        if (country == "United States") {
+          if (geoInfo[country].indexOf(this.info.state) == -1) {
+            this.info.state = "Oregon"
+          }
+          return geoInfo[country]
+        } else {
+          if (geoInfo[country].indexOf(this.info.state) == -1) {
+            this.info.state = geoInfo[country][0]
+          }
+          return geoInfo[country]
+        }
+      }
+    }
+  }
 }
 </script>

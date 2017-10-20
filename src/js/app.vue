@@ -24,7 +24,7 @@
 			<div id="Head-titleBar">
 				<div class="u-contentWrapper">
 					<a v-link="{ path: '/home' }">
-						<img id="Head-logo" src="/img/store/webLogo.svg" onerror="this.src='/img/store/webLogo.png;this.onerror=null;'">
+						<img id="Head-logo" src="/img/webLogo.svg" onerror="this.src='/img/webLogo.png;this.onerror=null;'">
 					</a>
 					<div id="Head-contact">
 						For questions and ordering<br>
@@ -87,67 +87,76 @@
 
 <script>
 module.exports = {
-	data () {
-		return {
-			search: true,
-			settings: {},
-			menus: {},
-			query: '',
-			loaded: false
-		}
-	},
+  data() {
+    return {
+      search: true,
+      settings: {},
+      menus: {},
+      query: "",
+      loaded: false
+    }
+  },
 
-	ready() {
-		this.getSettings()
-	},
+  ready() {
+    this.getSettings()
+  },
 
-	components: {
-		statusIcon: require('./components/statusIcon.vue'),
-		search: require('./components/search.vue'),
-		cart: require('./components/cart.vue'),
-	},
+  components: {
+    statusIcon: require("./components/statusIcon.vue"),
+    search: require("./components/search.vue"),
+    cart: require("./components/cart.vue")
+  },
 
-	methods: {
-		getSettings () {
-			this.$http.get('settings').then(function(response) {
-				this.$set('settings', response.data)
-				this.getMenus()
-			})
-		},
+  methods: {
+    getSettings() {
+      this.$http.get("settings").then(function(response) {
+        this.$set("settings", response.data)
+        this.getMenus()
+      })
+    },
 
-		getMenus () {
-			this.$http.get('menus').then(function(response) {
-				this.$set('menus', response.data)
-				this.loaded = true
-				this.$nextTick(() => {
-					$(window).scroll()
-				})
-			})
-		},
+    getMenus() {
+      this.$http.get("menus").then(function(response) {
+        this.$set("menus", response.data)
+        this.loaded = true
+        this.$nextTick(() => {
+          $(window).scroll()
+        })
+      })
+    },
 
-		queryChanged (event) {
-			if (event.keyCode == 27) { // esc
-				$('#Head-searchInput').blur()
-				this.$set('query', '')
-			}
-			if (event.keyIdentifier == 'Enter' || event.keyIdentifier == 'Up' || event.keyIdentifier == 'Down') {
-				this.$broadcast('searchEvent', { key: event.keyIdentifier })
-			}
-			if (event.keyCode == 8 || (46 < event.keyCode && event.keyCode < 91) || event.keyCode > 145) {
-				this.$refs.searchIcon.working()
-				this.$refs.search.searching = true
-			}
-		},
+    queryChanged(event) {
+      if (event.keyCode == 27) {
+        // esc
+        $("#Head-searchInput").blur()
+        this.$set("query", "")
+      }
+      if (
+        event.keyIdentifier == "Enter" ||
+        event.keyIdentifier == "Up" ||
+        event.keyIdentifier == "Down"
+      ) {
+        this.$broadcast("searchEvent", { key: event.keyIdentifier })
+      }
+      if (
+        event.keyCode == 8 ||
+        (46 < event.keyCode && event.keyCode < 91) ||
+        event.keyCode > 145
+      ) {
+        this.$refs.searchIcon.working()
+        this.$refs.search.searching = true
+      }
+    },
 
-		catalogSlugToId (slug) {
-			for (var i = 0; i < this.menus['sidebar'].length; i++) {
-				if (this.menus['sidebar'][i].slug == slug) {
-					return this.menus['sidebar'][i].id
-				}
-			}
+    catalogSlugToId(slug) {
+      for (var i = 0; i < this.menus["sidebar"].length; i++) {
+        if (this.menus["sidebar"][i].slug == slug) {
+          return this.menus["sidebar"][i].id
+        }
+      }
 
-			return null
-		}
-	},
+      return null
+    }
+  }
 }
 </script>
