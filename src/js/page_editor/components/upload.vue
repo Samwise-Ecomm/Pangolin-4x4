@@ -29,58 +29,61 @@
 </template>
 
 <script>
-module.exports = {
-	data: function() {
-		this.getFiles()
-		return {
-			files: {},
+export default {
+  data: function() {
+    this.getFiles()
+    return {
+      files: {},
       error: "",
-      errorDebouncer: 0,
-		}
-	},
+      errorDebouncer: 0
+    }
+  },
   props: {
     show: {
       type: Boolean,
       required: true,
-      twoWay: true    
+      twoWay: true
     }
   },
   events: {
-    error (message) {
+    error(message) {
       this.error = message
       this.errorDebouncer = Date.now() + 4500
-      setTimeout(function() {
-        if (this.errorDebouncer < Date.now()) {
-          this.error = ""
-        }
-      }.bind(this), 5000)
+      setTimeout(
+        function() {
+          if (this.errorDebouncer < Date.now()) {
+            this.error = ""
+          }
+        }.bind(this),
+        5000
+      )
     },
-    
-    closeUploads () {
+
+    closeUploads() {
       this.show = false
     }
   },
   methods: {
-  	getFiles () {
-  		this.$http.get('/api/images').then(response => {
-  			this.$set('files',response.data)
-  		})
-  	},
-  },
+    getFiles() {
+      this.$http.get("/api/images").then(response => {
+        this.$set("files", response.data)
+      })
+    }
+  }
 }
 </script>
 
 <style>
-input[type=text] {
+input[type="text"] {
   border: 0;
   width: 40%;
-  margin-left:1px;
+  margin-left: 1px;
   border-bottom: 1px solid #ccc;
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
 }
 
-input[type=text]:focus {
+input[type="text"]:focus {
   outline: none;
   border-bottom: 1px solid #000;
 }
@@ -89,12 +92,15 @@ ul > li {
   margin-left: 10px;
 }
 
-li div.u-active, li label.u-active, li i.u-active {
+li div.u-active,
+li label.u-active,
+li i.u-active {
   color: black;
   background: white;
 }
 
-li div.u-active:hover, li label.u-active:hover {
+li div.u-active:hover,
+li label.u-active:hover {
   cursor: pointer;
   color: #ce3229;
 }
@@ -119,9 +125,9 @@ li div.u-active:hover, li label.u-active:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: table;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .upload-wrapper {
@@ -135,8 +141,8 @@ li div.u-active:hover, li label.u-active:hover {
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-  transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
 }
 
 .upload-header h3 {
@@ -154,15 +160,17 @@ li div.u-active:hover, li label.u-active:hover {
   float: right;
 }
 
-.grow-enter, .grow-leave {
+.grow-enter,
+.grow-leave {
   height: 0;
 }
 
 .grow-transition {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
-.upload-enter, .upload-leave {
+.upload-enter,
+.upload-leave {
   opacity: 0;
 }
 

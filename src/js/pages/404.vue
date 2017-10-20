@@ -13,9 +13,9 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {}
-	},
+export default {
+  data() {
+    return {}
+  }
 }
 </script>

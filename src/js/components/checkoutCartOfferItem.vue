@@ -26,46 +26,46 @@
 </template>
 
 <script>
-module.exports = {
-	props: ['item'],
+export default {
+  props: ["item"],
 
-	watch: {
-		'item.count': function() {
-			if (this.item.count == '') {
-				this.item.count = 0
-			}
-		}
-	},
+  watch: {
+    "item.count": function() {
+      if (this.item.count == "") {
+        this.item.count = 0
+      }
+    }
+  },
 
-	methods: {
-		changeCount(change) {
-			this.item.count = parseInt(this.item.count) + change
-			if (this.item.count < 0) {
-				this.item.count = 0
-			}
-			if (this.item.count > this.item.stock && !this.item.infinite) {
-				this.item.count = this.item.stock
-			}
-			this.$parent.$parent.storeCart()
-		},
+  methods: {
+    changeCount(change) {
+      this.item.count = parseInt(this.item.count) + change
+      if (this.item.count < 0) {
+        this.item.count = 0
+      }
+      if (this.item.count > this.item.stock && !this.item.infinite) {
+        this.item.count = this.item.stock
+      }
+      this.$parent.$parent.storeCart()
+    },
 
-		checkKey(event) {
-			if (event.keyCode == 8) {
-				return 0
-			} else if (event.keyCode < 48 || 57 < event.keyCode) {
-				event.preventDefault()
-			}
-		},
+    checkKey(event) {
+      if (event.keyCode == 8) {
+        return 0
+      } else if (event.keyCode < 48 || 57 < event.keyCode) {
+        event.preventDefault()
+      }
+    },
 
-		checkCount() {
-			if (this.item.count < 0) {
-				this.item.count = 0
-			} else if (!this.item.infinite && this.item.count > this.item.stock) {
-				this.item.count = this.item.stock
-			}
+    checkCount() {
+      if (this.item.count < 0) {
+        this.item.count = 0
+      } else if (!this.item.infinite && this.item.count > this.item.stock) {
+        this.item.count = this.item.stock
+      }
 
-			this.$parent.$parent.storeCart()
-		}
-	}
+      this.$parent.$parent.storeCart()
+    }
+  }
 }
 </script>

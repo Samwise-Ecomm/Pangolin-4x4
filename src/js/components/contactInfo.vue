@@ -186,7 +186,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
   data() {
     return {
       warn: [],

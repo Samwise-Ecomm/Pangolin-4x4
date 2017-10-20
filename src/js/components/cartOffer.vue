@@ -8,11 +8,11 @@
 </template>
 
 <script>
-module.exports = {
-	props: ['offer', 'offerId', 'lastOfferId'],
+export default {
+  props: ["offer", "offerId", "lastOfferId"],
 
-	components: {
-		item: require('./cartOfferItem.vue')
-	}
+  components: {
+    item: require("./cartOfferItem.vue")
+  }
 }
 </script>

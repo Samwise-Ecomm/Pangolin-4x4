@@ -90,7 +90,7 @@
 </style>
 
 <script>
-module.exports = {
+export default {
   el: "#app",
 
   data() {

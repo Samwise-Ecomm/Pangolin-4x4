@@ -74,93 +74,94 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {
-			offer: {},
-			loaded: false
-		}
-	},
+export default {
+  data() {
+    return {
+      offer: {},
+      loaded: false
+    }
+  },
 
-	components: {
-		addToCart: require('../components/addToCart.vue')
-	},
+  components: {
+    addToCart: require("../components/addToCart.vue")
+  },
 
-	computed: {
-		partNumbers () {
-			var numbers = []
-			for (var i = 0; i < this.offer.items.length; i++) {
-				if (this.offer.items[i]['part_number'] == '') {
-					continue
-				}
+  computed: {
+    partNumbers() {
+      var numbers = []
+      for (var i = 0; i < this.offer.items.length; i++) {
+        if (this.offer.items[i]["part_number"] == "") {
+          continue
+        }
 
-				var item_numbers = this.offer.items[i]['part_number'].split(',')
+        var item_numbers = this.offer.items[i]["part_number"].split(",")
 
-				for (var j = 0; j < item_numbers.length; j++) {
-					item_numbers[j] = item_numbers[j].trim()
+        for (var j = 0; j < item_numbers.length; j++) {
+          item_numbers[j] = item_numbers[j].trim()
 
-					if (!numbers.includes(item_numbers[j])) {
-						numbers.push(item_numbers[j])
-					}
-				}
-			}
+          if (!numbers.includes(item_numbers[j])) {
+            numbers.push(item_numbers[j])
+          }
+        }
+      }
 
-			return numbers
-		},
+      return numbers
+    },
 
-		ssPartNumbers () {
-			var numbers = []
-			for (var i = 0; i < this.offer.items.length; i++) {
-				if (this.offer.items[i]['ss_part_number'] == '') {
-					continue
-				}
+    ssPartNumbers() {
+      var numbers = []
+      for (var i = 0; i < this.offer.items.length; i++) {
+        if (this.offer.items[i]["ss_part_number"] == "") {
+          continue
+        }
 
-				var item_numbers = this.offer.items[i]['ss_part_number'].split(',')
+        var item_numbers = this.offer.items[i]["ss_part_number"].split(",")
 
-				for (var j = 0; j < item_numbers.length; j++) {
-					item_numbers[j] = item_numbers[j].trim()
+        for (var j = 0; j < item_numbers.length; j++) {
+          item_numbers[j] = item_numbers[j].trim()
 
-					if (!numbers.includes(item_numbers[j])) {
-						numbers.push(item_numbers[j])
-					}
-				}
-			}
+          if (!numbers.includes(item_numbers[j])) {
+            numbers.push(item_numbers[j])
+          }
+        }
+      }
 
-			return numbers
-		},
-	},
+      return numbers
+    }
+  },
 
-	route: {
-		data() {
-			this.getOffer()
-		},
-	},
+  route: {
+    data() {
+      this.getOffer()
+    }
+  },
 
-	methods: {
-		getOffer () {
-			this.$http.get(`/public-api/offer/${this.$route.params.id}`).then(response => {
-				this.$set('offer', response.data)
-				for (var i = 0; i < this.offer.pictures.length; i++) {
-					this.$set(`offer.pictures[${i}].selected`, false)
-				}
-				this.selectPic(0)
-				document.title = "Pangolin 4x4: "+this.offer.name
+  methods: {
+    getOffer() {
+      this.$http
+        .get(`/public-api/offer/${this.$route.params.id}`)
+        .then(response => {
+          this.$set("offer", response.data)
+          for (var i = 0; i < this.offer.pictures.length; i++) {
+            this.$set(`offer.pictures[${i}].selected`, false)
+          }
+          this.selectPic(0)
+          document.title = "Pangolin 4x4: " + this.offer.name
 
-				this.loaded = true
-			})
-		},
+          this.loaded = true
+        })
+    },
 
-		selectPic(index) {
-			if (this.offer.pictures.length == 0) {
-				return
-			}
+    selectPic(index) {
+      if (this.offer.pictures.length == 0) {
+        return
+      }
 
-			for (var i = 0; i < this.offer.pictures.length; i++) {
-				this.offer.pictures[i].selected = false
-			}
-			this.offer.pictures[index].selected = true
-
-		}
-	},
+      for (var i = 0; i < this.offer.pictures.length; i++) {
+        this.offer.pictures[i].selected = false
+      }
+      this.offer.pictures[index].selected = true
+    }
+  }
 }
 </script>

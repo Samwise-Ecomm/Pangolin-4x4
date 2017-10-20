@@ -56,7 +56,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
   data() {
     var store = require("../store/invoiceInfo.js")
     store.load()

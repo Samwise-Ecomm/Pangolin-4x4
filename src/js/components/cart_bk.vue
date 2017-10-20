@@ -55,165 +55,185 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {
-			cart: {},
-			show: false
-		}
-	},
+export default {
+  data() {
+    return {
+      cart: {},
+      show: false
+    }
+  },
 
-	props: ['checkout'],
+  props: ["checkout"],
 
-	created () {
-		this.clearCart()
-		this.restoreCart()
-	},
+  created() {
+    this.clearCart()
+    this.restoreCart()
+  },
 
-	watch: {
-		cart () {
-			this.setAddToCartButtons()
-		}
-	},
+  watch: {
+    cart() {
+      this.setAddToCartButtons()
+    }
+  },
 
-	computed: {
-		lastObject () {
-			if (this.cart) {
-				return Object.keys(this.cart)[Object.keys(this.cart).length - 1]	
-			} else {
-				return null
-			}
-		},
+  computed: {
+    lastObject() {
+      if (this.cart) {
+        return Object.keys(this.cart)[Object.keys(this.cart).length - 1]
+      } else {
+        return null
+      }
+    },
 
-		subTotal () {
-			var subTotal = 0
-			for (var itemId in this.cart) {
-				for (var variantId in this.cart[itemId].variants) {
-					subTotal += this.cart[itemId].variants[variantId].count * this.cart[itemId].variants[variantId].price
-				}
-			}
+    subTotal() {
+      var subTotal = 0
+      for (var itemId in this.cart) {
+        for (var variantId in this.cart[itemId].variants) {
+          subTotal +=
+            this.cart[itemId].variants[variantId].count *
+            this.cart[itemId].variants[variantId].price
+        }
+      }
 
-			return subTotal
-		},
-	},
+      return subTotal
+    }
+  },
 
-	methods: {
-		addToCart (cartItem, itemId, variantId) {
-			ga('send', 'event', 'cart', 'itemAdded', 'Item #'+itemId+' - "'+cartItem.name+'"; Variant #'+variantId+' - "'+cartItem.variants[variantId].name+'"')
-			var cart = {}
-			if (localStorage.cart) {
-				cart = JSON.parse(localStorage.cart)
-			}
+  methods: {
+    addToCart(cartItem, itemId, variantId) {
+      ga(
+        "send",
+        "event",
+        "cart",
+        "itemAdded",
+        "Item #" +
+          itemId +
+          ' - "' +
+          cartItem.name +
+          '"; Variant #' +
+          variantId +
+          ' - "' +
+          cartItem.variants[variantId].name +
+          '"'
+      )
+      var cart = {}
+      if (localStorage.cart) {
+        cart = JSON.parse(localStorage.cart)
+      }
 
-			if(cart[itemId]) {
-				if (cart[itemId].variants[variantId]) {
-					cart[itemId].variants[variantId].count += cartItem.variants[variantId].count
+      if (cart[itemId]) {
+        if (cart[itemId].variants[variantId]) {
+          cart[itemId].variants[variantId].count +=
+            cartItem.variants[variantId].count
 
-					var variant = cart[itemId].variants[variantId]
-					if (!variant.infinite && variant.count > variant.stock ) {
-						cart[itemId].variants[variantId].count = variant.stock
-					}
-				} else {
-					cart[itemId].variants[variantId] = cartItem.variants[variantId]
-				}
-			} else {
-				cart[itemId] = cartItem
-			}
+          var variant = cart[itemId].variants[variantId]
+          if (!variant.infinite && variant.count > variant.stock) {
+            cart[itemId].variants[variantId].count = variant.stock
+          }
+        } else {
+          cart[itemId].variants[variantId] = cartItem.variants[variantId]
+        }
+      } else {
+        cart[itemId] = cartItem
+      }
 
-			this.storeCart(cart)
-		},
+      this.storeCart(cart)
+    },
 
-		storeCart(cart) {
-			localStorage.cartExperation = Date.now() + (1000 * 60 * 60 * 24);
-			localStorage.cart = JSON.stringify(cart)
-			this.restoreCart()
-		},
+    storeCart(cart) {
+      localStorage.cartExperation = Date.now() + 1000 * 60 * 60 * 24
+      localStorage.cart = JSON.stringify(cart)
+      this.restoreCart()
+    },
 
-		restoreCart() {
-			if (localStorage.cart) {
-				this.show = true
-				this.$set('cart', JSON.parse(localStorage.cart))
-			} else {
-				this.show = false
-				return {}
-			}
-		},
+    restoreCart() {
+      if (localStorage.cart) {
+        this.show = true
+        this.$set("cart", JSON.parse(localStorage.cart))
+      } else {
+        this.show = false
+        return {}
+      }
+    },
 
-		clearCart() {
-			if (localStorage.cartExperation && Date.now() > localStorage.cartExperation) {
-				delete localStorage.cart
-				delete localStorage.cartExperation
-				return {}
-			}
+    clearCart() {
+      if (
+        localStorage.cartExperation &&
+        Date.now() > localStorage.cartExperation
+      ) {
+        delete localStorage.cart
+        delete localStorage.cartExperation
+        return {}
+      }
 
-			if (!localStorage.cart) {
-				return 0
-			}
-			
- 			var cart = JSON.parse(localStorage.cart)
-			for (var itemId in cart) {
-				for (var variantId in cart[itemId].variants) {
-					if (cart[itemId].variants[variantId].count == 0) {
-						delete cart[itemId].variants[variantId]
-					}
-				}
-				if (Object.keys(cart[itemId].variants).length == 0) {
-					delete (cart[itemId])
-				}
-			}
-			if (Object.keys(cart).length == 0) {
-				localStorage.removeItem('cart')
-			} else {
-				localStorage.cart = JSON.stringify(cart)	
-			}
-		},
+      if (!localStorage.cart) {
+        return 0
+      }
 
-		changeCount(variant, change) {
-			variant.count = parseInt(variant.count) + change
-			if (variant.count < 0) {
-				variant.count = 0
-			}
-			if (!variant.infinite && variant.count > variant.stock) {
-				variant.count = variant.stock
-			}
+      var cart = JSON.parse(localStorage.cart)
+      for (var itemId in cart) {
+        for (var variantId in cart[itemId].variants) {
+          if (cart[itemId].variants[variantId].count == 0) {
+            delete cart[itemId].variants[variantId]
+          }
+        }
+        if (Object.keys(cart[itemId].variants).length == 0) {
+          delete cart[itemId]
+        }
+      }
+      if (Object.keys(cart).length == 0) {
+        localStorage.removeItem("cart")
+      } else {
+        localStorage.cart = JSON.stringify(cart)
+      }
+    },
 
-			this.storeCart(Object.assign({}, this.cart))
-		},
+    changeCount(variant, change) {
+      variant.count = parseInt(variant.count) + change
+      if (variant.count < 0) {
+        variant.count = 0
+      }
+      if (!variant.infinite && variant.count > variant.stock) {
+        variant.count = variant.stock
+      }
 
-		returnCount(itemId, variantId) {
-			if (cart[itemId] == undefined) {
-				return 0
-			}
+      this.storeCart(Object.assign({}, this.cart))
+    },
 
-			if (cart[itemId].variants[variantId] == undefined) {
-				return 0
-			}
+    returnCount(itemId, variantId) {
+      if (cart[itemId] == undefined) {
+        return 0
+      }
 
-			return cart[itemId].variants[variantId].count
-		},
+      if (cart[itemId].variants[variantId] == undefined) {
+        return 0
+      }
 
-		checkKey(event) {
-			if (event.keyCode == 8) {
-				return 0
-			} else if (event.keyCode < 48 || 57 < event.keyCode) {
-				event.preventDefault()
-			}
-		},
+      return cart[itemId].variants[variantId].count
+    },
 
-		checkCount(variant) {
-			if (variant.count < 0) {
-				variant.count = 0
-			} else if (!variant.infinite && variant.count > variant.stock) {
-				variant.count = variant.stock
-			}
+    checkKey(event) {
+      if (event.keyCode == 8) {
+        return 0
+      } else if (event.keyCode < 48 || 57 < event.keyCode) {
+        event.preventDefault()
+      }
+    },
 
-			this.storeCart(Object.assign({}, this.cart))
-		},
+    checkCount(variant) {
+      if (variant.count < 0) {
+        variant.count = 0
+      } else if (!variant.infinite && variant.count > variant.stock) {
+        variant.count = variant.stock
+      }
 
-		submitCheckout() {
-			this.clearCart()
-			this.$parent.nextStep()
-		}
-	}
+      this.storeCart(Object.assign({}, this.cart))
+    },
+
+    submitCheckout() {
+      this.clearCart()
+      this.$parent.nextStep()
+    }
+  }
 }
 </script>

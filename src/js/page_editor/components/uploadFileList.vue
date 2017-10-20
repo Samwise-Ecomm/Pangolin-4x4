@@ -13,13 +13,13 @@
 </template>
 
 <script>
-module.exports = {
-	props: {
-		file: Object
-	},
+export default {
+  props: {
+    file: Object
+  },
 
-	components: {
-		files: require('./files.vue')
-	}
+  components: {
+    files: require("./files.vue")
+  }
 }
 </script>

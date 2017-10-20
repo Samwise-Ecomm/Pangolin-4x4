@@ -35,105 +35,108 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {
-			catalog: {},
-			selected: [],
-			loaded: false,
-			id: null
-		}
-	},
+export default {
+  data() {
+    return {
+      catalog: {},
+      selected: [],
+      loaded: false,
+      id: null
+    }
+  },
 
-	components: {
-		catalog: require('../components/catalog.vue')
-	},
+  components: {
+    catalog: require("../components/catalog.vue")
+  },
 
-	route: {
-		data () {
-			this.selected = []
-			this.getCatalog()
-		},
-	},
+  route: {
+    data() {
+      this.selected = []
+      this.getCatalog()
+    }
+  },
 
-	computed: {
-		given () {
-			if (this.selected.length == 0) {
-				return this.catalog.tags
-			} else {
-				return this.selected
-			}
-		},
+  computed: {
+    given() {
+      if (this.selected.length == 0) {
+        return this.catalog.tags
+      } else {
+        return this.selected
+      }
+    },
 
-		trim () {
-			if (this.catalog.tags.length <= 1) {
-				return 0
-			}
+    trim() {
+      if (this.catalog.tags.length <= 1) {
+        return 0
+      }
 
-			var chunk = this.compareStartingChunks(this.catalog.tags[0], this.catalog.tags[1])
-			if (this.catalog.tags.length == 2) {
-				return chunk.length
-			}
+      var chunk = this.compareStartingChunks(
+        this.catalog.tags[0],
+        this.catalog.tags[1]
+      )
+      if (this.catalog.tags.length == 2) {
+        return chunk.length
+      }
 
-			for (var i = 2; i < this.catalog.tags.length; i++) {
-				var tag = this.catalog.tags[i]
-				chunk = this.compareStartingChunks(chunk, tag)
-			}
-			return chunk.length
-		}
-	},
+      for (var i = 2; i < this.catalog.tags.length; i++) {
+        var tag = this.catalog.tags[i]
+        chunk = this.compareStartingChunks(chunk, tag)
+      }
+      return chunk.length
+    }
+  },
 
-	methods: {
-		getCatalog () {
-			this.id = this.$root.catalogSlugToId(this.$route.params.slug)
+  methods: {
+    getCatalog() {
+      this.id = this.$root.catalogSlugToId(this.$route.params.slug)
 
-			this.$http.get('catalog/'+this.id).then(response => {
-				response.data['tags'] = response.data['tags'].split(',')
-				this.$set('catalog', response.data)
-				document.title = "Pangolin 4x4 Catalog: "+this.catalog.name
-				this.loaded = true
-			})
-		},
+      this.$http.get("catalog/" + this.id).then(response => {
+        response.data["tags"] = response.data["tags"].split(",")
+        this.$set("catalog", response.data)
+        document.title = "Pangolin 4x4 Catalog: " + this.catalog.name
+        this.loaded = true
+      })
+    },
 
-		fillTags () {
-			this.selected = []
-			for (var i = 0; i < this.catalog.tags.length; i++) {
-				this.selected.push(this.catalog.tags[i])
-			};
-		},
+    fillTags() {
+      this.selected = []
+      for (var i = 0; i < this.catalog.tags.length; i++) {
+        this.selected.push(this.catalog.tags[i])
+      }
+    },
 
-		clearTags () {
-			this.selected = []
-		},
+    clearTags() {
+      this.selected = []
+    },
 
-		toggleTag (tag) {
-			var index = this.selected.indexOf(tag)
-			if (index != -1) {
-				this.selected.splice(index, 1)
-			} else {
-				this.selected.push(tag)
-			}
-		},
+    toggleTag(tag) {
+      var index = this.selected.indexOf(tag)
+      if (index != -1) {
+        this.selected.splice(index, 1)
+      } else {
+        this.selected.push(tag)
+      }
+    },
 
-		compareStartingChunks(stringOne, stringTwo) {
-			var firstDash = stringOne.indexOf('-')
-			if (firstDash == -1) {
-				return ""
-			}
+    compareStartingChunks(stringOne, stringTwo) {
+      var firstDash = stringOne.indexOf("-")
+      if (firstDash == -1) {
+        return ""
+      }
 
-			var firstChunk = stringOne.substring(0,firstDash)
+      var firstChunk = stringOne.substring(0, firstDash)
 
-			var firstDash = stringTwo.indexOf('-')
-			if (firstDash == -1) {
-				return ""
-			}
+      var firstDash = stringTwo.indexOf("-")
+      if (firstDash == -1) {
+        return ""
+      }
 
-			if (stringTwo.substring(0,firstDash) == firstChunk) {
-				return firstChunk+'-'
-			} else {
-				return ""
-			}
-		}
-	},
+      if (stringTwo.substring(0, firstDash) == firstChunk) {
+        return firstChunk + "-"
+      } else {
+        return ""
+      }
+    }
+  }
 }
 </script>

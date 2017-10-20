@@ -80,7 +80,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
   data() {
     if (localStorage.cart) {
       var cart = JSON.parse(localStorage.cart)

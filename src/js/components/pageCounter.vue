@@ -13,19 +13,19 @@
 </template>
 
 <script>
-module.exports = {
-	props: ['givenPage', 'pages'],
+export default {
+  props: ["givenPage", "pages"],
 
-	computed: {
-		page () {
-			return this.givenPage + 1
-		}
-	},
+  computed: {
+    page() {
+      return this.givenPage + 1
+    }
+  },
 
-	methods: {
-		changePage (page) {
-			this.$dispatch('changePage', page - 1)
-		}
-	}
+  methods: {
+    changePage(page) {
+      this.$dispatch("changePage", page - 1)
+    }
+  }
 }
 </script>

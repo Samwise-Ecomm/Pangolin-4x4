@@ -22,51 +22,56 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {
-			loaded: true
-		}
-	},
+export default {
+  data() {
+    return {
+      loaded: true
+    }
+  },
 
-	computed: {
-		partNumbers () {
-			var numbers = []
-			for (var i = 0; i < this.offer.items.length; i++) {
-				if (this.offer.items[i]['part_number'] && !numbers.includes(this.offer.items[i]['part_number'])) {
-					var item_numbers = this.offer.items[i]['part_number'].split(',')
-					for (var j = 0; j < item_numbers.length; j++) {
-						item_numbers[j] = item_numbers[j].trim()
-						if (!numbers.includes(item_numbers[j])) {
-							numbers.push(item_numbers[j])
-						}
-					}
-				}
-			}
+  computed: {
+    partNumbers() {
+      var numbers = []
+      for (var i = 0; i < this.offer.items.length; i++) {
+        if (
+          this.offer.items[i]["part_number"] &&
+          !numbers.includes(this.offer.items[i]["part_number"])
+        ) {
+          var item_numbers = this.offer.items[i]["part_number"].split(",")
+          for (var j = 0; j < item_numbers.length; j++) {
+            item_numbers[j] = item_numbers[j].trim()
+            if (!numbers.includes(item_numbers[j])) {
+              numbers.push(item_numbers[j])
+            }
+          }
+        }
+      }
 
-			return numbers
-		},
-	},
+      return numbers
+    }
+  },
 
-	props: ['offer', 'id'],
+  props: ["offer", "id"],
 
-	methods: {
-		go (id) {
-			this.$root.$router.go({ path: `/item/${this.offer.id}` })
-		},
+  methods: {
+    go(id) {
+      this.$root.$router.go({ path: `/item/${this.offer.id}` })
+    },
 
-		changedVariant(item) {
-			var itemId = item.id
-			var variantId = item.selected
+    changedVariant(item) {
+      var itemId = item.id
+      var variantId = item.selected
 
-			$('.js-addToCart[item-id=' + itemId + ']').removeClass('isDisabled')
-			$('.js-addToCart[item-id=' + itemId + ']').addClass('Button--active')
-			$('.js-addToCart[item-id=' + itemId + ']').html('<i class="fa fa-cart-plus"></i> Add to Cart')
+      $(".js-addToCart[item-id=" + itemId + "]").removeClass("isDisabled")
+      $(".js-addToCart[item-id=" + itemId + "]").addClass("Button--active")
+      $(".js-addToCart[item-id=" + itemId + "]").html(
+        '<i class="fa fa-cart-plus"></i> Add to Cart'
+      )
 
-			this.$nextTick(function() {
-				this.$root.$refs.cart.setAddToCartButtons()	
-			})
-		},
-	}
+      this.$nextTick(function() {
+        this.$root.$refs.cart.setAddToCartButtons()
+      })
+    }
+  }
 }
 </script>

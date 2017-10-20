@@ -5,57 +5,60 @@
 </template>
 
 <script>
-module.exports = {
-	props: ['item', 'thumb', 'partNumbers'],
+export default {
+  props: ["item", "thumb", "partNumbers"],
 
-	computed: {
-		count () {
-			if (this.cart.cart[this.item.offer_id] && this.cart.cart[this.item.offer_id].items[this.item.id]) {
-				return this.cart.cart[this.item.offer_id].items[this.item.id].count
-			} else {
-				return 0
-			}
-		},
+  computed: {
+    count() {
+      if (
+        this.cart.cart[this.item.offer_id] &&
+        this.cart.cart[this.item.offer_id].items[this.item.id]
+      ) {
+        return this.cart.cart[this.item.offer_id].items[this.item.id].count
+      } else {
+        return 0
+      }
+    },
 
-		inStock () {
-			return (this.item.stock > 0 || this.item.infinite)
-		},
+    inStock() {
+      return this.item.stock > 0 || this.item.infinite
+    },
 
-		countMaxed () {
-			return (!this.item.infinite && this.count >= this.item.stock)
-		},
+    countMaxed() {
+      return !this.item.infinite && this.count >= this.item.stock
+    },
 
-		message () {
-			if (!this.inStock) {
-				return 'Out of Stock'
-			} else if (this.countMaxed) {
-				return `All in Cart (${this.count})`
-			} else if (this.count > 0) {
-				return `${this.count} in Cart`
-			} else {
-				return 'Add to Cart'
-			}
-		},
+    message() {
+      if (!this.inStock) {
+        return "Out of Stock"
+      } else if (this.countMaxed) {
+        return `All in Cart (${this.count})`
+      } else if (this.count > 0) {
+        return `${this.count} in Cart`
+      } else {
+        return "Add to Cart"
+      }
+    },
 
-		icon () {
-			return 'fa-cart-plus'
-		},
+    icon() {
+      return "fa-cart-plus"
+    },
 
-		cart () {
-			return this.$root.$refs.cart
-		}
-	},
+    cart() {
+      return this.$root.$refs.cart
+    }
+  },
 
-	methods: {
-		addItem () {
-			ga('send', 'event', 'addToCart', `${this.item.id} ${this.item.full_name}`)
+  methods: {
+    addItem() {
+      ga("send", "event", "addToCart", `${this.item.id} ${this.item.full_name}`)
 
-			if (!this.inStock || this.countMaxed) {
-				return
-			}
+      if (!this.inStock || this.countMaxed) {
+        return
+      }
 
-			this.cart.addItem(this.item, this.thumb, this.partNumbers)
-		}
-	}
+      this.cart.addItem(this.item, this.thumb, this.partNumbers)
+    }
+  }
 }
 </script>

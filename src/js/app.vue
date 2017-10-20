@@ -24,7 +24,7 @@
 			<div id="Head-titleBar">
 				<div class="u-contentWrapper">
 					<a v-link="{ path: '/home' }">
-						<img id="Head-logo" src="/img/webLogo.svg" onerror="this.src='/img/webLogo.png;this.onerror=null;'">
+						<img id="Head-logo" src="/img/webLogo.svg">
 					</a>
 					<div id="Head-contact">
 						For questions and ordering<br>
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
   data() {
     return {
       search: true,
@@ -109,10 +109,10 @@ module.exports = {
 
   methods: {
     getSettings() {
-      this.$http.get("settings").then(function(response) {
-        this.$set("settings", response.data)
-        this.getMenus()
-      })
+      // this.$http.get("settings").then(function(response) {
+      //   this.$set("settings", response.data)
+      //   this.getMenus()
+      // })
     },
 
     getMenus() {

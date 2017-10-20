@@ -38,120 +38,128 @@
 </template>
 
 <script>
-module.exports = {
-	data () {
-		return {
-			progress: 0,
-			newDirectory: ""
-		}
-	},
+export default {
+  data() {
+    return {
+      progress: 0,
+      newDirectory: ""
+    }
+  },
 
-	computed: {
-		validDirectory () {
-			if (this.newDirectory) {
-				return true
-			} else {
-				return false
-			}
-		}
-	},
+  computed: {
+    validDirectory() {
+      if (this.newDirectory) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
 
-	props: {
-		file: Object,
+  props: {
+    file: Object,
 
-		expanded: {
-			type: Boolean,
-			default: false
-		},
+    expanded: {
+      type: Boolean,
+      default: false
+    },
 
-		i: {
-			type: Number,
-			default: 0
-		}
-	},
+    i: {
+      type: Number,
+      default: 0
+    }
+  },
 
-	methods: {
-		startUpload() {
+  methods: {
+    startUpload() {
       this.progress = 0
       this.upload()
     },
 
-  	upload () {
+    upload() {
       if (this.progress >= this.$els.uploader.files.length) {
         return 1
       }
 
-  		var request = new FormData()
-    	request.append('uploader', this.$els.uploader.files[this.progress])
-    	request.append('path', this.file.path)
+      var request = new FormData()
+      request.append("uploader", this.$els.uploader.files[this.progress])
+      request.append("path", this.file.path)
       this.progress++
 
-    	this.$http.post('/api/image', request).then(function(response) {
-    		if (response.data.result == 'error') {
-    			this.$dispatch('error', response.data.body)
-    		}
+      this.$http.post("/api/image", request).then(function(response) {
+        if (response.data.result == "error") {
+          this.$dispatch("error", response.data.body)
+        }
 
-    		if (response.data.result == 'success') {
-    			this.file.children.push(response.data.body)
-    		}
+        if (response.data.result == "success") {
+          this.file.children.push(response.data.body)
+        }
 
-    		this.upload()
-    	})
-  	},
+        this.upload()
+      })
+    },
 
-  	deleteFile (path) {
-  		var request = {
-  			file: path
-  		}
+    deleteFile(path) {
+      var request = {
+        file: path
+      }
 
-  		this.$http.delete('/api/image', request).then(function(response) {
-  			if (response.data.result == 'error') {
-    			this.$dispatch('error', response.data.body)
-    		}
+      this.$http.delete("/api/image", request).then(function(response) {
+        if (response.data.result == "error") {
+          this.$dispatch("error", response.data.body)
+        }
 
-    		if (response.data.result == 'success') {
-    			this.$parent.file.children.splice(this.i, 1)
-    		}
-  		})
-  	},
+        if (response.data.result == "success") {
+          this.$parent.file.children.splice(this.i, 1)
+        }
+      })
+    },
 
-  	createDirectory () {
-  		var request = {
-  			path: this.file.path,
-  			name: this.newDirectory
-  		}
+    createDirectory() {
+      var request = {
+        path: this.file.path,
+        name: this.newDirectory
+      }
 
-  		this.$http.post('/api/image/directory', request).then(function(response) {
-  			if (response.data.result == 'error') {
-    			this.$dispatch('error', response.data.body)
-    		}
+      this.$http.post("/api/image/directory", request).then(function(response) {
+        if (response.data.result == "error") {
+          this.$dispatch("error", response.data.body)
+        }
 
-  			if (response.data.result == 'success') {
-  				this.file.children.push(response.data.body)
-  			}
+        if (response.data.result == "success") {
+          this.file.children.push(response.data.body)
+        }
 
-  			this.newDirectory = ""
-  		})
-  	},
+        this.newDirectory = ""
+      })
+    },
 
-  	deleteDirectory () {
-  		if (confirm("Are you sure you want to delete '"+this.file.name+"' along with all it's files?")) {
-  			this.$http.delete('/api/image/directory', { path: this.file.path }).then(function(response) {
-  				if (response.data.result == 'error') {
-	    			this.$dispatch('error', response.data.body)
-	    		}
+    deleteDirectory() {
+      if (
+        confirm(
+          "Are you sure you want to delete '" +
+            this.file.name +
+            "' along with all it's files?"
+        )
+      ) {
+        this.$http
+          .delete("/api/image/directory", { path: this.file.path })
+          .then(function(response) {
+            if (response.data.result == "error") {
+              this.$dispatch("error", response.data.body)
+            }
 
-	    		if (response.data.result == 'success') {
-	    			this.$parent.file.children.splice(this.i, 1)
-	    		}
-  			})
-  		}
-  	},
+            if (response.data.result == "success") {
+              this.$parent.file.children.splice(this.i, 1)
+            }
+          })
+      }
+    },
 
-  	insert() {
-  		this.$dispatch('insert', '/img/'+this.file.path)
-  		this.$dispatch('closeUploads')
-  	}
-	}
+    insert() {
+      this.$dispatch("insert", "/img/" + this.file.path)
+      this.$dispatch("closeUploads")
+    }
+  }
 }
 </script>

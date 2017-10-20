@@ -17,11 +17,11 @@
 </template>
 
 <script>
-module.exports = {
-	props: ['offer', 'offerId', 'lastOfferId'],
+export default {
+  props: ["offer", "offerId", "lastOfferId"],
 
-	components: {
-		item: require('./CheckoutCartOfferItem.vue')
-	}
+  components: {
+    item: require("./CheckoutCartOfferItem.vue")
+  }
 }
 </script>

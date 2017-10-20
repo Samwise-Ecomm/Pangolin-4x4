@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	shippingInfo: {
 		first_name: "",
 		last_name: "",
@@ -30,7 +30,7 @@ module.exports = {
 		apt: "",
 	},
 
-	load () {
+	load() {
 		if (sessionStorage.shippingInfo) {
 			this.shippingInfo = JSON.parse(sessionStorage.shippingInfo)
 		}
@@ -39,7 +39,7 @@ module.exports = {
 		}
 	},
 
-	clear () {
+	clear() {
 		this.shippingInfo = {
 			first_name: "",
 			last_name: "",

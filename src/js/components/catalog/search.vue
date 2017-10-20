@@ -3,7 +3,7 @@
 </template>
 
 <script>
-module.exports = {
-  props: ['query']
+export default {
+  props: ["query"]
 }
 </script>
