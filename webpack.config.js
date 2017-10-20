@@ -5,7 +5,7 @@ module.exports = {
   entry: './src/js/main.js',
   output: {
     path: path.resolve(__dirname, './public/js'),
-    publicPath: path.resolve(__dirname, './public'),
+    publicPath: '/js',
     filename: 'store.js'
   },
   module: {
@@ -27,7 +27,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.resolve(__dirname, './public'),
+    contentBase: path.resolve(__dirname, 'public'),
     historyApiFallback: true,
     noInfo: true,
     overlay: true
