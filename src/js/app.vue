@@ -116,11 +116,11 @@ export default {
 
     getMenus: async function() {
       const { data } = await this.$http.get("menus");
-			this.$set("menus", data);
-			this.loaded = true
-			this.$nextTick(() => {
-				$(window).scroll()
-			})
+      this.$set("menus", data);
+      this.loaded = true
+      this.$nextTick(() => {
+        $(window).scroll()
+      })
     },
 
     queryChanged(event) {
