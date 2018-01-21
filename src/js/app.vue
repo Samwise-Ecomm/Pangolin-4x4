@@ -109,10 +109,10 @@ export default {
 
   methods: {
     getSettings() {
-      // this.$http.get("settings").then(function(response) {
-      //   this.$set("settings", response.data)
-      //   this.getMenus()
-      // })
+      this.$http.get("settings").then(function(response) {
+        this.$set("settings", response.data)
+        this.getMenus()
+      })
     },
 
     getMenus() {

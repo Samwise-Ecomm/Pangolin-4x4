@@ -14,7 +14,7 @@ require('../sass/index.scss');
 Vue.use(VueRouter)
 Vue.use(VueResource)
 
-Vue.http.options.root = '/public-api';
+Vue.http.options.root = 'http://localhost:8080/v0/public';
 
 // Vue-filters
 var nl2br = require('./filters/nl2br.js')
