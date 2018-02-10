@@ -108,20 +108,18 @@ export default {
   },
 
   methods: {
-    getSettings() {
-      // this.$http.get("settings").then(function(response) {
-      //   this.$set("settings", response.data)
-      //   this.getMenus()
-      // })
+    getSettings: async function() {
+      const { data } = await this.$http.get("settings");
+      this.$set("settings", data);
+      this.getMenus();
     },
 
-    getMenus() {
-      this.$http.get("menus").then(function(response) {
-        this.$set("menus", response.data)
-        this.loaded = true
-        this.$nextTick(() => {
-          $(window).scroll()
-        })
+    getMenus: async function() {
+      const { data } = await this.$http.get("menus");
+      this.$set("menus", data);
+      this.loaded = true
+      this.$nextTick(() => {
+        $(window).scroll()
       })
     },
 
